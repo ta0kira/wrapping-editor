@@ -147,7 +147,9 @@ newParaViewer wrap (UnparsedPara cs) = editor where
     }
 
 instance RenderedLines (ParaViewer c) (LineViewer c) where
-  getAllLines = concat . map getAllLines . pvLines
+  getAllLines = nonempty . concat . map getAllLines . pvLines where
+    nonempty [] = [emptyLineViewer]
+    nonempty ls = ls
 
 
 data FixedCharSize =
@@ -160,6 +162,7 @@ data FixedCharSize =
 
 class Show a => FixedLineBreaker a c where
   breakLine :: a -> Int -> [c] -> (LineViewer c,[c])
+  renderLine :: a -> LineViewer c -> [c]
   joinLines :: a -> [LineViewer c] -> [c]
 
 
@@ -172,7 +175,6 @@ data TextEditor c =
     teViewOffset :: FixedCharSize,
     teWrap :: a
   }
-
 
 instance Show c => Show (TextEditor c) where
   show (TextEditor bs e as s o w) =
@@ -192,6 +194,12 @@ newTextEditor s@(FixedCharSize w h) wrap (p:ps) =
     teViewOffset = FixedCharSize 0 0,
     teWrap = wrap
   }
+
+renderEditorContents :: TextEditor c -> [[c]]
+renderEditorContents (TextEditor bs e as _ _ w) =
+  (concat $ map (map (renderLine w) . getAllLines) $ reverse bs) ++
+  (map (renderLine w) $ getAllLines e) ++
+  (concat $ map (map (renderLine w) . getAllLines) as)
 
 flattenEditorContents :: TextEditor c -> [UnparsedPara c]
 flattenEditorContents (TextEditor bs e as _ _ w) =
@@ -232,11 +240,14 @@ instance FixedLineBreaker LineBreakPolicy Char where
   breakLine FixedLineWidth n cs = breakToLine front rest where
     front = take n cs
     rest = drop n cs
+  renderLine _ (LineViewer cs BrokenWord) = cs ++ "-"
+  renderLine _ (LineViewer cs _)          = cs
   joinLines _ = concat . map unrenderLine
 
 main = do
   contents <- readFile "testdata.txt"
   let paras = breakParagraphs contents
-  let editor = newTextEditor (FixedCharSize 5 10) FixedLineWidth paras
+  let editor = newTextEditor (FixedCharSize 7 10) FixedLineWidth paras
   putStrLn $ show editor
-  putStrLn $ show $ flattenEditorContents editor
+  putStr $ unlines $ map upData $ flattenEditorContents editor
+  putStr $ unlines $ renderEditorContents editor
