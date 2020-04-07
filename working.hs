@@ -30,19 +30,24 @@ class LineViewport a u | a -> u where
   getCursor :: a -> Maybe u
 
 
--- NOTE: Using this instead of [c] allows for something like a line-break type
--- (e.g., hyphen, ellipsis) to be included later on.
+data LineBreak = SymbolBreak | WhitespaceBreak | BrokenWord | ParaBreak deriving (Show)
+
 data LineViewer c =
   LineViewer {
-    lvLine :: [c]
+    lvLine :: [c],
+    lvBreak :: LineBreak
   }
   deriving (Show)
 
-newLineViewer :: [c] -> LineViewer c
-newLineViewer cs = editor where
+newLineViewer :: [c] -> LineBreak -> LineViewer c
+newLineViewer cs b = editor where
   editor = LineViewer {
-      lvLine = cs
+      lvLine = cs,
+      lvBreak = b
     }
+
+emptyLineViewer :: LineViewer c
+emptyLineViewer = newLineViewer [] ParaBreak
 
 instance RenderedLines (LineViewer c) (LineViewer c) where
   getAllLines = (:[])
@@ -52,16 +57,18 @@ data LineEditor c =
   LineEditor {
     leCharsBefore :: [c],  -- Reversed.
     leCharsAfter :: [c],
+    leBreak :: LineBreak,
     lePosition :: Int,
     leSize :: Int
   }
   deriving (Show)
 
 newLineEditor :: LineViewer c -> LineEditor c
-newLineEditor (LineViewer cs) =
+newLineEditor (LineViewer cs b) =
   LineEditor {
     leCharsBefore = [],
     leCharsAfter = cs,
+    leBreak = b,
     lePosition = 0,
     leSize = length cs
   }
@@ -70,13 +77,13 @@ getLineChar :: LineEditor c -> Int
 getLineChar = lePosition
 
 seekLineChar :: Int -> LineEditor c -> LineEditor c
-seekLineChar n e@(LineEditor bs as p s)
-  | p < n && not (null as) = seekLineChar n (LineEditor (head as:bs) (tail as) (p+1) s)
-  | p > n && not (null bs) = seekLineChar n (LineEditor (tail bs) (head bs:as) (p-1) s)
+seekLineChar n e@(LineEditor bs as b p s)
+  | p < n && not (null as) = seekLineChar n (LineEditor (head as:bs) (tail as) b (p+1) s)
+  | p > n && not (null bs) = seekLineChar n (LineEditor (tail bs) (head bs:as) b (p-1) s)
   | otherwise = e
 
 getFullLine :: LineEditor c -> LineViewer c
-getFullLine e = LineViewer $ reverse (leCharsBefore e) ++ leCharsAfter e
+getFullLine (LineEditor bs as b _ _) = LineViewer (reverse bs ++ as) b
 
 getLineSize :: LineEditor c -> Int
 getLineSize = leSize
@@ -110,7 +117,7 @@ newParaEditor wrap (UnparsedPara cs) = editor where
       pePosition = 0
     }
   (first:rest) = nonempty (splitAllLines wrap cs)
-  nonempty [] = [LineViewer []]
+  nonempty [] = [emptyLineViewer]
   nonempty ls = ls
 
 seekParaLine :: Int -> ParaEditor c -> ParaEditor c
@@ -194,20 +201,38 @@ flattenEditorContents (TextEditor bs e as _ _ w) =
 
 
 splitAllLines :: ([c] -> (l,[c])) -> [c] -> [l]
-splitAllLines f [] = []
+splitAllLines _ [] = []
 splitAllLines f cs = let (l,cs2) = f cs in l:(splitAllLines f cs2)
 
 flattenToPara :: (FixedLineBreaker a c, RenderedLines b (LineViewer c)) => a -> b -> UnparsedPara c
 flattenToPara w = UnparsedPara . joinLines w . getAllLines
 
 
+-- Testing stuff -->
+
 breakParagraphs = map UnparsedPara . lines
 
 data LineBreakPolicy = FixedLineWidth deriving Show
 
+breakToLine :: [Char] -> [Char] -> (LineViewer Char,[Char])
+breakToLine ls [] = (LineViewer ls ParaBreak,[])
+breakToLine ls cs
+  | isWhitespace (head cs) = (LineViewer ls WhitespaceBreak,tail cs)
+  | isWhitespace (last ls) = (LineViewer (init ls) WhitespaceBreak,cs)
+  | isLetter (head cs) && isLetter (last ls) = (LineViewer ls BrokenWord,cs)
+  | otherwise = (LineViewer ls SymbolBreak,cs) where
+    isWhitespace c = c == ' '
+    isLetter c = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
+
+unrenderLine :: LineViewer Char -> [Char]
+unrenderLine (LineViewer cs WhitespaceBreak) = cs ++ " "
+unrenderLine (LineViewer cs _)               = cs
+
 instance FixedLineBreaker LineBreakPolicy Char where
-  breakLine FixedLineWidth n cs = (LineViewer $ take n cs,drop n cs)
-  joinLines _ = concat . map lvLine
+  breakLine FixedLineWidth n cs = breakToLine front rest where
+    front = take n cs
+    rest = drop n cs
+  joinLines _ = concat . map unrenderLine
 
 main = do
   contents <- readFile "testdata.txt"
