@@ -99,6 +99,11 @@ data UnparsedPara c =
   deriving (Show)
 
 
+splitAllLines :: ([c] -> (l,[c])) -> [c] -> [l]
+splitAllLines _ [] = []
+splitAllLines f cs = let (l,cs2) = f cs in l:(splitAllLines f cs2)
+
+
 data ParaEditor c =
   ParaEditor {
     peLinesBefore :: [LineViewer c],  -- Reversed.
@@ -166,51 +171,79 @@ class Show a => FixedLineBreaker a c where
   joinLines :: a -> [LineViewer c] -> [c]
 
 
+data ViewBuffer c =
+  ViewBuffer {
+    vbAbove :: [LineViewer c],  -- Reversed.
+    vbBelow :: [LineViewer c]
+  }
+  deriving (Show)
+
+newViewBuffer :: [LineViewer c] -> [LineViewer c] -> ViewBuffer c
+newViewBuffer la lb =
+  ViewBuffer {
+    vbAbove = la,
+    vbBelow = lb
+  }
+
+shiftViewFocus :: Int -> ViewBuffer c -> ViewBuffer c
+shiftViewFocus n v@(ViewBuffer la lb)
+  | n < 0 && not (null la) = shiftViewFocus (n+1) (ViewBuffer (tail la) (head la:lb))
+  | n > 0 && not (null lb) = shiftViewFocus (n-1) (ViewBuffer (head lb:la) (tail lb))
+  | otherwise = v
+
+replaceLinesBelow :: Int -> [LineViewer c] -> ViewBuffer c -> ViewBuffer c
+replaceLinesBelow n ls (ViewBuffer la lb) = ViewBuffer la (ls ++ drop n lb)
+
+-- TODO: This will fail if the split is out of view.
+getViewLines :: Int -> Int -> ViewBuffer c -> [LineViewer c]
+getViewLines na nb (ViewBuffer la lb) = reverse (take na la) ++ take nb lb
+
+
 data TextEditor c =
   forall a. FixedLineBreaker a c => TextEditor {
-    teBefore :: [ParaViewer c],  -- Reversed.
+    teBefore :: [UnparsedPara c],  -- Reversed.
     teEditing :: ParaEditor c,
-    teAfter :: [ParaViewer c],
+    teAfter :: [UnparsedPara c],
+    teBuffer :: ViewBuffer c,
     teViewSize :: FixedCharSize,
     teViewOffset :: FixedCharSize,
+    teEditCursor :: FixedCharSize,  -- Relative to top-left of view.
     teWrap :: a
   }
 
 instance Show c => Show (TextEditor c) where
-  show (TextEditor bs e as s o w) =
+  show (TextEditor bs e as _ s o c w) =
     (concat $ map (++ "\n") $ map show $ reverse bs) ++
     show e ++ "\n" ++
     (concat $ map (++ "\n") $ map show as) ++
-    "Size: " ++ show s ++ ", Corner: " ++ show o ++ ", Wrap: " ++ show w
+    "Size: " ++ show s ++ ", Corner: " ++ show o ++ ", Cursor: " ++ show c ++ ", Wrap: " ++ show w
 
 newTextEditor :: FixedLineBreaker a c => FixedCharSize -> a -> [UnparsedPara c] -> TextEditor c
 newTextEditor s wrap [] = newTextEditor s wrap [UnparsedPara []]
 newTextEditor s@(FixedCharSize w h) wrap (p:ps) =
   TextEditor {
     teBefore = [],
-    teEditing = newParaEditor (breakLine wrap w) p,
-    teAfter = map (newParaViewer (breakLine wrap w)) ps,
+    teEditing = editing,
+    teAfter = ps,
+    teBuffer = buffer,
     teViewSize = s,
     teViewOffset = FixedCharSize 0 0,
+    teEditCursor = FixedCharSize 0 0,
     teWrap = wrap
-  }
+  } where
+    editing = newParaEditor (breakLine wrap w) p
+    rendered = map (newParaViewer (breakLine wrap w)) ps
+    buffer = newViewBuffer [] (getAllLines editing ++ concat (map getAllLines rendered))
 
 renderEditorContents :: TextEditor c -> [[c]]
-renderEditorContents (TextEditor bs e as _ _ w) =
-  (concat $ map (map (renderLine w) . getAllLines) $ reverse bs) ++
-  (map (renderLine w) $ getAllLines e) ++
-  (concat $ map (map (renderLine w) . getAllLines) as)
+renderEditorContents (TextEditor _ _ _ b (FixedCharSize _ h) _ (FixedCharSize _ cy) w) = contents where
+  contents = map (renderLine w) $ getViewLines na nb b
+  na = cy
+  nb = h-cy
 
 flattenEditorContents :: TextEditor c -> [UnparsedPara c]
-flattenEditorContents (TextEditor bs e as _ _ w) =
-  (map (flattenToPara w) $ reverse bs) ++
-  [flattenToPara w e] ++
-  (map (flattenToPara w) as)
+flattenEditorContents (TextEditor bs e as _ _ _ _ w) = reverse bs ++ [flattenToPara w e] ++ as
 
-
-splitAllLines :: ([c] -> (l,[c])) -> [c] -> [l]
-splitAllLines _ [] = []
-splitAllLines f cs = let (l,cs2) = f cs in l:(splitAllLines f cs2)
 
 flattenToPara :: (FixedLineBreaker a c, RenderedLines b (LineViewer c)) => a -> b -> UnparsedPara c
 flattenToPara w = UnparsedPara . joinLines w . getAllLines
@@ -247,7 +280,7 @@ instance FixedLineBreaker LineBreakPolicy Char where
 main = do
   contents <- readFile "testdata.txt"
   let paras = breakParagraphs contents
-  let editor = newTextEditor (FixedCharSize 7 10) FixedLineWidth paras
+  let editor = newTextEditor (FixedCharSize 20 10) FixedLineWidth paras
   putStrLn $ show editor
   putStr $ unlines $ map upData $ flattenEditorContents editor
   putStr $ unlines $ renderEditorContents editor
