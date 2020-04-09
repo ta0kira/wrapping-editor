@@ -37,7 +37,7 @@ instance FixedFontViewer (EditingDocument c) c where
     | h /= edHeight d = resizeHeight h d
     | otherwise = d
   getViewSize d = (edWidth d,edHeight d)
-  getVisible = getVisibleLines
+  getVisible d@(EditingDocument _ _ _ _ _ _ p) = map (renderLine p) $ getVisibleLines d
 
 instance FixedFontEditor (EditingDocument c) c where
   editText da m d = modifyDoc m d da
