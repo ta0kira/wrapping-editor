@@ -13,28 +13,39 @@ import Viewer
 
 data ParsePolicy = BreakExact Int deriving (Show)
 
+breakExact = BreakExact 0
+
 instance FixedFontParser ParsePolicy Char where
   setLineWidth _ w = BreakExact w
   breakParas _ = map UnparsedPara . lines
   joinParas _ = unlines . map upText
+  breakLines _ [] = [emptyLine]
   breakLines b@(BreakExact w) cs
     | w < 2 = [VisibleLine cs (length cs) ParaBreak]
     | otherwise = correct (take w cs) (drop w cs) where
+      break2 [] = []
+      break2 ys = breakLines b ys
       correct xs ys
         | last xs == ' ' =
           -- Drop space from end of line.
-          (VisibleLine (init xs) (length xs-1) SpaceBreak):(breakLines b ys)
+          (VisibleLine (init xs) (length xs-1) SpaceBreak):(break2 ys)
       correct xs [] = [VisibleLine xs (length xs) ParaBreak]
       correct xs ys
         | head ys == ' ' =
           -- Drop space from beginning of next line.
-          (VisibleLine xs (length xs) SpaceBreak):(breakLines b (tail ys))
+          (VisibleLine xs (length xs) SpaceBreak):(break2 (tail ys))
       correct xs ys
         | isLetter (last xs) && isLetter (head ys) =
-          (VisibleLine xs (length xs) BrokenWord):(breakLines b ys)
-      correct xs ys = (VisibleLine xs (length xs) TokenBreak):(breakLines b ys)
+          (VisibleLine xs (length xs) BrokenWord):(break2 ys)
+      correct xs ys = (VisibleLine xs (length xs) TokenBreak):(break2 ys)
   joinLines _ = concat . map fixLine where
     fixLine (VisibleLine cs _ SpaceBreak) = cs ++ " "
     fixLine (VisibleLine cs _ _) = cs
+  -- TODO: The dash is going to render past the wrap width.
   renderLine _ (VisibleLine cs _ BrokenWord) = cs ++ "-"
   renderLine _ (VisibleLine cs _ _) = cs
+
+main = do
+  contents <- readFile "testdata.txt"
+  let doc = setViewSize (editDocument breakExact contents) (25,15)
+  putStr $ unlines $ getVisible doc
