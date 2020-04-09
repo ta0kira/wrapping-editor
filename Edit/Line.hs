@@ -12,8 +12,6 @@ module Edit.Line (
   modifyLine,
   moveLineCursor,
   prependToLine,
-  setCursorBack,
-  setCursorFront,
   setLineCursor,
   splitLine,
   viewLine,
@@ -30,7 +28,7 @@ data EditingLine c b =
     elCursor :: Int,
     elBreak :: b
   }
-  deriving (Show)
+  deriving (Eq,Show)
 
 editLine :: VisibleLine c b -> EditingLine c b
 editLine (VisibleLine cs b) = EditingLine [] cs 0 b
@@ -58,6 +56,10 @@ lineCursorMovable MoveNext (EditingLine _ (_:_) _ _) = True
 lineCursorMovable _ _ = False
 
 moveLineCursor :: MoveDirection -> EditingLine c b -> EditingLine c b
+moveLineCursor MoveUp (EditingLine bs as c b) =
+  (EditingLine [] (reverse bs ++ as) 0 b)
+moveLineCursor MoveDown (EditingLine bs as c b) =
+  (EditingLine (reverse as ++ bs) [] (length as + length bs) b)
 moveLineCursor MovePrev (EditingLine bs as c b)
   | not (null bs) = (EditingLine (tail bs) (head bs:as) (c-1) b)
 moveLineCursor MoveNext (EditingLine bs as c b)
@@ -69,12 +71,6 @@ atLineFront = null . elTextBefore
 
 atLineBack :: EditingLine c b -> Bool
 atLineBack = null . elTextAfter
-
-setCursorFront :: EditingLine c b -> EditingLine c b
-setCursorFront (EditingLine bs as c b) = (EditingLine [] (reverse bs ++ as) 0 b)
-
-setCursorBack :: EditingLine c b -> EditingLine c b
-setCursorBack (EditingLine bs as c b) = (EditingLine (reverse as ++ bs) [] (length as + length bs) b)
 
 appendToLine :: EditingLine c b -> VisibleLine c b -> EditingLine c b
 appendToLine (EditingLine bs as c b) (VisibleLine cs _) =
@@ -94,10 +90,10 @@ modifyLine (InsertText cs) d (EditingLine bs as c b) = revised where
            else as
   revised = EditingLine bs2 as2 (length bs2) b
 modifyLine DeleteText d (EditingLine bs as c b) = revised where
-  bs2 = if d == EditBefore
+  bs2 = if d == EditBefore && not (null bs)
            then tail bs
            else bs
-  as2 = if d == EditAfter
+  as2 = if d == EditAfter && not (null as)
            then tail as
            else as
   revised = EditingLine bs2 as2 (length bs2) b

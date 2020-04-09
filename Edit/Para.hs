@@ -142,8 +142,8 @@ moveParaCursor d p@(EditingPara bs l as) = revised where
     | lineCursorMovable d l = EditingPara bs (moveLineCursor d l) as
     | d == MovePrev = setBack  $ moveParaCursor MoveUp   p
     | d == MoveNext = setFront $ moveParaCursor MoveDown p
-  setBack  (EditingPara bs l as) = (EditingPara bs (setCursorBack  l) as)
-  setFront (EditingPara bs l as) = (EditingPara bs (setCursorFront l) as)
+  setBack  (EditingPara bs l as) = (EditingPara bs (moveLineCursor MoveDown l) as)
+  setFront (EditingPara bs l as) = (EditingPara bs (moveLineCursor MoveUp   l) as)
 
 atParaFront :: EditingPara c b -> Bool
 atParaFront (EditingPara bs l _) = null bs && atLineFront l
@@ -152,12 +152,12 @@ atParaBack :: EditingPara c b -> Bool
 atParaBack (EditingPara _ l as) = null as && atLineBack l
 
 seekParaFront :: EditingPara c b -> EditingPara c b
-seekParaFront (EditingPara [] l as) = EditingPara [] (setCursorFront l) as
+seekParaFront (EditingPara [] l as) = EditingPara [] (moveLineCursor MoveUp l) as
 seekParaFront (EditingPara bs l as) =
   seekParaFront $ EditingPara [] (editLine $ last bs) (reverse (init bs) ++ [viewLine l] ++ as)
 
 seekParaBack :: EditingPara c b -> EditingPara c b
-seekParaBack (EditingPara bs l []) = EditingPara bs (setCursorBack l) []
+seekParaBack (EditingPara bs l []) = EditingPara bs (moveLineCursor MoveDown l) []
 seekParaBack (EditingPara bs l as) =
   seekParaBack $ EditingPara (reverse (init as) ++ [viewLine l] ++ bs) (editLine $ last as) []
 
