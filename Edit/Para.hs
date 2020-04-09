@@ -2,6 +2,8 @@
 
 module Edit.Para (
   EditingPara,
+  VisibleParaAfter,
+  VisibleParaBefore,
   appendToPara,
   atParaBack,
   atParaFront,
@@ -37,6 +39,18 @@ import Para
 import Parser
 import Edit.Line
 
+
+data VisibleParaBefore c b =
+  VisibleParaBefore {
+    vpbLines :: [VisibleLine c b]  -- Reversed.
+  }
+  deriving (Show)
+
+data VisibleParaAfter c b =
+  VisibleParaAfter {
+    vpaLines :: [VisibleLine c b]
+  }
+  deriving (Show)
 
 data EditingPara c b =
   EditingPara {

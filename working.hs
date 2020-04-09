@@ -24,35 +24,35 @@ instance FixedFontParser ParsePolicy Char LineBreakType where
   joinParas _ = unlines . map upText
   breakLines _ [] = [emptyLine]
   breakLines b@(BreakExact w) cs
-    | w < 2 = [VisibleLine cs (length cs) ParaBreak]
+    | w < 2 = [VisibleLine cs ParaBreak]
     | otherwise = correct (take w cs) (drop w cs) where
       break2 [] = []
       break2 ys = breakLines b ys
       correct xs ys
         | last xs == ' ' =
           -- Drop space from end of line.
-          (VisibleLine (init xs) (length xs-1) SpaceBreak):(break2 ys)
-      correct xs [] = [VisibleLine xs (length xs) ParaBreak]
+          (VisibleLine (init xs) SpaceBreak):(break2 ys)
+      correct xs [] = [VisibleLine xs ParaBreak]
       correct xs ys
         | head ys == ' ' =
           -- Drop space from beginning of next line.
-          (VisibleLine xs (length xs) SpaceBreak):(break2 (tail ys))
+          (VisibleLine xs SpaceBreak):(break2 (tail ys))
       correct xs ys
         | isLetter (last xs) && isLetter (head ys) =
           fixWord (init xs) (last xs:ys)
-      correct xs ys = (VisibleLine xs (length xs) TokenBreak):(break2 ys)
+      correct xs ys = (VisibleLine xs TokenBreak):(break2 ys)
       fixWord xs ys
         | isLetter (last xs) && isLetter (head ys) =
-          (VisibleLine xs (length xs) BrokenWord):(break2 ys)
+          (VisibleLine xs BrokenWord):(break2 ys)
         | last xs == ' ' =
           -- Drop space from end of line.
-          (VisibleLine (init xs) (length xs-1) SpaceBreak):(break2 ys)
-        | otherwise = (VisibleLine xs (length xs) TokenBreak):(break2 ys)
+          (VisibleLine (init xs) SpaceBreak):(break2 ys)
+        | otherwise = (VisibleLine xs TokenBreak):(break2 ys)
   joinLines _ = concat . map fixLine where
-    fixLine (VisibleLine cs _ SpaceBreak) = cs ++ " "
-    fixLine (VisibleLine cs _ _) = cs
-  renderLine _ (VisibleLine cs _ BrokenWord) = cs ++ "-"
-  renderLine _ (VisibleLine cs _ _) = cs
+    fixLine (VisibleLine cs SpaceBreak) = cs ++ " "
+    fixLine (VisibleLine cs _) = cs
+  renderLine _ (VisibleLine cs BrokenWord) = cs ++ "-"
+  renderLine _ (VisibleLine cs _) = cs
 
 main = do
   contents <- readFile "testdata.txt"

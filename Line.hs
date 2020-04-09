@@ -9,10 +9,9 @@ module Line (
 data VisibleLine c b =
   VisibleLine {
     vlText :: [c],
-    vlWidth :: Int,
     vlBreak :: b
   }
-  deriving (Show)
+  deriving (Eq,Ord,Show)
 
 emptyLine :: Enum b => VisibleLine c b
-emptyLine = VisibleLine [] 0 (toEnum 0)
+emptyLine = VisibleLine [] (toEnum 0)
