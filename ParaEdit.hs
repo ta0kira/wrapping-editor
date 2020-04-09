@@ -14,6 +14,7 @@ module ParaEdit (
   parseParaAfter,
   parseParaBefore,
   prependToPara,
+  reparsePara,
   setParaCursor,
   splitPara,
   takeLinesAfter,
@@ -63,6 +64,14 @@ editPara parser (UnparsedPara cs) = EditingPara [] (editLine line) after 0 (leng
 unparsePara :: FixedFontParser a c => a -> EditingPara c -> UnparsedPara c
 unparsePara parser (EditingPara bs l as _ _) = UnparsedPara $ joinLines parser ls where
   ls = reverse bs ++ [viewLine l] ++ as
+
+reparsePara :: FixedFontParser a c => a -> EditingPara c -> EditingPara c
+reparsePara parser (EditingPara bs l as n h) = reparseParaTail parser revised where
+  revised = EditingPara bs2 l2 as (length bs2) h
+  bs' = breakLines parser $ joinLines parser (reverse bs)
+  (l2,bs2)
+    | null bs' = (l,[])
+    | otherwise = (head bs' `prependToLine` l,tail bs')
 
 viewParaBefore :: EditingPara c -> VisibleParaBefore c
 viewParaBefore (EditingPara bs l as _ _) = VisibleParaBefore ls where
