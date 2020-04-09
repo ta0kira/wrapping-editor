@@ -36,16 +36,23 @@ instance FixedFontParser ParsePolicy Char where
           (VisibleLine xs (length xs) SpaceBreak):(break2 (tail ys))
       correct xs ys
         | isLetter (last xs) && isLetter (head ys) =
-          (VisibleLine xs (length xs) BrokenWord):(break2 ys)
+          fixWord (init xs) (last xs:ys)
       correct xs ys = (VisibleLine xs (length xs) TokenBreak):(break2 ys)
+      fixWord xs ys
+        | isLetter (last xs) && isLetter (head ys) =
+          (VisibleLine xs (length xs) BrokenWord):(break2 ys)
+        | last xs == ' ' =
+          -- Drop space from end of line.
+          (VisibleLine (init xs) (length xs-1) SpaceBreak):(break2 ys)
+        | otherwise = (VisibleLine xs (length xs) TokenBreak):(break2 ys)
   joinLines _ = concat . map fixLine where
     fixLine (VisibleLine cs _ SpaceBreak) = cs ++ " "
     fixLine (VisibleLine cs _ _) = cs
-  -- TODO: The dash is going to render past the wrap width.
   renderLine _ (VisibleLine cs _ BrokenWord) = cs ++ "-"
   renderLine _ (VisibleLine cs _ _) = cs
 
 main = do
   contents <- readFile "testdata.txt"
-  let doc = setViewSize (editDocument breakExact contents) (25,15)
+  let doc = setViewSize (editDocument breakExact contents) (26,13)
   putStr $ unlines $ getVisible doc
+  putStrLn $ show $ flattenDocument doc == contents
