@@ -4,6 +4,9 @@ module ParaEdit (
   EditingPara,
   appendToPara,
   editPara,
+  getAfterLines,
+  getBeforeLines,
+  getCurrentLine,
   getParaCursor,
   modifyPara,
   moveParaCursor,
@@ -13,6 +16,8 @@ module ParaEdit (
   prependToPara,
   setParaCursor,
   splitPara,
+  takeLinesAfter,
+  takeLinesBefore,
   unparsePara,
   unparseParaAfter,
   unparseParaBefore,
@@ -66,6 +71,21 @@ viewParaBefore (EditingPara bs l as _ _) = VisibleParaBefore ls where
 viewParaAfter :: EditingPara c -> VisibleParaAfter c
 viewParaAfter (EditingPara bs l as _ _) = VisibleParaAfter ls where
   ls = reverse as ++ [viewLine l] ++ bs
+
+getBeforeLines :: EditingPara c -> VisibleParaBefore c
+getBeforeLines = VisibleParaBefore . epBefore
+
+getCurrentLine :: EditingPara c -> VisibleLine c
+getCurrentLine = viewLine . epEditing
+
+getAfterLines :: EditingPara c -> VisibleParaAfter c
+getAfterLines = VisibleParaAfter . epAfter
+
+takeLinesBefore :: Int -> [VisibleParaBefore c] -> [VisibleLine c]
+takeLinesBefore n = reverse . take n . concat . map vpbLines
+
+takeLinesAfter :: Int -> [VisibleParaAfter c] -> [VisibleLine c]
+takeLinesAfter n = take n . concat . map vpaLines
 
 getParaCursor :: EditingPara c -> (Int,Int)
 getParaCursor (EditingPara _ l _ n _) = (getLineCursor l,n)
