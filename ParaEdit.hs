@@ -15,6 +15,8 @@ module ParaEdit (
   parseParaBefore,
   prependToPara,
   reparsePara,
+  seekParaBack,
+  seekParaFront,
   setParaCursor,
   splitPara,
   takeLinesAfter,
@@ -121,6 +123,16 @@ moveParaCursor d p@(EditingPara bs l as) = revised where
     | d == MoveNext = setFront $ moveParaCursor MoveDown p
   setBack  (EditingPara bs l as) = (EditingPara bs (setCursorBack  l) as)
   setFront (EditingPara bs l as) = (EditingPara bs (setCursorFront l) as)
+
+seekParaFront :: EditingPara c -> EditingPara c
+seekParaFront (EditingPara [] l as) = EditingPara [] (setCursorFront l) as
+seekParaFront (EditingPara bs l as) =
+  seekParaFront $ EditingPara [] (editLine $ last bs) (reverse (init bs) ++ [viewLine l] ++ as)
+
+seekParaBack :: EditingPara c -> EditingPara c
+seekParaBack (EditingPara bs l []) = EditingPara bs (setCursorBack l) []
+seekParaBack (EditingPara bs l as) =
+  seekParaBack $ EditingPara (reverse (init as) ++ [viewLine l] ++ bs) (editLine $ last as) []
 
 appendToPara :: FixedFontParser a c => a -> EditingPara c -> VisibleParaAfter c -> EditingPara c
 appendToPara parser p (VisibleParaAfter []) = p
