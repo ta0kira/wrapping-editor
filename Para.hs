@@ -19,14 +19,14 @@ data UnparsedPara c =
 emptyPara :: UnparsedPara c
 emptyPara = UnparsedPara []
 
-data VisibleParaBefore c =
+data VisibleParaBefore c b =
   VisibleParaBefore {
-    vpbLines :: [VisibleLine c]  -- Reversed.
+    vpbLines :: [VisibleLine c b]  -- Reversed.
   }
   deriving (Show)
 
-data VisibleParaAfter c =
+data VisibleParaAfter c b =
   VisibleParaAfter {
-    vpaLines :: [VisibleLine c]
+    vpaLines :: [VisibleLine c b]
   }
   deriving (Show)

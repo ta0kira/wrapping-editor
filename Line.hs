@@ -1,21 +1,18 @@
 {-# LANGUAGE Safe #-}
 
 module Line (
-  LineBreakType(..),
   VisibleLine(..),
   emptyLine,
 ) where
 
 
-data LineBreakType = ParaBreak | SpaceBreak | BrokenWord | TokenBreak deriving (Eq,Ord,Show)
-
-data VisibleLine c =
+data VisibleLine c b =
   VisibleLine {
     vlText :: [c],
     vlWidth :: Int,
-    vlBreak :: LineBreakType
+    vlBreak :: b
   }
   deriving (Show)
 
-emptyLine :: VisibleLine c
-emptyLine = VisibleLine [] 0 ParaBreak
+emptyLine :: Enum b => VisibleLine c b
+emptyLine = VisibleLine [] 0 (toEnum 0)

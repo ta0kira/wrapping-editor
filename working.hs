@@ -15,7 +15,10 @@ data ParsePolicy = BreakExact Int deriving (Show)
 
 breakExact = BreakExact 0
 
-instance FixedFontParser ParsePolicy Char where
+
+data LineBreakType = ParaBreak | SpaceBreak | BrokenWord | TokenBreak deriving (Enum,Eq,Ord,Show)
+
+instance FixedFontParser ParsePolicy Char LineBreakType where
   setLineWidth _ w = BreakExact w
   breakParas _ = map UnparsedPara . lines
   joinParas _ = unlines . map upText

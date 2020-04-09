@@ -10,10 +10,10 @@ import Line
 import Para
 
 
-class FixedFontParser a c | a -> c where
+class Enum b => FixedFontParser a c b | a -> c b where
   setLineWidth :: a -> Int -> a
   breakParas :: a -> [c] -> [UnparsedPara c]
   joinParas :: a -> [UnparsedPara c] -> [c]
-  breakLines :: a -> [c] -> [VisibleLine c]
-  joinLines :: a -> [VisibleLine c] -> [c]
-  renderLine :: a -> VisibleLine c -> [c]
+  breakLines :: a -> [c] -> [VisibleLine c b]
+  joinLines :: a -> [VisibleLine c b] -> [c]
+  renderLine :: a -> VisibleLine c b -> [c]
