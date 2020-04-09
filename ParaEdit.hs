@@ -161,6 +161,9 @@ modifyPara :: FixedFontParser a c => a -> EditAction c -> EditDirection -> Editi
 modifyPara parser m@(InsertText _) d (EditingPara bs l as) =
   reparseParaTail parser (EditingPara bs (modifyLine m d l) as)
 modifyPara parser m@(DeleteText _) d p = reparseParaTail parser revised where
+  -- TODO: Deletion of multiple chars doesn't cross paragraphs and won't span
+  -- more than one additional line above or below. Maybe just get rid of the
+  -- char count in DeleteText.
   (EditingPara bs l as) = mergeForDelete parser p
   revised = (EditingPara bs (modifyLine m d l) as)
 

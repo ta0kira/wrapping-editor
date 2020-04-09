@@ -32,8 +32,9 @@ data EditingDocument c =
 
 instance FixedFontViewer (EditingDocument c) c where
   setViewSize d s@(w,h)
-    | w /= edWidth d  = flip setViewSize s $ resizeWidth  w d
-    | h /= edHeight d = flip setViewSize s $ resizeHeight h d
+    | w /= edWidth d && h /= edHeight d = resizeHeight h $ resizeWidth w d
+    | w /= edWidth d  = resizeWidth  w d
+    | h /= edHeight d = resizeHeight h d
     | otherwise = d
   getViewSize d = (edWidth d,edHeight d)
   getVisible = getVisibleLines
