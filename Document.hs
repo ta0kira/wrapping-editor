@@ -60,12 +60,12 @@ flattenDocument (EditingDocument bs e as _ _ _ p) = joinParas p ps where
 -- Private below here.
 
 joinParaNext :: EditingDocument c -> EditingDocument c
-joinParaNext d@(EditingDocument _ _ [] _ _ _ _) = d
+joinParaNext da@(EditingDocument _ _ [] _ _ _ _) = da
 joinParaNext (EditingDocument bs e (a:as) w h k p) =
   EditingDocument bs (appendToPara p e a) as w h k p
 
 joinParaPrev :: EditingDocument c -> EditingDocument c
-joinParaPrev d@(EditingDocument [] _ _ _ _ _ _) = d
+joinParaPrev da@(EditingDocument [] _ _ _ _ _ _) = da
 joinParaPrev (EditingDocument (b:bs) e as w h k p) =
   EditingDocument bs (prependToPara p b e) as w h (max 0 (k-1)) p
 
@@ -87,25 +87,35 @@ resizeHeight h2 (EditingDocument bs e as w h k p) =
   (EditingDocument bs e as w h2 (max 0 $ min (h2-1) k) p)
 
 moveDocCursor :: MoveDirection -> EditingDocument c -> EditingDocument c
-moveDocCursor m d@(EditingDocument bs e as w h k p) = revised where
+moveDocCursor d da@(EditingDocument bs e as w h k p) = revised where
   revised
-    | paraCursorMovable m e = let e2 = moveParaCursor m e in (EditingDocument bs e2 as w h (fixOffset e2) p)
-    | m == MoveUp && not (null bs) =
+    | paraCursorMovable d e = let e2 = moveParaCursor d e in (EditingDocument bs e2 as w h (fixOffset e2) p)
+    | d == MoveUp && not (null bs) =
         let
           bs2 = tail bs
           e2 = editPara p $ unparseParaBefore p $ head bs
           as2 = viewParaAfter e:as
           k2 = max 0 (k-1) in
         EditingDocument bs2 e2 as2 w h k2 p
-    | m == MoveDown && not (null as) =
+    | d == MoveDown && not (null as) =
         let
           bs2 = viewParaBefore e:bs
           e2 = editPara p $ unparseParaAfter p $ head as
           as2 = tail as
           k2 = min (h-1) (k+1) in
         EditingDocument bs2 e2 as2 w h k2 p
-    | m == MovePrev = seekBack  $ moveDocCursor MoveUp   d
-    | m == MoveNext = seekFront $ moveDocCursor MoveDown d
+    | d == MovePrev = seekBack  $ moveDocCursor MoveUp   da
+    | d == MoveNext = seekFront $ moveDocCursor MoveDown da
   fixOffset e2 = min (h-1) $ max 0 $ k + (getCursorLine e2 - getCursorLine e)
   seekBack  (EditingDocument bs e as w h k p) = EditingDocument bs (seekParaBack e)  as w h k p
   seekFront (EditingDocument bs e as w h k p) = EditingDocument bs (seekParaFront e) as w h k p
+
+modifyDoc :: EditAction c -> EditDirection -> EditingDocument c -> EditingDocument c
+modifyDoc m d da@(EditingDocument bs e as w h k p) = revised m d where
+  revised (DeleteText _) EditBefore
+    | atParaFront e && not (null bs) =
+      EditingDocument (tail bs) (prependToPara p (head bs) e) as w h (max 0 (k-1)) p
+  revised (DeleteText _) EditAfter
+    | atParaBack e && not (null as) =
+      EditingDocument bs (appendToPara p e (head as)) (tail as) w h (min (h-1) (k+1)) p
+  revised _ _ = EditingDocument bs (modifyPara p m d e) as w h k p

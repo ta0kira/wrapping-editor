@@ -3,6 +3,8 @@
 module ParaEdit (
   EditingPara,
   appendToPara,
+  atParaBack,
+  atParaFront,
   editPara,
   getAfterLines,
   getBeforeLines,
@@ -127,6 +129,12 @@ moveParaCursor d p@(EditingPara bs l as) = revised where
     | d == MoveNext = setFront $ moveParaCursor MoveDown p
   setBack  (EditingPara bs l as) = (EditingPara bs (setCursorBack  l) as)
   setFront (EditingPara bs l as) = (EditingPara bs (setCursorFront l) as)
+
+atParaFront :: EditingPara c -> Bool
+atParaFront (EditingPara bs l _) = null bs && atLineFront l
+
+atParaBack :: EditingPara c -> Bool
+atParaBack (EditingPara _ l as) = null as && atLineBack l
 
 seekParaFront :: EditingPara c -> EditingPara c
 seekParaFront (EditingPara [] l as) = EditingPara [] (setCursorFront l) as

@@ -3,6 +3,8 @@
 module LineEdit (
   EditingLine,
   appendToLine,
+  atLineBack,
+  atLineFront,
   editLine,
   emptyLine,
   getLineCursor,
@@ -63,6 +65,12 @@ moveLineCursor MovePrev (EditingLine bs as c w b)
 moveLineCursor MoveNext (EditingLine bs as c w b)
   | not (null as) = (EditingLine (head as:bs) (tail as) (c+1) w b)
 moveLineCursor _ l = l
+
+atLineFront :: EditingLine c -> Bool
+atLineFront l = elCursor l == 0
+
+atLineBack :: EditingLine c -> Bool
+atLineBack l = elCursor l == elWidth l
 
 setCursorFront :: EditingLine c -> EditingLine c
 setCursorFront (EditingLine bs as c w b) = (EditingLine [] (reverse bs ++ as) 0 w b)
