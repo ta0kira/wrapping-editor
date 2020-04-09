@@ -42,7 +42,7 @@ data EditingLine c =
   EditingLine {
     elTextBefore :: [c],  -- Reversed.
     elTextAfter :: [c],
-    elCursor :: Int,
+    elCursor :: Int,  -- TODO: Allow this to be past the end.
     elWidth :: Int,
     elBreak :: LineBreakType
   }
@@ -118,6 +118,12 @@ moveLineCursor MoveNext (EditingLine bs as c w b)
   | not (null as) = (EditingLine (head as:bs) (tail as) (c+1) w b)
 moveLineCursor _ l = l
 
+setCursorFront :: EditingLine c -> EditingLine c
+setCursorFront (EditingLine bs as c w b) = (EditingLine [] (reverse bs ++ as) 0 w b)
+
+setCursorBack :: EditingLine c -> EditingLine c
+setCursorBack (EditingLine bs as c w b) = (EditingLine (reverse as ++ bs) [] w w b)
+
 modifyLine :: EditAction c -> EditDirection -> EditingLine c -> EditingLine c
 modifyLine (InsertText cs) d (EditingLine bs as c w b) = revised where
   bs2 = if d == EditBefore
@@ -178,13 +184,26 @@ paraCursorMovable d (EditingPara bs l as _ _)
   | d == MoveDown = not (null as)
   | otherwise = lineCursorMovable d l
 
--- NOTE: Cursor position not preserved for up/down movements.
 moveParaCursor :: MoveDirection -> EditingPara c -> EditingPara c
-moveParaCursor d p@(EditingPara bs l as n h)
-  | not (paraCursorMovable d p) = p
-  | d == MoveUp   = EditingPara (tail bs) (editLine $ head bs) (viewLine l:as) (n-1) h
-  | d == MoveDown = EditingPara (viewLine l:bs) (editLine $ head as) (tail as) (n+1) h
-  | otherwise = EditingPara bs (moveLineCursor d l) as n h
+moveParaCursor d p@(EditingPara bs l as n h) = revised where
+  revised
+    | not (paraCursorMovable d p) = p
+    | d == MoveUp   = setParaCursor (getLineCursor l) $ EditingPara (tail bs) (editLine $ head bs) (viewLine l:as) (n-1) h
+    | d == MoveDown = setParaCursor (getLineCursor l) $ EditingPara (viewLine l:bs) (editLine $ head as) (tail as) (n+1) h
+    | lineCursorMovable d l = EditingPara bs (moveLineCursor d l) as n h
+    | d == MovePrev = setBack  $ moveParaCursor MoveUp   p
+    | d == MoveNext = setFront $ moveParaCursor MoveDown p
+  setBack  (EditingPara bs l as n h) = (EditingPara bs (setCursorBack  l) as n h)
+  setFront (EditingPara bs l as n h) = (EditingPara bs (setCursorFront l) as n h)
+
+reparseParaTail :: FixedFontParser a c => a -> EditingPara c -> EditingPara c
+reparseParaTail parser (EditingPara bs l as n h) = moveBy offset revised where
+  offset = getLineCursor l
+  revised = EditingPara bs (editLine line) after n (n + length as + 1)
+  (line:after) = breakLines parser $ joinLines parser (viewLine l:as)
+  moveBy k
+    | k > 0 = moveBy (k-1) . moveParaCursor MoveNext
+    | otherwise = id
 
 modifyPara :: FixedFontParser a c => a -> EditAction c -> EditDirection -> EditingPara c -> EditingPara c
 modifyPara parser (InsertText cs) d p@(EditingPara bs l as n h) = p  -- TODO: Implement.
