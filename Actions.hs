@@ -7,7 +7,7 @@ module Actions (
 ) where
 
 
-data EditAction c = InsertText [c] | DeleteText Int deriving (Show)
+data EditAction c = InsertText [c] | DeleteText deriving (Show)
 
 data EditDirection = EditBefore | EditAfter deriving (Eq,Ord,Show)
 

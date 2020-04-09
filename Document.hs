@@ -120,10 +120,10 @@ moveDocCursor d da@(EditingDocument bs e as w h k p) = revised where
 
 modifyDoc :: EditAction c -> EditDirection -> EditingDocument c -> EditingDocument c
 modifyDoc m d da@(EditingDocument bs e as w h k p) = revised m d where
-  revised (DeleteText _) EditBefore
+  revised DeleteText EditBefore
     | atParaFront e && not (null bs) =
       EditingDocument (tail bs) (prependToPara p (head bs) e) as w h (max 0 (k-1)) p
-  revised (DeleteText _) EditAfter
+  revised DeleteText EditAfter
     | atParaBack e && not (null as) =
       EditingDocument bs (appendToPara p e (head as)) (tail as) w h (min (h-1) (k+1)) p
   revised _ _ = EditingDocument bs (modifyPara p m d e) as w h k p

@@ -95,11 +95,11 @@ modifyLine (InsertText cs) d (EditingLine bs as c w b) = revised where
            then cs ++ as
            else as
   revised = EditingLine bs2 as2 (length bs2) (length bs2 + length as2) b
-modifyLine (DeleteText k) d (EditingLine bs as c w b) = revised where
+modifyLine DeleteText d (EditingLine bs as c w b) = revised where
   bs2 = if d == EditBefore
-           then drop k bs
+           then tail bs
            else bs
   as2 = if d == EditAfter
-           then drop k as
+           then tail as
            else as
   revised = EditingLine bs2 as2 (length bs2) (length bs2 + length as2) b
