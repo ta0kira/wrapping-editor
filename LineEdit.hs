@@ -70,8 +70,8 @@ setCursorFront (EditingLine bs as c w b) = (EditingLine [] (reverse bs ++ as) 0 
 setCursorBack :: EditingLine c -> EditingLine c
 setCursorBack (EditingLine bs as c w b) = (EditingLine (reverse as ++ bs) [] w w b)
 
-appendToLine :: VisibleLine c -> EditingLine c -> EditingLine c
-appendToLine (VisibleLine cs w2 _) (EditingLine bs as c w b) =
+appendToLine :: EditingLine c -> VisibleLine c -> EditingLine c
+appendToLine (EditingLine bs as c w b) (VisibleLine cs w2 _) =
   (EditingLine bs (as ++ cs) c (w+w2) b)
 
 prependToLine :: VisibleLine c -> EditingLine c -> EditingLine c

@@ -2,7 +2,7 @@
 
 module ParaEdit (
   EditingPara,
-  VisiblePara,
+  appendToPara,
   editPara,
   getParaCursor,
   modifyPara,
@@ -10,9 +10,14 @@ module ParaEdit (
   paraCursorMovable,
   parseParaAfter,
   parseParaBefore,
+  prependToPara,
   setParaCursor,
   splitPara,
-  viewPara,
+  unparsePara,
+  unparseParaAfter,
+  unparseParaBefore,
+  viewParaAfter,
+  viewParaBefore,
 ) where
 
 import Actions
@@ -21,15 +26,6 @@ import LineEdit
 import Para
 import Parser
 
-
-data VisiblePara c =
-  VisibleParaBefore {
-    vpaLines :: [VisibleLine c]  -- Reversed.
-  } |
-  VisibleParaAfter {
-    vpbLines :: [VisibleLine c]
-  }
-  deriving (Show)
 
 data EditingPara c =
   EditingPara {
@@ -41,15 +37,17 @@ data EditingPara c =
   }
   deriving (Show)
 
-parseParaBefore :: FixedFontParser a c => a -> UnparsedPara c -> VisiblePara c
+parseParaBefore :: FixedFontParser a c => a -> UnparsedPara c -> VisibleParaBefore c
 parseParaBefore parser (UnparsedPara cs) = VisibleParaBefore (reverse $ breakLines parser cs)
 
-parseParaAfter :: FixedFontParser a c => a -> UnparsedPara c -> VisiblePara c
+parseParaAfter :: FixedFontParser a c => a -> UnparsedPara c -> VisibleParaAfter c
 parseParaAfter parser (UnparsedPara cs) = VisibleParaAfter (breakLines parser cs)
 
-unparsePara :: FixedFontParser a c => a -> VisiblePara c -> UnparsedPara c
-unparsePara parser (VisibleParaBefore cs) = UnparsedPara (joinLines parser $ reverse cs)
-unparsePara parser (VisibleParaAfter cs)  = UnparsedPara (joinLines parser cs)
+unparseParaBefore :: FixedFontParser a c => a -> VisibleParaBefore c -> UnparsedPara c
+unparseParaBefore parser (VisibleParaBefore ls) = UnparsedPara $ joinLines parser (reverse ls)
+
+unparseParaAfter :: FixedFontParser a c => a -> VisibleParaAfter c -> UnparsedPara c
+unparseParaAfter parser (VisibleParaAfter ls) = UnparsedPara $ joinLines parser ls
 
 editPara :: FixedFontParser a c => a -> UnparsedPara c -> EditingPara c
 editPara parser (UnparsedPara cs) = EditingPara [] (editLine line) after 0 (length after + 1) where
@@ -57,9 +55,17 @@ editPara parser (UnparsedPara cs) = EditingPara [] (editLine line) after 0 (leng
   nonempty [] = [emptyLine]
   nonempty ls = ls
 
-viewPara :: FixedFontParser a c => a -> EditingPara c -> VisiblePara c
-viewPara parser (EditingPara bs l as _ _) = VisibleParaAfter ls where
+unparsePara :: FixedFontParser a c => a -> EditingPara c -> UnparsedPara c
+unparsePara parser (EditingPara bs l as _ _) = UnparsedPara $ joinLines parser ls where
   ls = reverse bs ++ [viewLine l] ++ as
+
+viewParaBefore :: EditingPara c -> VisibleParaBefore c
+viewParaBefore (EditingPara bs l as _ _) = VisibleParaBefore ls where
+  ls = reverse bs ++ [viewLine l] ++ as
+
+viewParaAfter :: EditingPara c -> VisibleParaAfter c
+viewParaAfter (EditingPara bs l as _ _) = VisibleParaAfter ls where
+  ls = reverse as ++ [viewLine l] ++ bs
 
 getParaCursor :: EditingPara c -> (Int,Int)
 getParaCursor (EditingPara _ l _ n _) = (getLineCursor l,n)
@@ -67,7 +73,7 @@ getParaCursor (EditingPara _ l _ n _) = (getLineCursor l,n)
 setParaCursor :: Int -> EditingPara c -> EditingPara c
 setParaCursor k e@(EditingPara bs l as n h) = (EditingPara bs (setLineCursor k l) as n h)
 
-splitPara :: EditingPara c -> (VisiblePara c,VisiblePara c)
+splitPara :: EditingPara c -> (VisibleParaBefore c,VisibleParaAfter c)
 splitPara (EditingPara bs l as _ _) =
   (VisibleParaBefore bs,VisibleParaAfter (viewLine l:as))
 
@@ -89,6 +95,16 @@ moveParaCursor d p@(EditingPara bs l as n h) = revised where
   setBack  (EditingPara bs l as n h) = (EditingPara bs (setCursorBack  l) as n h)
   setFront (EditingPara bs l as n h) = (EditingPara bs (setCursorFront l) as n h)
   h2 = h - (if null bs then 0 else 1) - (if null as then 0 else 1)
+
+appendToPara :: FixedFontParser a c => a -> EditingPara c -> VisibleParaAfter c -> EditingPara c
+appendToPara parser p (VisibleParaAfter []) = p
+appendToPara parser (EditingPara bs l as n h) (VisibleParaAfter (c:cs)) = reparseParaTail parser revised where
+  revised = EditingPara bs (l `appendToLine` c) (as ++ cs) n (h + length cs - 1)
+
+prependToPara :: FixedFontParser a c => a -> VisibleParaBefore c -> EditingPara c -> EditingPara c
+prependToPara parser (VisibleParaBefore []) p = p
+prependToPara parser (VisibleParaBefore (c:cs)) (EditingPara bs l as n h) = reparseParaTail parser revised where
+  revised = EditingPara (cs ++ bs) (c `prependToLine` l) as (n + length cs - 1) (h + length cs - 1)
 
 modifyPara :: FixedFontParser a c => a -> EditAction c -> EditDirection -> EditingPara c -> EditingPara c
 modifyPara parser m@(InsertText _) d (EditingPara bs l as n h) =
@@ -112,9 +128,9 @@ reparseParaTail parser (EditingPara bs l as n h) = moveBy offset revised where
 mergeForDelete :: FixedFontParser a c => a -> EditingPara c -> EditingPara c
 mergeForDelete parser (EditingPara bs l as n h) = EditingPara bs2 l2 as2 n2 h2 where
   l2 = addAfter as $ addBefore bs l where
-    addAfter (v:_) l = appendToLine v l
+    addAfter (v:_) l = l `appendToLine` v
     addAfter _ l = l
-    addBefore (v:_) l = prependToLine v l
+    addBefore (v:_) l = v `prependToLine` l
     addBefore _ l = l
   bs2 = if null bs then [] else tail bs
   as2 = if null as then [] else tail as
