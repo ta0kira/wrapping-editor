@@ -158,10 +158,8 @@ prependToPara parser (VisibleParaBefore (c:cs)) (EditingPara bs l as) = reparseP
   revised = EditingPara (cs ++ bs) (c `prependToLine` l) as
 
 modifyPara :: FixedFontParser a c => a -> EditAction c -> EditDirection -> EditingPara c -> EditingPara c
-modifyPara parser m@(InsertText _) d (EditingPara bs l as) =
-  reparseParaTail parser (EditingPara bs (modifyLine m d l) as)
-modifyPara parser m@DeleteText d p = reparseParaTail parser revised where
-  (EditingPara bs l as) = mergeForDelete parser p
+modifyPara parser m d p = reparseParaTail parser revised where
+  (EditingPara bs l as) = mergeForEdit parser p
   revised = (EditingPara bs (modifyLine m d l) as)
 
 
@@ -176,8 +174,8 @@ reparseParaTail parser (EditingPara bs l as) = moveBy offset revised where
     | k > 0 = moveBy (k-1) . moveParaCursor MoveNext
     | otherwise = id
 
-mergeForDelete :: FixedFontParser a c => a -> EditingPara c -> EditingPara c
-mergeForDelete parser (EditingPara bs l as) = EditingPara bs2 l2 as2 where
+mergeForEdit :: FixedFontParser a c => a -> EditingPara c -> EditingPara c
+mergeForEdit parser (EditingPara bs l as) = EditingPara bs2 l2 as2 where
   l2 = addAfter as $ addBefore bs l where
     addAfter (v:_) l = l `appendToLine` v
     addAfter _ l = l
