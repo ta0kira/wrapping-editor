@@ -108,9 +108,10 @@ getCursorLine = length . epBefore
 setParaCursor :: Int -> EditingPara c -> EditingPara c
 setParaCursor k e@(EditingPara bs l as) = (EditingPara bs (setLineCursor k l) as)
 
-splitPara :: EditingPara c -> (VisibleParaBefore c,VisibleParaAfter c)
-splitPara (EditingPara bs l as) =
-  (VisibleParaBefore bs,VisibleParaAfter (viewLine l:as))
+splitPara :: FixedFontParser a c => a -> EditingPara c -> (UnparsedPara c,UnparsedPara c)
+splitPara parser (EditingPara bs l as) = let (b,a) = splitLine l in
+  (unparseParaBefore parser $ VisibleParaBefore (b:bs),
+   unparseParaAfter  parser $ VisibleParaAfter  (a:as))
 
 paraCursorMovable :: MoveDirection -> EditingPara c -> Bool
 paraCursorMovable d (EditingPara bs l as)

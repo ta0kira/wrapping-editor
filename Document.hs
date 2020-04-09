@@ -10,6 +10,7 @@ module Document (
 ) where
 
 import Actions
+import Editor
 import Line
 import LineEdit
 import Para
@@ -36,6 +37,12 @@ instance FixedFontViewer (EditingDocument c) c where
     | otherwise = d
   getViewSize d = (edWidth d,edHeight d)
   getVisible = getVisibleLines
+
+instance FixedFontEditor (EditingDocument c) c where
+  editText da m d = modifyDoc m d da
+  breakPara da d = insertParaSplit d da
+  moveCursor da d = moveDocCursor d da
+  getCursor (EditingDocument _ e _ _ _ k _) = (getParaCursor e,k)
 
 editDocument :: FixedFontParser a c => a -> [c] -> EditingDocument c
 editDocument parser cs = document where
@@ -119,3 +126,10 @@ modifyDoc m d da@(EditingDocument bs e as w h k p) = revised m d where
     | atParaBack e && not (null as) =
       EditingDocument bs (appendToPara p e (head as)) (tail as) w h (min (h-1) (k+1)) p
   revised _ _ = EditingDocument bs (modifyPara p m d e) as w h k p
+
+insertParaSplit :: EditDirection -> EditingDocument c -> EditingDocument c
+insertParaSplit d (EditingDocument bs e as w h k p) = revised where
+  (b,a) = splitPara p e
+  revised
+    | d == EditBefore = EditingDocument (parseParaBefore p b:bs) (editPara p a) as w h k p
+    | d == EditAfter  = EditingDocument bs (editPara p b) (parseParaAfter p a:as) w h k p
