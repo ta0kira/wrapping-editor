@@ -1,8 +1,6 @@
 {-# LANGUAGE Safe #-}
 
 module LineEdit (
-  LineBreakType(..),  -- From Line.
-  VisibleLine(..),  -- From Line.
   EditingLine,
   appendToLine,
   editLine,
@@ -33,9 +31,6 @@ data EditingLine c =
   }
   deriving (Show)
 
-
-emptyLine :: VisibleLine c
-emptyLine = VisibleLine [] 0 ParaBreak
 
 editLine :: VisibleLine c -> EditingLine c
 editLine (VisibleLine cs w b) = EditingLine [] cs 0 w b

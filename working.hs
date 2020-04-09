@@ -1,5 +1,6 @@
 {-# LANGUAGE Safe #-}
 
+import Document
 import Editor
 import LineEdit
 import ParaEdit

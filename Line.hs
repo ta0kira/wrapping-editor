@@ -3,6 +3,7 @@
 module Line (
   LineBreakType(..),
   VisibleLine(..),
+  emptyLine,
 ) where
 
 
@@ -15,3 +16,6 @@ data VisibleLine c =
     vlBreak :: LineBreakType
   }
   deriving (Show)
+
+emptyLine :: VisibleLine c
+emptyLine = VisibleLine [] 0 ParaBreak

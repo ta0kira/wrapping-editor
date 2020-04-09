@@ -1,8 +1,8 @@
 {-# LANGUAGE Safe #-}
 
 module ParaEdit (
-  StaticPara(..),  -- From Para.
   EditingPara,
+  VisiblePara,
   editPara,
   getParaCursor,
   modifyPara,
@@ -16,10 +16,20 @@ module ParaEdit (
 ) where
 
 import Actions
+import Line
 import LineEdit
 import Para
 import Parser
 
+
+data VisiblePara c =
+  VisibleParaBefore {
+    vpaLines :: [VisibleLine c]  -- Reversed.
+  } |
+  VisibleParaAfter {
+    vpbLines :: [VisibleLine c]
+  }
+  deriving (Show)
 
 data EditingPara c =
   EditingPara {
@@ -31,21 +41,23 @@ data EditingPara c =
   }
   deriving (Show)
 
-parseParaBefore :: FixedFontParser a c => a -> StaticPara c -> StaticPara c
-parseParaBefore parser para = VisibleParaBefore (reverse $ breakLines parser cs) where
-  cs = flattenPara parser para
+parseParaBefore :: FixedFontParser a c => a -> UnparsedPara c -> VisiblePara c
+parseParaBefore parser (UnparsedPara cs) = VisibleParaBefore (reverse $ breakLines parser cs)
 
-parseParaAfter :: FixedFontParser a c => a -> StaticPara c -> StaticPara c
-parseParaAfter parser para = VisibleParaBefore (breakLines parser cs) where
-  cs = flattenPara parser para
+parseParaAfter :: FixedFontParser a c => a -> UnparsedPara c -> VisiblePara c
+parseParaAfter parser (UnparsedPara cs) = VisibleParaAfter (breakLines parser cs)
 
-editPara :: FixedFontParser a c => a -> StaticPara c -> EditingPara c
-editPara parser para = EditingPara [] (editLine line) after 0 (length after + 1) where
-  (line:after) = nonempty $ breakLines parser $ flattenPara parser para
+unparsePara :: FixedFontParser a c => a -> VisiblePara c -> UnparsedPara c
+unparsePara parser (VisibleParaBefore cs) = UnparsedPara (joinLines parser $ reverse cs)
+unparsePara parser (VisibleParaAfter cs)  = UnparsedPara (joinLines parser cs)
+
+editPara :: FixedFontParser a c => a -> UnparsedPara c -> EditingPara c
+editPara parser (UnparsedPara cs) = EditingPara [] (editLine line) after 0 (length after + 1) where
+  (line:after) = nonempty $ breakLines parser cs
   nonempty [] = [emptyLine]
   nonempty ls = ls
 
-viewPara :: FixedFontParser a c => a -> EditingPara c -> StaticPara c
+viewPara :: FixedFontParser a c => a -> EditingPara c -> VisiblePara c
 viewPara parser (EditingPara bs l as _ _) = VisibleParaAfter ls where
   ls = reverse bs ++ [viewLine l] ++ as
 
@@ -55,7 +67,7 @@ getParaCursor (EditingPara _ l _ n _) = (getLineCursor l,n)
 setParaCursor :: Int -> EditingPara c -> EditingPara c
 setParaCursor k e@(EditingPara bs l as n h) = (EditingPara bs (setLineCursor k l) as n h)
 
-splitPara :: EditingPara c -> (StaticPara c,StaticPara c)
+splitPara :: EditingPara c -> (VisiblePara c,VisiblePara c)
 splitPara (EditingPara bs l as _ _) =
   (VisibleParaBefore bs,VisibleParaAfter (viewLine l:as))
 
@@ -87,11 +99,6 @@ modifyPara parser m@(DeleteText _) d p = reparseParaTail parser revised where
 
 
 -- Private below here.
-
-flattenPara :: FixedFontParser a c => a -> StaticPara c -> [c]
-flattenPara parser (UnparsedPara cs) = cs
-flattenPara parser (VisibleParaBefore ls) = reverse $ joinLines parser ls
-flattenPara parser (VisibleParaAfter ls) = joinLines parser ls
 
 reparseParaTail :: FixedFontParser a c => a -> EditingPara c -> EditingPara c
 reparseParaTail parser (EditingPara bs l as n h) = moveBy offset revised where

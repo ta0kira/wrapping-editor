@@ -1,20 +1,18 @@
 {-# LANGUAGE Safe #-}
 
 module Para (
-  StaticPara(..),
+  UnparsedPara(..),
+  emptyPara,
 ) where
 
 import Line
 
 
-data StaticPara c =
+data UnparsedPara c =
   UnparsedPara {
     upText :: [c]
-  } |
-  VisibleParaBefore {
-    vpaLines :: [VisibleLine c]  -- Reversed.
-  } |
-  VisibleParaAfter {
-    vpbLines :: [VisibleLine c]
   }
   deriving (Show)
+
+emptyPara :: UnparsedPara c
+emptyPara = UnparsedPara []
