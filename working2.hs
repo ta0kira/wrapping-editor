@@ -205,6 +205,21 @@ reparseParaTail parser (EditingPara bs l as n h) = moveBy offset revised where
     | k > 0 = moveBy (k-1) . moveParaCursor MoveNext
     | otherwise = id
 
+mergeForDelete :: FixedFontParser a c => a -> EditingPara c -> EditingPara c
+mergeForDelete parser (EditingPara bs l as n h) = EditingPara bs2 l2 as2 n2 h2 where
+  l2 = addAfter as $ addBefore bs l where
+    addAfter ((VisibleLine cs w2 _):_) (EditingLine bs as c w b) = (EditingLine bs (as ++ cs) c (w+w2) b)
+    addAfter _ l = l
+    addBefore ((VisibleLine cs w2 b):_) (EditingLine bs as c w _) = (EditingLine (bs ++ reverse cs) as (c+w2) (w+w2) b)
+    addBefore _ l = l
+  bs2 = if null bs then [] else tail bs
+  as2 = if null as then [] else tail as
+  n2 = n - (if null bs then 0 else 1)
+  h2 = h - (if null bs then 0 else 1) - (if null as then 0 else 1)
+
 modifyPara :: FixedFontParser a c => a -> EditAction c -> EditDirection -> EditingPara c -> EditingPara c
-modifyPara parser (InsertText cs) d p@(EditingPara bs l as n h) = p  -- TODO: Implement.
-modifyPara parser (DeleteText k)  d p@(EditingPara bs l as n h) = p  -- TODO: Implement.
+modifyPara parser m@(InsertText _) d (EditingPara bs l as n h) =
+  reparseParaTail parser (EditingPara bs (modifyLine m d l) as n h)
+modifyPara parser m@(DeleteText _) d p = reparseParaTail parser revised where
+  (EditingPara bs l as n h) = mergeForDelete parser p
+  revised = (EditingPara bs (modifyLine m d l) as n h)
