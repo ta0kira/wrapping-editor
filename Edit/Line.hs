@@ -1,6 +1,6 @@
 {-# LANGUAGE Safe #-}
 
-module LineEdit (
+module Edit.Line (
   EditingLine,
   appendToLine,
   atLineBack,
@@ -32,7 +32,6 @@ data EditingLine c =
     elBreak :: LineBreakType
   }
   deriving (Show)
-
 
 editLine :: VisibleLine c -> EditingLine c
 editLine (VisibleLine cs w b) = EditingLine [] cs 0 w b

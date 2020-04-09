@@ -1,6 +1,6 @@
 {-# LANGUAGE Safe #-}
 
-module ParaEdit (
+module Edit.Para (
   EditingPara,
   appendToPara,
   atParaBack,
@@ -33,9 +33,9 @@ module ParaEdit (
 
 import Actions
 import Line
-import LineEdit
 import Para
 import Parser
+import Edit.Line
 
 
 data EditingPara c =

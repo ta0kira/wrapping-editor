@@ -12,11 +12,11 @@ module Document (
 import Actions
 import Editor
 import Line
-import LineEdit
 import Para
-import ParaEdit
 import Parser
 import Viewer
+import Edit.Line
+import Edit.Para
 
 
 data EditingDocument c =
