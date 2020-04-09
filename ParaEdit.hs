@@ -7,6 +7,7 @@ module ParaEdit (
   getAfterLines,
   getBeforeLines,
   getCurrentLine,
+  getCursorLine,
   getParaCursor,
   modifyPara,
   moveParaCursor,
@@ -98,6 +99,9 @@ takeLinesAfter n = take n . concat . map vpaLines
 
 getParaCursor :: EditingPara c -> Int
 getParaCursor = getLineCursor . epEditing
+
+getCursorLine :: EditingPara c -> Int
+getCursorLine = length . epBefore
 
 setParaCursor :: Int -> EditingPara c -> EditingPara c
 setParaCursor k e@(EditingPara bs l as) = (EditingPara bs (setLineCursor k l) as)
