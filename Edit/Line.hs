@@ -17,8 +17,8 @@ module Edit.Line (
   viewLine,
 ) where
 
-import Actions
-import Line
+import Base.Actions
+import Base.Line
 
 
 data EditingLine c b =

@@ -4,11 +4,9 @@
 import Data.Char (isLetter)
 
 import Document
-import Editor
-import Line
-import Para
-import Parser
-import Viewer
+import Base.Line
+import Base.Para
+import Base.Parser
 
 
 data ParsePolicy = BreakExact Int deriving (Show)

@@ -35,10 +35,10 @@ module Edit.Para (
   viewParaBefore,
 ) where
 
-import Actions
-import Line
-import Para
-import Parser
+import Base.Actions
+import Base.Line
+import Base.Para
+import Base.Parser
 import Edit.Line
 
 

@@ -1,11 +1,11 @@
 {-# LANGUAGE Safe #-}
 
-module Para (
+module Base.Para (
   UnparsedPara(..),
   emptyPara,
 ) where
 
-import Line
+import Base.Line
 
 
 data UnparsedPara c =

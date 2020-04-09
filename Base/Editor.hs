@@ -2,11 +2,11 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE Safe #-}
 
-module Editor (
+module Base.Editor (
   FixedFontEditor(..),
 ) where
 
-import Actions
+import Base.Actions
 
 
 class FixedFontEditor a c | a -> c where

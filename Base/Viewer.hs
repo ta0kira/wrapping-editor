@@ -2,7 +2,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE Safe #-}
 
-module Viewer (
+module Base.Viewer (
   FixedFontViewer(..),
 ) where
 

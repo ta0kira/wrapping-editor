@@ -1,6 +1,6 @@
 {-# LANGUAGE Safe #-}
 
-module Line (
+module Base.Line (
   VisibleLine(..),
   emptyLine,
 ) where

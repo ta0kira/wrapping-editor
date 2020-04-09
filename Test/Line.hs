@@ -4,10 +4,10 @@ module Test.Line (
   allTests,
 ) where
 
-import Actions
-import Line
+import Base.Actions
+import Base.Line
 import Edit.Line
-import Test.Base
+import Test.Common
 
 
 allTests :: [(String,IO (Maybe String))]

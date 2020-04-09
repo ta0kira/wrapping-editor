@@ -4,17 +4,23 @@
 {-# LANGUAGE Safe #-}
 
 module Document (
+  EditAction(..), -- From Base.
+  EditDirection(..), -- From Base.
+  FixedFontEditor(..), -- From Base.
+  FixedFontParser, -- From Base.
+  FixedFontViewer(..), -- From Base.
+  MoveDirection(..), -- From Base.
   EditingDocument,
   editDocument,
   flattenDocument,
 ) where
 
-import Actions
-import Editor
-import Line
-import Para
-import Parser
-import Viewer
+import Base.Actions
+import Base.Editor
+import Base.Line
+import Base.Para
+import Base.Parser
+import Base.Viewer
 import Edit.Line
 import Edit.Para
 

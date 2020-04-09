@@ -1,7 +1,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE Safe #-}
 
-module Test.Base (
+module Test.Common (
   BreakExact,
   LineBreak(..),
   breakExact,
@@ -20,9 +20,9 @@ import Control.Monad (when)
 import Data.Maybe
 import System.IO
 
-import Line
-import Para
-import Parser
+import Base.Line
+import Base.Para
+import Base.Parser
 
 
 data LineBreak = LineBreak | AlternateBreak deriving (Enum,Eq,Ord,Show)

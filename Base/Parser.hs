@@ -2,12 +2,12 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE Safe #-}
 
-module Parser (
+module Base.Parser (
   FixedFontParser(..),
 ) where
 
-import Line
-import Para
+import Base.Line
+import Base.Para
 
 
 class Enum b => FixedFontParser a c b | a -> c b where

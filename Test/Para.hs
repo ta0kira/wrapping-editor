@@ -4,12 +4,12 @@ module Test.Para (
   allTests,
 ) where
 
-import Actions
-import Line
-import Para
-import Parser
+import Base.Actions
+import Base.Line
+import Base.Para
+import Base.Parser
 import Edit.Para
-import Test.Base
+import Test.Common
 
 
 allTests :: [(String,IO (Maybe String))]

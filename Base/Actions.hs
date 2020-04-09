@@ -1,6 +1,6 @@
 {-# LANGUAGE Safe #-}
 
-module Actions (
+module Base.Actions (
   EditAction(..),
   EditDirection(..),
   MoveDirection(..),
