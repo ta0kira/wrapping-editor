@@ -41,6 +41,7 @@ instance FixedFontParser ParsePolicy Char LineBreakType where
         | isLetter (last xs) && isLetter (head ys) =
           fixWord (init xs) (last xs:ys)
       correct xs ys = (VisibleLine xs TokenBreak):(break2 ys)
+      -- TODO: This won't work properly when left/right cursor movement crosses lines.
       fixWord xs ys
         | isLetter (last xs) && isLetter (head ys) =
           (VisibleLine xs BrokenWord):(break2 ys)
@@ -55,7 +56,7 @@ instance FixedFontParser ParsePolicy Char LineBreakType where
   renderLine _ (VisibleLine cs _) = cs
 
 main = do
-  contents <- readFile "testdata.txt"
+  contents <- readFile "Test/testdata.txt"
   let doc = setViewSize (editDocument breakExact contents) (26,13)
   putStr $ unlines $ getVisible doc
   putStrLn $ show $ flattenDocument doc == contents

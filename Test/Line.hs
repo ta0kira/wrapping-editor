@@ -124,29 +124,29 @@ allTests = [
        let line = editLine $ VisibleLine "this is a test line" AlternateBreak
        let (left,right) = splitLine $ setLineCursor 5 line
        checkConditions [
-           (left == (VisibleLine "this " LineBreak),show left),
-           (right == (VisibleLine "is a test line" AlternateBreak),show right)
+           (left == (VisibleLine "this " LineBreak),"Left: " ++ show left),
+           (right == (VisibleLine "is a test line" AlternateBreak),"Right: " ++ show right)
          ]),
     ("split line front", do
        let line = editLine $ VisibleLine "this is a test line" AlternateBreak
        let (left,right) = splitLine $ moveLineCursor MoveUp line
        checkConditions [
-           (left == (VisibleLine "" LineBreak),show left),
-           (right == (VisibleLine "this is a test line" AlternateBreak),show right)
+           (left == (VisibleLine "" LineBreak),"Left: " ++ show left),
+           (right == (VisibleLine "this is a test line" AlternateBreak),"Right: " ++ show right)
          ]),
     ("split line back", do
        let line = editLine $ VisibleLine "this is a test line" AlternateBreak
        let (left,right) = splitLine $ moveLineCursor MoveDown line
        checkConditions [
-           (left == (VisibleLine "this is a test line" LineBreak),show left),
-           (right == (VisibleLine "" AlternateBreak),show right)
+           (left == (VisibleLine "this is a test line" LineBreak),"Left: " ++ show left),
+           (right == (VisibleLine "" AlternateBreak),"Right: " ++ show right)
          ]),
     ("prepend preserves cursor", checkLineEdit
        "this is a test line"
        "XYthis Zis a test line" $
        composeActions [
            setLineCursor 5,
-           prependToLine (constructLine "XY"),
+           prependToLine (newLine "XY"),
            modifyLine (InsertText "Z") EditAfter
          ]),
     ("append preserves cursor", checkLineEdit
@@ -154,16 +154,14 @@ allTests = [
        "this Zis a test lineXY" $
        composeActions [
            setLineCursor 5,
-           flip appendToLine (constructLine "XY"),
+           flip appendToLine (newLine "XY"),
            modifyLine (InsertText "Z") EditAfter
          ])
   ]
 
-constructLine cs = VisibleLine cs LineBreak
-
 checkLineEdit x y f = do
-  let lx = constructLine x
-  let ly = constructLine y
+  let lx = newLine x
+  let ly = newLine y
   let edit = f (editLine lx)
   let restored = viewLine edit
   checkCondition (restored == ly) (show restored)

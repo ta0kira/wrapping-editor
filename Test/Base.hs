@@ -8,6 +8,7 @@ module Test.Base (
   checkCondition,
   checkConditions,
   composeActions,
+  newLine,
   repeatAction,
   runTests,
   testFail,
@@ -24,11 +25,12 @@ import Para
 import Parser
 
 
+data LineBreak = LineBreak | AlternateBreak deriving (Enum,Eq,Ord,Show)
+
 data BreakExact = BreakExact Int deriving (Show)
 
+breakExact :: BreakExact
 breakExact = BreakExact 0
-
-data LineBreak = LineBreak | AlternateBreak deriving (Enum,Eq,Ord,Show)
 
 instance FixedFontParser BreakExact Char LineBreak where
   setLineWidth _ w = BreakExact w
@@ -45,6 +47,8 @@ instance FixedFontParser BreakExact Char LineBreak where
   joinLines _ = concat . map vlText
   renderLine _ = vlText
 
+newLine :: String -> VisibleLine Char LineBreak
+newLine cs = VisibleLine cs LineBreak
 
 composeActions :: [a -> a] -> a -> a
 composeActions = foldr (flip (.)) id
