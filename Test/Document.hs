@@ -11,6 +11,10 @@ import Test.Common
 
 allTests :: [(String,IO (Maybe String))]
 allTests = [
+    ("document preserved", checkEditContent
+       "Test/testfiles/testdata.txt"
+       "Test/testfiles/testdata.txt"
+       id),
     ("default view at top", checkEditView
        "Test/testfiles/testdata.txt"
        "Test/testfiles/default-view.txt"
