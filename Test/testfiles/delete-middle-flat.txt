@@ -1,0 +1,13 @@
+I need a lot more text here in order to test out viewing.
+
+I also need some more paragraphs so that some are out of view, and thus remain unparsed.
+Honestly, this file is avery contrived.
+It would certainly suffice to just fill it with random characters, but this will be easier to read in test output.
+
+Since the view buffer has five parts to it, we need at least five paragraphs.
+But, that five number is already out-of-date.
+Or, that's at least the situation as it stands now.
+There are also a few random extra lines to see how "empty" paragraphs are handled.
+
+I can't seem to stop writing paragraphs, even though this is just a test file.
+Isn't it annoying how each paragraph only has a single sentence in it?

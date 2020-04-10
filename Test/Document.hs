@@ -19,7 +19,7 @@ allTests = [
        "Test/testfiles/testdata.txt"
        "Test/testfiles/below-view.txt" $
        repeatAction 15 (flip moveCursor MoveDown)),
-    ("insert in middle", checkEditView
+    ("insert in middle view", checkEditView
        "Test/testfiles/testdata.txt"
        "Test/testfiles/insert-middle-view.txt" $
        composeActions [
@@ -28,9 +28,27 @@ allTests = [
            repeatAction 7 (flip moveCursor MoveNext),
            flip2 editText (InsertText "XYZ") EditBefore
          ]),
-    ("delete in middle", checkEditView
+    ("insert in middle content", checkEditContent
+       "Test/testfiles/testdata.txt"
+       "Test/testfiles/insert-middle-flat.txt" $
+       composeActions [
+           repeatAction 15 (flip moveCursor MoveDown),
+           repeatAction 5 (flip moveCursor MoveUp),
+           repeatAction 7 (flip moveCursor MoveNext),
+           flip2 editText (InsertText "XYZ") EditBefore
+         ]),
+    ("delete in middle view", checkEditView
        "Test/testfiles/testdata.txt"
        "Test/testfiles/delete-middle-view.txt" $
+       composeActions [
+           repeatAction 15 (flip moveCursor MoveDown),
+           repeatAction 5 (flip moveCursor MoveUp),
+           repeatAction 7 (flip moveCursor MoveNext),
+           repeatAction 3 (flip2 editText DeleteText EditBefore)
+         ]),
+    ("delete in middle content", checkEditContent
+       "Test/testfiles/testdata.txt"
+       "Test/testfiles/delete-middle-flat.txt" $
        composeActions [
            repeatAction 15 (flip moveCursor MoveDown),
            repeatAction 5 (flip moveCursor MoveUp),
