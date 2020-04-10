@@ -16,6 +16,7 @@ module Document (
   FixedFontViewer(..),
   MoveDirection(..),
   ViewerAction,
+  editorAppendAction,
   editorBackspaceAction,
   editorDeleteAction,
   editorDownAction,
@@ -23,7 +24,6 @@ module Document (
   editorLeftAction,
   editorInsertAction,
   editorRightAction,
-  editorTypeAction,
   editorUpAction,
   viewerResizeAction,
   -- <<< From Base

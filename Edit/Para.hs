@@ -6,9 +6,7 @@ module Edit.Para (
   VisibleParaBefore,
   appendToPara,
   atParaBack,
-  atParaBottom,
   atParaFront,
-  atParaTop,
   editPara,
   getAfterLines,
   getBeforeLines,
@@ -162,12 +160,6 @@ atParaFront p@(EditingPara _ l _) = atParaTop p && atLineFront l
 atParaBack :: EditingPara c b -> Bool
 atParaBack p@(EditingPara _ l _) = atParaBottom p && atLineBack l
 
-atParaTop :: EditingPara c b -> Bool
-atParaTop (EditingPara bs _ _) = null bs
-
-atParaBottom :: EditingPara c b -> Bool
-atParaBottom (EditingPara _ _ as) = null as
-
 seekParaFront :: EditingPara c b -> EditingPara c b
 seekParaFront (EditingPara [] l as) = EditingPara [] (moveLineCursor MoveUp l) as
 seekParaFront (EditingPara bs l as) =
@@ -218,3 +210,9 @@ mergeForEdit parser (EditingPara bs l as) = EditingPara bs2 l2 as2 where
     addBefore _ l = l
   bs2 = if null bs then [] else tail bs
   as2 = if null as then [] else tail as
+
+atParaTop :: EditingPara c b -> Bool
+atParaTop (EditingPara bs _ _) = null bs
+
+atParaBottom :: EditingPara c b -> Bool
+atParaBottom (EditingPara _ _ as) = null as

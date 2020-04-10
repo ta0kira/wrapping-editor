@@ -30,7 +30,7 @@ allTests = [
            repeatAction 15 editorDownAction,
            repeatAction 5 editorUpAction,
            repeatAction 7 editorRightAction,
-           composeActions (map editorTypeAction "XYZ")
+           composeActions (map editorAppendAction "XYZ")
          ]),
     ("line position preserved when passing short lines", checkEditView
        "Test/testfiles/testdata.txt"
@@ -40,7 +40,7 @@ allTests = [
            -- This traverses past empty lines after the line position is set.
            repeatAction 15 editorDownAction,
            repeatAction 5 editorUpAction,
-           composeActions (map editorTypeAction "XYZ")
+           composeActions (map editorAppendAction "XYZ")
          ]),
     ("insert in middle content", checkEditContent
        "Test/testfiles/testdata.txt"
@@ -49,7 +49,7 @@ allTests = [
            repeatAction 15 editorDownAction,
            repeatAction 5 editorUpAction,
            repeatAction 7 editorRightAction,
-           composeActions (map editorTypeAction "XYZ")
+           composeActions (map editorAppendAction "XYZ")
          ]),
     ("delete in middle view", checkEditView
        "Test/testfiles/testdata.txt"
@@ -92,7 +92,7 @@ allTests = [
            repeatAction 5 editorUpAction,
            repeatAction 7 editorRightAction,
            editorEnterAction,
-           composeActions (map editorTypeAction "XYZ")
+           composeActions (map editorAppendAction "XYZ")
          ]),
     ("break in middle after", checkEditView
        "Test/testfiles/testdata.txt"

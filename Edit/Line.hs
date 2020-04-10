@@ -6,7 +6,6 @@ module Edit.Line (
   atLineBack,
   atLineFront,
   editLine,
-  emptyLine,
   getLineCursor,
   lineCursorMovable,
   modifyLine,

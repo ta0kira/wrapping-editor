@@ -6,6 +6,7 @@
 module Base.Editor (
   EditorAction,
   FixedFontEditor(..),
+  editorAppendAction,
   editorBackspaceAction,
   editorDeleteAction,
   editorDownAction,
@@ -13,7 +14,6 @@ module Base.Editor (
   editorInsertAction,
   editorLeftAction,
   editorRightAction,
-  editorTypeAction,
   editorUpAction,
 ) where
 
@@ -37,8 +37,8 @@ editorDeleteAction e = editText e DeleteText EditAfter
 editorEnterAction :: EditorAction c
 editorEnterAction e = breakPara e EditBefore
 
-editorTypeAction :: c -> EditorAction c
-editorTypeAction c e = editText e (InsertText [c]) EditBefore
+editorAppendAction :: c -> EditorAction c
+editorAppendAction c e = editText e (InsertText [c]) EditBefore
 
 editorInsertAction :: c -> EditorAction c
 editorInsertAction c e = editText e (InsertText [c]) EditAfter
