@@ -97,7 +97,7 @@ The basic editor can support any character type for which a wrapping policy is
 available. The editor for [Brick][brick] currently only supports `Char`, but it
 will likely be modified to support other character types.
 
-[brick]: https://github.com/jtdaugherty/brick/blob/master/docs/guide.rst
+[brick]: https://github.com/jtdaugherty/brick
 [brick-example.hs]: https://github.com/ta0kira/wrapping-editor/blob/master/brick-example.hs
 [ghc]: https://www.haskell.org/ghc/
 [home]: https://github.com/ta0kira/wrapping-editor
