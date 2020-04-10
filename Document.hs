@@ -4,15 +4,29 @@
 {-# LANGUAGE Safe #-}
 
 module Document (
-  EditAction(..), -- From Base.
-  EditDirection(..), -- From Base.
-  FixedFontEditor(..), -- From Base.
-  FixedFontParser, -- From Base.
-  FixedFontViewer(..), -- From Base.
-  MoveDirection(..), -- From Base.
   EditingDocument,
   editDocument,
   flattenDocument,
+  -- From Base >>>
+  EditAction(..),
+  EditDirection(..),
+  EditorAction,
+  FixedFontEditor(..),
+  FixedFontParser,
+  FixedFontViewer(..),
+  MoveDirection(..),
+  ViewerAction,
+  editorBackspaceAction,
+  editorDeleteAction,
+  editorDownAction,
+  editorEnterAction,
+  editorLeftAction,
+  editorInsertAction,
+  editorRightAction,
+  editorTypeAction,
+  editorUpAction,
+  viewerResizeAction,
+  -- <<< From Base
 ) where
 
 import Base.Actions
