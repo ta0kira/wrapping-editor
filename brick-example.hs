@@ -41,17 +41,25 @@ handleEventsWith handler x (VtyEvent e) = continue =<< handler x e
 
 -- An app containing nothing but a single editor widget.
 app = App {
+  -- renderWrappingEditor renders the current editor in a viewport with the same
+  -- name as the editor. True means that the editor has focus.
   appDraw = \edit -> [renderWrappingEditor True edit],
   appChooseCursor = const listToMaybe,
+  -- handleWrappingEditor handles editor events such as cursor movements and
+  -- typing actions.
   appHandleEvent = handleEventsWith handleWrappingEditor,
   appStartEvent = return,
   appAttrMap = const (attrMap defAttr [])
 }
 
 -- Loads the filename, runs the editor, and returns the final data.
+-- NOTE: This *doesn't* modify the contents of the file.
 fakeEditFile f = do
   contents <- fmap lines $ readFile f
+  -- newWrappingEditor creates an editor object. breakExact is a wrapping policy
+  -- that breaks at exactly n characters.
   let editor = newWrappingEditor breakExact "editor" contents
+  -- dumpWrappingEditor extracts the editor's contents.
   modified <- defaultMain app editor >>= return . dumpWrappingEditor
   return $ unlines modified
 

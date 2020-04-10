@@ -44,7 +44,7 @@ newWrappingEditor b n cs = WrappingEditor n $ editDocument b $ map UnparsedPara 
 dumpWrappingEditor :: WrappingEditor (EditingDocument c b) n -> [[c]]
 dumpWrappingEditor (WrappingEditor _ editor) = map upText $ exportDocument editor
 
-renderWrappingEditor :: (Ord n, Show n, FixedFontViewer a Char, FixedFontEditor a c) =>
+renderWrappingEditor :: (Ord n, Show n, FixedFontViewer a Char, FixedFontEditor a Char) =>
   Bool -> WrappingEditor a n -> Widget n
 renderWrappingEditor focus (WrappingEditor n editor) = Widget Greedy Greedy $ do
   ctx <- getContext
@@ -60,7 +60,7 @@ renderWrappingEditor focus (WrappingEditor n editor) = Widget Greedy Greedy $ do
     strFill w cs = str $ take w $ cs ++ repeat ' '
     lineFill w h ls = take h $ ls ++ repeat (strFill w "")
 
-handleWrappingEditor :: (Eq n, FixedFontViewer e c, FixedFontEditor e Char) =>
+handleWrappingEditor :: (Eq n, FixedFontViewer e Char, FixedFontEditor e Char) =>
   WrappingEditor e n -> Event -> EventM n (WrappingEditor e n)
 handleWrappingEditor (WrappingEditor n editor) event = do
   let action = case event of
