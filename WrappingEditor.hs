@@ -24,12 +24,12 @@ limitations under the License.
 module WrappingEditor (
   WrappingEditor,
   dumpWrappingEditor,
-  guessWrappingEditorSize,
   handleWrappingEditor,
   newWrappingEditor,
   renderWrappingEditor,
 ) where
 
+import Brick.Main
 import Brick.Types
 import Brick.Widgets.Core
 import Graphics.Vty.Input
@@ -44,16 +44,15 @@ newWrappingEditor b n cs = WrappingEditor n $ editDocument b $ map UnparsedPara 
 dumpWrappingEditor :: WrappingEditor (EditingDocument c b) n -> [[c]]
 dumpWrappingEditor (WrappingEditor _ editor) = map upText $ exportDocument editor
 
-guessWrappingEditorSize :: (Int,Int) -> WrappingEditor (EditingDocument c b) n -> WrappingEditor (EditingDocument c b) n
-guessWrappingEditorSize size (WrappingEditor n editor) =
-  (WrappingEditor n (viewerResizeAction size editor))
-
+renderWrappingEditor :: (Ord n, Show n, FixedFontViewer a Char, FixedFontEditor a c) =>
+  Bool -> WrappingEditor a n -> Widget n
 renderWrappingEditor focus (WrappingEditor n editor) = Widget Greedy Greedy $ do
   ctx <- getContext
   let width = ctx^.availWidthL
   let height = ctx^.availHeightL
+  -- NOTE: Resizing is a no-op if the size is unchanged.
   let editor' = viewerResizeAction (width,height) editor
-  render $ setCursor editor' $ textArea width height editor' where
+  render $ viewport n Vertical $ setCursor editor' $ textArea width height editor' where
     setCursor
       | focus = showCursor n . Location . getCursor
       | otherwise = const id
@@ -61,17 +60,26 @@ renderWrappingEditor focus (WrappingEditor n editor) = Widget Greedy Greedy $ do
     strFill w cs = str $ take w $ cs ++ repeat ' '
     lineFill w h ls = take h $ ls ++ repeat (strFill w "")
 
-handleWrappingEditor (WrappingEditor n editor) event = return (WrappingEditor n (action editor)) where
-  action = case event of
-                EvKey KEnter [] -> editorEnterAction
-                EvKey KDel [] ->  editorDeleteAction
-                EvKey KBS [] -> editorBackspaceAction
-                EvKey KUp [] -> editorUpAction
-                EvKey KDown [] ->  editorDownAction
-                EvKey KLeft [] -> editorLeftAction
-                EvKey KRight [] -> editorRightAction
-                EvKey (KChar c) [] | not (c `elem` "\t\r\n") -> editorAppendAction [c]
-                _ -> id
+handleWrappingEditor :: (Eq n, FixedFontViewer e c, FixedFontEditor e Char) =>
+  WrappingEditor e n -> Event -> EventM n (WrappingEditor e n)
+handleWrappingEditor (WrappingEditor n editor) event = do
+  let action = case event of
+                    EvKey KEnter [] -> editorEnterAction
+                    EvKey KDel [] ->  editorDeleteAction
+                    EvKey KBS [] -> editorBackspaceAction
+                    EvKey KUp [] -> editorUpAction
+                    EvKey KDown [] ->  editorDownAction
+                    EvKey KLeft [] -> editorLeftAction
+                    EvKey KRight [] -> editorRightAction
+                    EvKey (KChar c) [] | not (c `elem` "\t\r\n") -> editorAppendAction [c]
+                    _ -> id
+  editor' <- setSize editor >>= return . action
+  return $ WrappingEditor n editor' where
+    setSize editor = do
+      extent <- lookupExtent n
+      case extent of
+           Nothing -> return editor
+           (Just ext) -> return $ viewerResizeAction (extentSize ext) editor
 
 data WrappingEditor e n =
   WrappingEditor {
