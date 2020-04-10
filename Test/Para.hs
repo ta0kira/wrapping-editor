@@ -85,6 +85,37 @@ allTests = [
          " they are suppo",
          "sed to."]) $
         repeatAction 5 (moveParaCursor MoveUp)),
+    ("move up at top sets to paragraph front", checkParaStructure
+       commonParser
+       examplePara
+       ([],
+        "XYZThis is a te",
+        ["st paragraph to",
+         " make sure that",
+         " paragraph-rela",
+         "ted things work",
+         " as they are su",
+         "pposed to."]) $
+       composeActions [
+           repeatAction 5 (moveParaCursor MoveNext),
+           moveParaCursor MoveUp,
+           modifyPara commonParser (InsertText "XYZ") EditBefore
+         ]),
+    ("move down at bottom sets to paragraph back", checkParaStructure
+       commonParser
+       examplePara
+       (["This is a test ",
+         "paragraph to ma",
+         "ke sure that pa",
+         "ragraph-related",
+         " things work as",
+         " they are suppo"],
+        "sed to.XYZ",
+        []) $
+       composeActions [
+           repeatAction 7 (moveParaCursor MoveDown),
+           modifyPara commonParser (InsertText "XYZ") EditBefore
+         ]),
     ("continue to next line", checkParaStructure
        commonParser
        examplePara

@@ -156,9 +156,11 @@ moveDocCursor d da@(EditingDocument bs e as w h k c p) = revised where
   revised
     | paraCursorMovable d e =
       let e2 = moveParaCursor d e in (EditingDocument bs e2 as w h (fixOffset e2) c p)
-    | d == MoveUp && null bs =
-      let e2 = seekParaFront e in (EditingDocument bs e2 as w h k c p)
-    | d == MoveUp && not (null bs) =
+    | (d == MoveUp && null bs) || (d == MoveDown && null as) =
+      -- NOTE: The cursor is explicitly stored here so that the position at the
+      -- front or back of the paragraph is preserved.
+      let e2 = moveParaCursor d e in storeCursor $ (EditingDocument bs e2 as w h (fixOffset e2) c p)
+    | d == MoveUp =
         let
           bs2 = tail bs
           e2 = seekParaBack $ editPara p $ unparseParaBefore p $ head bs
@@ -166,9 +168,7 @@ moveDocCursor d da@(EditingDocument bs e as w h k c p) = revised where
           k2 = boundOffset h (k-1) in
         -- NOTE: This doesn't preserve cursor position.
         EditingDocument bs2 e2 as2 w h k2 c p
-    | d == MoveDown && null as =
-      let e2 = seekParaBack e in (EditingDocument bs e2 as w h k c p)
-    | d == MoveDown && not (null as) =
+    | d == MoveDown =
         let
           bs2 = viewParaBefore e:bs
           e2 = editPara p $ unparseParaAfter p $ head as
@@ -178,6 +178,7 @@ moveDocCursor d da@(EditingDocument bs e as w h k c p) = revised where
         EditingDocument bs2 e2 as2 w h k2 c p
     | d == MovePrev = seekBack  $ moveDocCursor MoveUp   da
     | d == MoveNext = seekFront $ moveDocCursor MoveDown da
+    | otherwise = da
   fixOffset e2 = boundOffset h $ k + (getCursorLine e2 - getCursorLine e)
   seekBack  (EditingDocument bs e as w h k c p) = EditingDocument bs (seekParaBack e)  as w h k c p
   seekFront (EditingDocument bs e as w h k c p) = EditingDocument bs (seekParaFront e) as w h k c p

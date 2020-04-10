@@ -163,6 +163,8 @@ paraCursorMovable d
 moveParaCursor :: MoveDirection -> EditingPara c b -> EditingPara c b
 moveParaCursor d p@(EditingPara bs l as) = revised where
   revised
+    | d == MoveUp   && atParaTop p    = seekParaFront p
+    | d == MoveDown && atParaBottom p = seekParaBack p
     | not (paraCursorMovable d p) = p
     | d == MoveUp   = setParaCursor (getLineCursor l) $ EditingPara (tail bs) (editLine $ head bs) (viewLine l:as)
     | d == MoveDown = setParaCursor (getLineCursor l) $ EditingPara (viewLine l:bs) (editLine $ head as) (tail as)
