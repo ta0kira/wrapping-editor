@@ -16,6 +16,7 @@ limitations under the License.
 
 -- Author: Kevin P. Barry [ta0kira@gmail.com]
 
+{-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -38,14 +39,13 @@ import Lens.Micro
 import Document
 
 
-newWrappingEditor :: FixedFontParser a c b => a -> n -> [[c]] -> WrappingEditor (EditingDocument c b) n
+newWrappingEditor :: FixedFontParser a c b => a -> n -> [[c]] -> WrappingEditor c n
 newWrappingEditor b n cs = WrappingEditor n $ editDocument b $ map UnparsedPara cs
 
-dumpWrappingEditor :: WrappingEditor (EditingDocument c b) n -> [[c]]
+dumpWrappingEditor :: WrappingEditor c n -> [[c]]
 dumpWrappingEditor (WrappingEditor _ editor) = map upText $ exportDocument editor
 
-renderWrappingEditor :: (Ord n, Show n, FixedFontViewer a Char, FixedFontEditor a Char) =>
-  Bool -> WrappingEditor a n -> Widget n
+renderWrappingEditor :: (Ord n, Show n) => Bool -> WrappingEditor Char n -> Widget n
 renderWrappingEditor focus (WrappingEditor n editor) = Widget Greedy Greedy $ do
   ctx <- getContext
   let width = ctx^.availWidthL
@@ -60,8 +60,7 @@ renderWrappingEditor focus (WrappingEditor n editor) = Widget Greedy Greedy $ do
     strFill w cs = str $ take w $ cs ++ repeat ' '
     lineFill w h ls = take h $ ls ++ repeat (strFill w "")
 
-handleWrappingEditor :: (Eq n, FixedFontViewer e Char, FixedFontEditor e Char) =>
-  WrappingEditor e n -> Event -> EventM n (WrappingEditor e n)
+handleWrappingEditor :: (Eq n) => WrappingEditor Char n -> Event -> EventM n (WrappingEditor Char n)
 handleWrappingEditor (WrappingEditor n editor) event = do
   let action = case event of
                     EvKey KEnter [] -> editorEnterAction
@@ -81,11 +80,11 @@ handleWrappingEditor (WrappingEditor n editor) event = do
            Nothing -> return editor
            (Just ext) -> return $ viewerResizeAction (extentSize ext) editor
 
-data WrappingEditor e n =
-  WrappingEditor {
+data WrappingEditor c n =
+  forall b. () => WrappingEditor {
     neName :: n,
-    neEditor :: e
+    neEditor :: EditingDocument c b
   }
 
-instance Named (WrappingEditor e n) n where
+instance Named (WrappingEditor c n) n where
     getName = neName
