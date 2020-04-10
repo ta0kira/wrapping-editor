@@ -71,13 +71,13 @@ viewAfterLines :: VisibleParaAfter c b -> [VisibleLine c b]
 viewAfterLines = vpaLines
 
 parseParaBefore :: FixedFontParser a c b => a -> UnparsedPara c -> VisibleParaBefore c b
-parseParaBefore parser (UnparsedPara cs) = VisibleParaBefore (reverse $ breakLines parser cs)
+parseParaBefore parser (UnparsedPara cs) = VisibleParaBefore $ reverse $ breakLines parser cs
 
 parseParaAfter :: FixedFontParser a c b => a -> UnparsedPara c -> VisibleParaAfter c b
-parseParaAfter parser (UnparsedPara cs) = VisibleParaAfter (breakLines parser cs)
+parseParaAfter parser (UnparsedPara cs) = VisibleParaAfter $ breakLines parser cs
 
 unparseParaBefore :: FixedFontParser a c b => a -> VisibleParaBefore c b -> UnparsedPara c
-unparseParaBefore parser (VisibleParaBefore ls) = UnparsedPara $ joinLines parser (reverse ls)
+unparseParaBefore parser (VisibleParaBefore ls) = UnparsedPara $ joinLines parser $ reverse ls
 
 unparseParaAfter :: FixedFontParser a c b => a -> VisibleParaAfter c b -> UnparsedPara c
 unparseParaAfter parser (VisibleParaAfter ls) = UnparsedPara $ joinLines parser ls
@@ -95,7 +95,7 @@ unparsePara parser (EditingPara bs l as) = UnparsedPara $ joinLines parser ls wh
 reparsePara :: FixedFontParser a c b => a -> EditingPara c b -> EditingPara c b
 reparsePara parser (EditingPara bs l as) = reparseParaTail parser revised where
   revised = EditingPara bs2 l2 as
-  bs' = breakLines parser $ joinLines parser (reverse bs)
+  bs' = reverse $ breakLines parser $ joinLines parser (reverse bs)
   (l2,bs2)
     | null bs' = (l,[])
     | otherwise = (head bs' `prependToLine` l,tail bs')

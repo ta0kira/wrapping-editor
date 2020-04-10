@@ -71,6 +71,26 @@ allTests = [
            repeatAction 7 (flip moveCursor MoveNext),
            flip breakPara EditAfter,
            flip2 editText (InsertText "XYZ") EditAfter
+         ]),
+    ("resize smaller preserves line offset and cursor", checkEditView
+       "Test/testfiles/testdata.txt"
+       "Test/testfiles/resize-smaller-view.txt" $
+       composeActions [
+           repeatAction 15 (flip moveCursor MoveDown),
+           repeatAction 5 (flip moveCursor MoveUp),
+           repeatAction 3 (flip moveCursor MoveNext),
+           flip setViewSize (18,9),
+           flip2 editText (InsertText "XYZ") EditAfter
+         ]),
+    ("resize larger preserves line offset and cursor", checkEditView
+       "Test/testfiles/testdata.txt"
+       "Test/testfiles/resize-larger-view.txt" $
+       composeActions [
+           repeatAction 15 (flip moveCursor MoveDown),
+           repeatAction 5 (flip moveCursor MoveUp),
+           repeatAction 3 (flip moveCursor MoveNext),
+           flip setViewSize (24,12),
+           flip2 editText (InsertText "XYZ") EditAfter
          ])
   ]
 

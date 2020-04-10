@@ -39,7 +39,7 @@ data EditingDocument c b =
 
 instance FixedFontViewer (EditingDocument c b) c where
   setViewSize d s@(w,h)
-    | w /= edWidth d && h /= edHeight d = storeCursor $ resizeHeight h $ resizeWidth w d
+    | w /= edWidth d && h /= edHeight d = storeCursor $ resizeWidth w $ resizeHeight h d
     | w /= edWidth d  = storeCursor $ resizeWidth  w d
     | h /= edHeight d = storeCursor $ resizeHeight h d
     | otherwise = d
