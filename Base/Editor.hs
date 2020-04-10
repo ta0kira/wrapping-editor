@@ -55,11 +55,11 @@ editorDeleteAction e = editText e DeleteText EditAfter
 editorEnterAction :: EditorAction c
 editorEnterAction e = breakPara e EditBefore
 
-editorAppendAction :: c -> EditorAction c
-editorAppendAction c e = editText e (InsertText [c]) EditBefore
+editorAppendAction :: [c] -> EditorAction c
+editorAppendAction cs e = editText e (InsertText cs) EditBefore
 
-editorInsertAction :: c -> EditorAction c
-editorInsertAction c e = editText e (InsertText [c]) EditAfter
+editorInsertAction :: [c] -> EditorAction c
+editorInsertAction cs e = editText e (InsertText cs) EditAfter
 
 editorUpAction :: EditorAction c
 editorUpAction e = moveCursor e MoveUp

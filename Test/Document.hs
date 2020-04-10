@@ -48,7 +48,7 @@ allTests = [
            repeatAction 15 editorDownAction,
            repeatAction 5 editorUpAction,
            repeatAction 7 editorRightAction,
-           composeActions (map editorAppendAction "XYZ")
+           editorAppendAction "XYZ"
          ]),
     ("line position preserved when passing short lines", checkEditView
        "Test/testfiles/testdata.txt"
@@ -58,7 +58,7 @@ allTests = [
            -- This traverses past empty lines after the line position is set.
            repeatAction 15 editorDownAction,
            repeatAction 5 editorUpAction,
-           composeActions (map editorAppendAction "XYZ")
+           editorAppendAction "XYZ"
          ]),
     ("insert in middle content", checkEditContent
        "Test/testfiles/testdata.txt"
@@ -67,7 +67,7 @@ allTests = [
            repeatAction 15 editorDownAction,
            repeatAction 5 editorUpAction,
            repeatAction 7 editorRightAction,
-           composeActions (map editorAppendAction "XYZ")
+           editorAppendAction "XYZ"
          ]),
     ("delete in middle view", checkEditView
        "Test/testfiles/testdata.txt"
@@ -110,7 +110,7 @@ allTests = [
            repeatAction 5 editorUpAction,
            repeatAction 7 editorRightAction,
            editorEnterAction,
-           composeActions (map editorAppendAction "XYZ")
+           editorAppendAction "XYZ"
          ]),
     ("break in middle after", checkEditView
        "Test/testfiles/testdata.txt"
@@ -120,7 +120,7 @@ allTests = [
            repeatAction 5 editorUpAction,
            repeatAction 7 editorRightAction,
            flip breakPara EditAfter,
-           composeActions (map editorInsertAction "ZYX")
+           editorInsertAction "XYZ"
          ]),
     ("resize smaller preserves line offset and cursor", checkEditView
        "Test/testfiles/testdata.txt"
@@ -130,7 +130,7 @@ allTests = [
            repeatAction 5 editorUpAction,
            repeatAction 3 editorRightAction,
            viewerResizeAction (18,9),
-           composeActions (map editorInsertAction "ZYX")
+           editorInsertAction "XYZ"
          ]),
     ("resize larger preserves line offset and cursor", checkEditView
        "Test/testfiles/testdata.txt"
@@ -140,7 +140,7 @@ allTests = [
            repeatAction 5 editorUpAction,
            repeatAction 3 editorRightAction,
            viewerResizeAction (24,12),
-           composeActions (map editorInsertAction "ZYX")
+           editorInsertAction "XYZ"
          ])
   ]
 
