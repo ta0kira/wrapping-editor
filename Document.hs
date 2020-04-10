@@ -24,7 +24,7 @@ limitations under the License.
 module Document (
   EditingDocument,
   editDocument,
-  flattenDocument,
+  exportDocument,
   -- From Base >>>
   EditAction(..),
   EditDirection(..),
@@ -33,6 +33,7 @@ module Document (
   FixedFontParser,
   FixedFontViewer(..),
   MoveDirection(..),
+  UnparsedPara(..),
   ViewerAction,
   editorAppendAction,
   editorBackspaceAction,
@@ -87,8 +88,8 @@ instance FixedFontEditor (EditingDocument c b) c where
       | otherwise = storeCursor
   getCursor (EditingDocument _ e _ _ _ k _ _) = (getParaCursor e,k)
 
-editDocument :: FixedFontParser a c b => a -> [c] -> EditingDocument c b
-editDocument parser cs = document where
+editDocument :: FixedFontParser a c b => a -> [UnparsedPara c] -> EditingDocument c b
+editDocument parser ps = document where
   document = EditingDocument {
       edBefore = [],
       edEditing = editPara parser first,
@@ -99,13 +100,13 @@ editDocument parser cs = document where
       edLastCursor = 0,
       edParser = parser
     }
-  (first:rest) = nonempty (breakParas parser cs)
+  (first:rest) = nonempty ps
   nonempty [] = [emptyPara]
   nonempty ps = ps
 
-flattenDocument :: EditingDocument c b -> [c]
-flattenDocument (EditingDocument bs e as _ _ _ _ p) = joinParas p ps where
-  ps = reverse (map (unparseParaBefore p) bs) ++ [unparsePara p e] ++ (map (unparseParaAfter p) as)
+exportDocument :: EditingDocument c b -> [UnparsedPara c]
+exportDocument (EditingDocument bs e as _ _ _ _ p) =
+  reverse (map (unparseParaBefore p) bs) ++ [unparsePara p e] ++ (map (unparseParaAfter p) as)
 
 
 -- Private below here.

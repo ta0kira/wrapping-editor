@@ -22,6 +22,7 @@ module Test.Para (
   allTests,
 ) where
 
+import LineWrap
 import Base.Actions
 import Base.Line
 import Base.Para
@@ -314,6 +315,7 @@ allTests = [
          ])
   ]
 
+commonParser :: BreakExact Char
 commonParser = setLineWidth breakExact 15
 
 examplePara = UnparsedPara "This is a test paragraph to make sure that paragraph-related things work as they are supposed to."

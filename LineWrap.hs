@@ -16,19 +16,37 @@ limitations under the License.
 
 -- Author: Kevin P. Barry [ta0kira@gmail.com]
 
-{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE Safe #-}
 
-module Base.Parser (
-  FixedFontParser(..),
+module LineWrap (
+  BreakExact,
+  LineBreak(..),
+  breakExact,
 ) where
 
 import Base.Line
+import Base.Para
+import Base.Parser
 
 
-class Enum b => FixedFontParser a c b | a -> c b where
-  setLineWidth :: a -> Int -> a
-  breakLines :: a -> [c] -> [VisibleLine c b]
-  joinLines :: a -> [VisibleLine c b] -> [c]
-  renderLine :: a -> VisibleLine c b -> [c]
+data LineBreak = SimpleBreak | HiddenSpace | WordHyphen deriving (Enum,Eq,Ord,Show)
+
+data BreakExact c = BreakExact Int deriving (Show)
+
+breakExact :: BreakExact c
+breakExact = BreakExact 0
+
+instance FixedFontParser (BreakExact c) c LineBreak where
+  setLineWidth _ w = BreakExact w
+  breakLines _ [] = [emptyLine]
+  breakLines (BreakExact w) cs
+    | w < 1 = [VisibleLine cs SimpleBreak]
+    | otherwise = breakOrEmpty cs where
+      breakOrEmpty [] = []
+      breakOrEmpty cs = line:(breakOrEmpty rest) where
+        line = VisibleLine (take w cs) SimpleBreak
+        rest = drop w cs
+  joinLines _ = concat . map vlText
+  renderLine _ = vlText

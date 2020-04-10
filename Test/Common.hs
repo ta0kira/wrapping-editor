@@ -20,9 +20,6 @@ limitations under the License.
 {-# LANGUAGE Safe #-}
 
 module Test.Common (
-  BreakExact,
-  LineBreak(..),
-  breakExact,
   checkCondition,
   checkConditions,
   composeActions,
@@ -35,38 +32,15 @@ module Test.Common (
 
 import Control.Applicative ((<|>))
 import Control.Monad (when)
-import Data.Maybe
-import System.IO
+import Data.Maybe (catMaybes)
+import System.IO (hPutStr,hPutStrLn,stderr)
 
+import LineWrap
 import Base.Line
-import Base.Para
-import Base.Parser
 
-
-data LineBreak = LineBreak | AlternateBreak deriving (Enum,Eq,Ord,Show)
-
-data BreakExact = BreakExact Int deriving (Show)
-
-breakExact :: BreakExact
-breakExact = BreakExact 0
-
-instance FixedFontParser BreakExact Char LineBreak where
-  setLineWidth _ w = BreakExact w
-  breakParas _ = map UnparsedPara . lines
-  joinParas _ = unlines . map upText
-  breakLines _ [] = [emptyLine]
-  breakLines (BreakExact w) cs
-    | w < 2 = [VisibleLine cs LineBreak]
-    | otherwise = breakOrEmpty cs where
-      breakOrEmpty [] = []
-      breakOrEmpty cs = line:(breakOrEmpty rest) where
-        line = VisibleLine (take w cs) LineBreak
-        rest = drop w cs
-  joinLines _ = concat . map vlText
-  renderLine _ = vlText
 
 newLine :: String -> VisibleLine Char LineBreak
-newLine cs = VisibleLine cs LineBreak
+newLine cs = VisibleLine cs SimpleBreak
 
 composeActions :: [a -> a] -> a -> a
 composeActions = foldr (flip (.)) id

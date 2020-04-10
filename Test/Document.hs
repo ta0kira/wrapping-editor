@@ -23,6 +23,7 @@ module Test.Document (
   allTests,
 ) where
 
+import LineWrap
 import Document
 import Test.Common
 
@@ -146,14 +147,20 @@ allTests = [
 
 defaultView = (20,10)
 
+splitParas = map UnparsedPara . lines
+
+joinParas = unlines . map upText
+
+loadDoc = viewerResizeAction defaultView . editDocument breakExact . splitParas
+
 checkEditContent fx fy f = do
-  edit <- fmap (f . viewerResizeAction defaultView . editDocument breakExact) $ readFile fx
+  edit <- fmap (f . loadDoc) $ readFile fx
   view <- readFile fy
-  let restored = flattenDocument edit
+  let restored = joinParas $ exportDocument edit
   checkCondition (restored == view) ("\n" ++ restored)
 
 checkEditView fx fy f = do
-  edit <- fmap (f . viewerResizeAction defaultView . editDocument breakExact) $ readFile fx
+  edit <- fmap (f . loadDoc) $ readFile fx
   view <- fmap (map trimSpace . lines) $ readFile fy
   let restored = map trimSpace $ getVisible edit
   checkCondition (restored == view) ("\n" ++ unlines restored)

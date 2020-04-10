@@ -22,6 +22,7 @@ module Test.Line (
   allTests,
 ) where
 
+import LineWrap
 import Base.Actions
 import Base.Line
 import Edit.Line
@@ -139,25 +140,25 @@ allTests = [
            modifyLine DeleteText EditAfter
          ]),
     ("split line middle", do
-       let line = editLine $ VisibleLine "this is a test line" AlternateBreak
+       let line = editLine $ VisibleLine "this is a test line" HiddenSpace
        let (left,right) = splitLine $ setLineCursor 5 line
        checkConditions [
-           (left == (VisibleLine "this " LineBreak),"Left: " ++ show left),
-           (right == (VisibleLine "is a test line" AlternateBreak),"Right: " ++ show right)
+           (left == (VisibleLine "this " SimpleBreak),"Left: " ++ show left),
+           (right == (VisibleLine "is a test line" HiddenSpace),"Right: " ++ show right)
          ]),
     ("split line front", do
-       let line = editLine $ VisibleLine "this is a test line" AlternateBreak
+       let line = editLine $ VisibleLine "this is a test line" HiddenSpace
        let (left,right) = splitLine $ moveLineCursor MoveUp line
        checkConditions [
-           (left == (VisibleLine "" LineBreak),"Left: " ++ show left),
-           (right == (VisibleLine "this is a test line" AlternateBreak),"Right: " ++ show right)
+           (left == (VisibleLine "" SimpleBreak),"Left: " ++ show left),
+           (right == (VisibleLine "this is a test line" HiddenSpace),"Right: " ++ show right)
          ]),
     ("split line back", do
-       let line = editLine $ VisibleLine "this is a test line" AlternateBreak
+       let line = editLine $ VisibleLine "this is a test line" HiddenSpace
        let (left,right) = splitLine $ moveLineCursor MoveDown line
        checkConditions [
-           (left == (VisibleLine "this is a test line" LineBreak),"Left: " ++ show left),
-           (right == (VisibleLine "" AlternateBreak),"Right: " ++ show right)
+           (left == (VisibleLine "this is a test line" SimpleBreak),"Left: " ++ show left),
+           (right == (VisibleLine "" HiddenSpace),"Right: " ++ show right)
          ]),
     ("prepend preserves cursor", checkLineEdit
        "this is a test line"
