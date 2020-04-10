@@ -6,7 +6,9 @@ module Edit.Para (
   VisibleParaBefore,
   appendToPara,
   atParaBack,
+  atParaBottom,
   atParaFront,
+  atParaTop,
   editPara,
   getAfterLines,
   getBeforeLines,
@@ -100,11 +102,11 @@ reparsePara parser (EditingPara bs l as) = reparseParaTail parser revised where
 
 viewParaBefore :: EditingPara c b -> VisibleParaBefore c b
 viewParaBefore (EditingPara bs l as) = VisibleParaBefore ls where
-  ls = reverse bs ++ [viewLine l] ++ as
+  ls = reverse $ reverse bs ++ [viewLine l] ++ as
 
 viewParaAfter :: EditingPara c b -> VisibleParaAfter c b
 viewParaAfter (EditingPara bs l as) = VisibleParaAfter ls where
-  ls = reverse as ++ [viewLine l] ++ bs
+  ls = reverse bs ++ [viewLine l] ++ as
 
 getBeforeLines :: EditingPara c b -> VisibleParaBefore c b
 getBeforeLines = VisibleParaBefore . epBefore
@@ -136,11 +138,11 @@ splitPara parser (EditingPara bs l as) = let (b,a) = splitLine l in
    unparseParaAfter  parser $ VisibleParaAfter  (a:as))
 
 paraCursorMovable :: MoveDirection -> EditingPara c b -> Bool
-paraCursorMovable d (EditingPara bs l as)
-  | d == MoveUp   = not (null bs)
-  | d == MoveDown = not (null as)
-  | d == MovePrev = not (null bs) || lineCursorMovable d l
-  | d == MoveNext = not (null as) || lineCursorMovable d l
+paraCursorMovable d
+  | d == MoveUp   = not . atParaTop
+  | d == MoveDown = not . atParaBottom
+  | d == MovePrev = not . atParaFront
+  | d == MoveNext = not . atParaBack
 
 moveParaCursor :: MoveDirection -> EditingPara c b -> EditingPara c b
 moveParaCursor d p@(EditingPara bs l as) = revised where
@@ -155,10 +157,16 @@ moveParaCursor d p@(EditingPara bs l as) = revised where
   setFront (EditingPara bs l as) = (EditingPara bs (moveLineCursor MoveUp   l) as)
 
 atParaFront :: EditingPara c b -> Bool
-atParaFront (EditingPara bs l _) = null bs && atLineFront l
+atParaFront p@(EditingPara _ l _) = atParaTop p && atLineFront l
 
 atParaBack :: EditingPara c b -> Bool
-atParaBack (EditingPara _ l as) = null as && atLineBack l
+atParaBack p@(EditingPara _ l _) = atParaBottom p && atLineBack l
+
+atParaTop :: EditingPara c b -> Bool
+atParaTop (EditingPara bs _ _) = null bs
+
+atParaBottom :: EditingPara c b -> Bool
+atParaBottom (EditingPara _ _ as) = null as
 
 seekParaFront :: EditingPara c b -> EditingPara c b
 seekParaFront (EditingPara [] l as) = EditingPara [] (moveLineCursor MoveUp l) as

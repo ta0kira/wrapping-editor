@@ -110,26 +110,33 @@ resizeWidth w (EditingDocument bs e as _ h k c p) = (EditingDocument bs2 e2 as2 
   e2 = reparsePara p2 e
 
 resizeHeight :: Int -> EditingDocument c b -> EditingDocument c b
-resizeHeight h2 (EditingDocument bs e as w h k c p) =
+resizeHeight h2 (EditingDocument bs e as w _ k c p) =
   (EditingDocument bs e as w h2 (max 0 $ min (h2-1) k) c p)
 
 moveDocCursor :: MoveDirection -> EditingDocument c b -> EditingDocument c b
 moveDocCursor d da@(EditingDocument bs e as w h k c p) = revised where
   revised
-    | paraCursorMovable d e = let e2 = moveParaCursor d e in (EditingDocument bs e2 as w h (fixOffset e2) c p)
+    | paraCursorMovable d e =
+      let e2 = moveParaCursor d e in (EditingDocument bs e2 as w h (fixOffset e2) c p)
+    | d == MoveUp && null bs =
+      let e2 = seekParaFront e in (EditingDocument bs e2 as w h k c p)
     | d == MoveUp && not (null bs) =
         let
           bs2 = tail bs
-          e2 = editPara p $ unparseParaBefore p $ head bs
+          e2 = seekParaBack $ editPara p $ unparseParaBefore p $ head bs
           as2 = viewParaAfter e:as
           k2 = max 0 (k-1) in
+        -- NOTE: This doesn't preserve cursor position.
         EditingDocument bs2 e2 as2 w h k2 c p
+    | d == MoveDown && null as =
+      let e2 = seekParaBack e in (EditingDocument bs e2 as w h k c p)
     | d == MoveDown && not (null as) =
         let
           bs2 = viewParaBefore e:bs
           e2 = editPara p $ unparseParaAfter p $ head as
           as2 = tail as
           k2 = min (h-1) (k+1) in
+        -- NOTE: This doesn't preserve cursor position.
         EditingDocument bs2 e2 as2 w h k2 c p
     | d == MovePrev = seekBack  $ moveDocCursor MoveUp   da
     | d == MoveNext = seekFront $ moveDocCursor MoveDown da
@@ -151,5 +158,5 @@ insertParaSplit :: EditDirection -> EditingDocument c b -> EditingDocument c b
 insertParaSplit d (EditingDocument bs e as w h k c p) = revised where
   (b,a) = splitPara p e
   revised
-    | d == EditBefore = EditingDocument (parseParaBefore p b:bs) (editPara p a) as w h k c p
-    | d == EditAfter  = EditingDocument bs (editPara p b) (parseParaAfter p a:as) w h k c p
+    | d == EditBefore = EditingDocument (parseParaBefore p b:bs) (editPara p a) as w h (min (h-1) (k+1)) c p
+    | d == EditAfter  = EditingDocument bs (seekParaBack $ editPara p b) (parseParaAfter p a:as) w h k c p
