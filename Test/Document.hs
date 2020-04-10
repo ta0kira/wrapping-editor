@@ -32,6 +32,16 @@ allTests = [
            repeatAction 7 (flip moveCursor MoveNext),
            flip2 editText (InsertText "XYZ") EditBefore
          ]),
+    ("line position preserved when passing short lines", checkEditView
+       "Test/testfiles/testdata.txt"
+       "Test/testfiles/insert-middle-view.txt" $
+       composeActions [
+           repeatAction 7 (flip moveCursor MoveNext),
+           -- This traverses past empty lines after the line position is set.
+           repeatAction 15 (flip moveCursor MoveDown),
+           repeatAction 5 (flip moveCursor MoveUp),
+           flip2 editText (InsertText "XYZ") EditBefore
+         ]),
     ("insert in middle content", checkEditContent
        "Test/testfiles/testdata.txt"
        "Test/testfiles/insert-middle-flat.txt" $
