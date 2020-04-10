@@ -25,12 +25,14 @@ import System.IO
 import Test.Common (runTests)
 import qualified Test.Document as TestDocument (allTests)
 import qualified Test.Line as TestLine (allTests)
+import qualified Test.LineWrap as TestLineWrap (allTests)
 import qualified Test.Para as TestPara (allTests)
 
 
 main = do
   cwd <- getCurrentDirectory
   hPutStrLn stderr $ "Running from " ++ cwd
+  runTests "LineWrap Tests" TestLineWrap.allTests
   runTests "Line Tests" TestLine.allTests
   runTests "Para Tests" TestPara.allTests
   runTests "Document Tests" TestDocument.allTests
