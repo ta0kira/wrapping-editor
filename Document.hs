@@ -76,8 +76,7 @@ data EditingDocument c =
 
 instance FixedFontViewer (EditingDocument c) c where
   setViewSize d s@(w,h)
-    | w /= edWidth d && h /= edHeight d = storeCursor $ resizeHeight h $ resizeWidth w d
-    | w /= edWidth d  = storeCursor $ resizeWidth  w d
+    | w /= edWidth d  = storeCursor $ resizeHeight h $ resizeWidth w d
     | h /= edHeight d = storeCursor $ resizeHeight h d
     | otherwise = d
   getViewSize d = (edWidth d,edHeight d)
@@ -94,7 +93,7 @@ instance FixedFontEditor (EditingDocument c) c where
     updateCursor
       | d == MovePrev || d == MoveNext || d == MoveHome || d == MoveEnd = storeCursor
       | otherwise = applyCursor
-  getCursor (EditingDocument _ e _ _ h k _ _) = (getParaCursor e,min h k)
+  getCursor (EditingDocument _ e _ _ h k _ _) = (getParaCursor e,boundOffset h k)
 
 editDocument :: FixedFontParser a c b => a -> [UnparsedPara c] -> EditingDocument c
 editDocument parser ps = document where
@@ -122,7 +121,7 @@ exportDocument (EditingDocument bs e as _ _ _ _ _) =
 boundOffset :: Int -> Int -> Int
 boundOffset h k
   | h < 1 = k
-  | otherwise = min (h-1) (max 0 k)
+  | otherwise = max 0 (min (h-1) k)
 
 storeCursor :: EditingDocument c -> EditingDocument c
 storeCursor (EditingDocument bs e as w h k _ p) =
