@@ -39,9 +39,13 @@ module Document (
   editorBackspaceAction,
   editorDeleteAction,
   editorDownAction,
+  editorEndAction,
   editorEnterAction,
-  editorLeftAction,
+  editorHomeAction,
   editorInsertAction,
+  editorLeftAction,
+  editorPageDownAction,
+  editorPageUpAction,
   editorRightAction,
   editorUpAction,
   viewerResizeAction,
@@ -84,8 +88,8 @@ instance FixedFontEditor (EditingDocument c b) c where
   breakPara da d = storeCursor $ insertParaSplit d da
   moveCursor da d = updateCursor $ moveDocCursor d da where
     updateCursor
-      | d == MoveUp || d == MoveDown = applyCursor
-      | otherwise = storeCursor
+      | d == MovePrev || d == MoveNext || d == MoveHome || d == MoveEnd = storeCursor
+      | otherwise = applyCursor
   getCursor (EditingDocument _ e _ _ h k _ _) = (getParaCursor e,k)
 
 editDocument :: FixedFontParser a c b => a -> [UnparsedPara c] -> EditingDocument c b
@@ -178,10 +182,14 @@ moveDocCursor d da@(EditingDocument bs e as w h k c p) = revised where
         EditingDocument bs2 e2 as2 w h k2 c p
     | d == MovePrev = seekBack  $ moveDocCursor MoveUp   da
     | d == MoveNext = seekFront $ moveDocCursor MoveDown da
+    | d == MovePageUp   = editAtTop $ repeatTimes h (moveDocCursor MoveUp)   da
+    | d == MovePageDown = editAtTop $ repeatTimes h (moveDocCursor MoveDown) da
     | otherwise = da
   fixOffset e2 = boundOffset h $ k + (getCursorLine e2 - getCursorLine e)
   seekBack  (EditingDocument bs e as w h k c p) = EditingDocument bs (seekParaBack e)  as w h k c p
   seekFront (EditingDocument bs e as w h k c p) = EditingDocument bs (seekParaFront e) as w h k c p
+  repeatTimes n = foldr (flip (.)) id . replicate n
+  editAtTop (EditingDocument bs e as w h _ c p) = EditingDocument bs e as w h 0 c p
 
 modifyDoc :: EditAction c -> EditDirection -> EditingDocument c b -> EditingDocument c b
 modifyDoc m d da@(EditingDocument bs e as w h k c p) = revised m d where

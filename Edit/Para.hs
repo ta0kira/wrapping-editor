@@ -159,10 +159,13 @@ paraCursorMovable d
   | d == MoveDown = not . atParaBottom
   | d == MovePrev = not . atParaFront
   | d == MoveNext = not . atParaBack
+  | d == MoveHome || d == MoveEnd = const True
+  | otherwise = const False
 
 moveParaCursor :: MoveDirection -> EditingPara c b -> EditingPara c b
 moveParaCursor d p@(EditingPara bs l as) = revised where
   revised
+    | d == MoveHome || d == MoveEnd = EditingPara bs (moveLineCursor d l) as
     | d == MoveUp   && atParaTop p    = seekParaFront p
     | d == MoveDown && atParaBottom p = seekParaBack p
     | not (paraCursorMovable d p) = p

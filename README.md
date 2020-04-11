@@ -10,11 +10,6 @@ Here are some important features:
 - Customizable line-wrapping policies, to include special line rendering.
 - Efficient editing operations for long documents.
 
-Here are a few things that could be improved:
-
-- No independent scrolling of the viewport.
-- No support for special actions like `Home` and `End`.
-
 If you have any problems using this library, or if you would like to see new
 features, please see the [issues page][issues].
 

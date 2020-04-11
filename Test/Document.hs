@@ -42,6 +42,23 @@ allTests = [
        "Test/testfiles/testdata.txt"
        "Test/testfiles/below-view.txt" $
        repeatAction 15 editorDownAction),
+    ("page down puts edit at top and preserves cursor", checkEditView
+       "Test/testfiles/testdata.txt"
+       "Test/testfiles/page-down-view.txt" $
+       composeActions [
+           repeatAction 4 editorRightAction,
+           editorPageDownAction,
+           editorAppendAction "XYZ"
+         ]),
+    ("page up puts edit at top and preserves cursor", checkEditView
+       "Test/testfiles/testdata.txt"
+       "Test/testfiles/page-up-view.txt" $
+       composeActions [
+           repeatAction 4 editorRightAction,
+           repeatAction 15 editorDownAction,
+           editorPageUpAction,
+           editorAppendAction "XYZ"
+         ]),
     ("insert in middle view", checkEditView
        "Test/testfiles/testdata.txt"
        "Test/testfiles/insert-middle-view.txt" $

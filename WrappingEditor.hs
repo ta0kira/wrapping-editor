@@ -63,13 +63,17 @@ renderWrappingEditor focus (WrappingEditor n editor) = Widget Greedy Greedy $ do
 handleWrappingEditor :: (Eq n) => WrappingEditor Char n -> Event -> EventM n (WrappingEditor Char n)
 handleWrappingEditor (WrappingEditor n editor) event = do
   let action = case event of
-                    EvKey KEnter [] -> editorEnterAction
-                    EvKey KDel [] ->  editorDeleteAction
-                    EvKey KBS [] -> editorBackspaceAction
-                    EvKey KUp [] -> editorUpAction
-                    EvKey KDown [] ->  editorDownAction
-                    EvKey KLeft [] -> editorLeftAction
-                    EvKey KRight [] -> editorRightAction
+                    EvKey KBS []       -> editorBackspaceAction
+                    EvKey KDel []      -> editorDeleteAction
+                    EvKey KDown []     -> editorDownAction
+                    EvKey KEnd []      -> editorEndAction
+                    EvKey KEnter []    -> editorEnterAction
+                    EvKey KHome []     -> editorHomeAction
+                    EvKey KLeft []     -> editorLeftAction
+                    EvKey KPageDown [] -> editorPageDownAction
+                    EvKey KPageUp []   -> editorPageUpAction
+                    EvKey KRight []    -> editorRightAction
+                    EvKey KUp []       -> editorUpAction
                     EvKey (KChar c) [] | not (c `elem` "\t\r\n") -> editorAppendAction [c]
                     _ -> id
   editor' <- setSize editor >>= return . action

@@ -96,7 +96,7 @@ allTests = [
        "Xthis is a test line" $
        composeActions [
            setLineCursor 5,
-           moveLineCursor MoveUp,
+           moveLineCursor MoveHome,
            modifyLine (InsertText "X") EditAfter
          ]),
     ("insert at back", checkLineEdit
@@ -104,7 +104,7 @@ allTests = [
        "this is a test lineX" $
        composeActions [
            setLineCursor 5,
-           moveLineCursor MoveDown,
+           moveLineCursor MoveEnd,
            modifyLine (InsertText "X") EditAfter
          ]),
     ("delete after front", checkLineEdit
@@ -112,7 +112,7 @@ allTests = [
        "his is a test line" $
        composeActions [
            setLineCursor 5,
-           moveLineCursor MoveUp,
+           moveLineCursor MoveHome,
            modifyLine DeleteText EditAfter
          ]),
     ("delete before front", checkLineEdit
@@ -120,7 +120,7 @@ allTests = [
        "this is a test line" $
        composeActions [
            setLineCursor 5,
-           moveLineCursor MoveUp,
+           moveLineCursor MoveHome,
            modifyLine DeleteText EditBefore
          ]),
     ("delete before back", checkLineEdit
@@ -128,7 +128,7 @@ allTests = [
        "this is a test lin" $
        composeActions [
            setLineCursor 5,
-           moveLineCursor MoveDown,
+           moveLineCursor MoveEnd,
            modifyLine DeleteText EditBefore
          ]),
     ("delete after back", checkLineEdit
@@ -136,7 +136,7 @@ allTests = [
        "this is a test line" $
        composeActions [
            setLineCursor 5,
-           moveLineCursor MoveDown,
+           moveLineCursor MoveEnd,
            modifyLine DeleteText EditAfter
          ]),
     ("split line middle", do

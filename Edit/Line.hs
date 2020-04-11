@@ -70,9 +70,13 @@ splitLine (EditingLine bs as c b) =
 lineCursorMovable :: MoveDirection -> EditingLine c b -> Bool
 lineCursorMovable MovePrev (EditingLine (_:_) _ _ _) = True
 lineCursorMovable MoveNext (EditingLine _ (_:_) _ _) = True
+lineCursorMovable MoveHome _ = True
+lineCursorMovable MoveEnd  _ = True
 lineCursorMovable _ _ = False
 
 moveLineCursor :: MoveDirection -> EditingLine c b -> EditingLine c b
+moveLineCursor MoveHome p = moveLineCursor MoveUp   p
+moveLineCursor MoveEnd  p = moveLineCursor MoveDown p
 moveLineCursor MoveUp (EditingLine bs as c b) =
   (EditingLine [] (reverse bs ++ as) 0 b)
 moveLineCursor MoveDown (EditingLine bs as c b) =

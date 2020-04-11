@@ -28,9 +28,13 @@ module Base.Editor (
   editorBackspaceAction,
   editorDeleteAction,
   editorDownAction,
+  editorEndAction,
   editorEnterAction,
+  editorHomeAction,
   editorInsertAction,
   editorLeftAction,
+  editorPageDownAction,
+  editorPageUpAction,
   editorRightAction,
   editorUpAction,
 ) where
@@ -72,3 +76,15 @@ editorLeftAction e = moveCursor e MovePrev
 
 editorRightAction :: EditorAction c
 editorRightAction e = moveCursor e MoveNext
+
+editorHomeAction :: EditorAction c
+editorHomeAction e = moveCursor e MoveHome
+
+editorEndAction :: EditorAction c
+editorEndAction e = moveCursor e MoveEnd
+
+editorPageUpAction :: EditorAction c
+editorPageUpAction e = moveCursor e MovePageUp
+
+editorPageDownAction :: EditorAction c
+editorPageDownAction e = moveCursor e MovePageDown

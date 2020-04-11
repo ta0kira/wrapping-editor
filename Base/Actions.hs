@@ -29,4 +29,7 @@ data EditAction c = InsertText [c] | DeleteText deriving (Show)
 
 data EditDirection = EditBefore | EditAfter deriving (Eq,Ord,Show)
 
-data MoveDirection = MoveUp | MoveDown | MovePrev | MoveNext deriving (Eq,Ord,Show)
+data MoveDirection =
+  MoveUp | MoveDown | MovePrev | MoveNext |
+  MoveHome | MoveEnd | MovePageUp | MovePageDown
+  deriving (Eq,Ord,Show)
