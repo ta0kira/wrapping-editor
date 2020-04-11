@@ -23,7 +23,8 @@ module Test.Common (
   checkCondition,
   checkConditions,
   composeActions,
-  newLine,
+  endLine,
+  innerLine,
   repeatAction,
   runTests,
   testFail,
@@ -39,8 +40,11 @@ import LineWrap
 import Base.Line
 
 
-newLine :: String -> VisibleLine Char LineBreak
-newLine cs = VisibleLine cs SimpleBreak
+endLine :: String -> VisibleLine Char LineBreak
+endLine cs = VisibleLine cs ParagraphEnd
+
+innerLine :: String -> VisibleLine Char LineBreak
+innerLine cs = VisibleLine cs SimpleBreak
 
 composeActions :: [a -> a] -> a -> a
 composeActions = foldr (flip (.)) id

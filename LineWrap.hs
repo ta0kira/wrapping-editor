@@ -32,7 +32,7 @@ import Base.Para
 import Base.Parser
 
 
-data LineBreak = SimpleBreak | WordHyphen deriving (Enum,Eq,Ord,Show)
+data LineBreak = ParagraphEnd | SimpleBreak deriving (Enum,Eq,Ord,Show)
 
 newtype BreakExact c = BreakExact Int deriving (Show)
 
@@ -52,7 +52,9 @@ instance FixedFontParser (BreakExact c) c LineBreak where
 instance SpaceChar c => FixedFontParser (TrimSpaces c) c LineBreak where
   setLineWidth _ w = TrimSpaces w
   breakLines (TrimSpaces w) = breakCommon isSpaceChar w
-  renderLine _ = reverse . trimSpacesFront . reverse . vlText
+  renderLine _ (VisibleLine cs ParagraphEnd) = cs
+  renderLine _ (VisibleLine cs SimpleBreak)  = reverse $ trimSpacesFront $ reverse cs
+  tweakCursor _ (VisibleLine _ ParagraphEnd) = id
   tweakCursor _ (VisibleLine cs _) = max 0 . min (total-post) where
     post = countSpacesFront $ reverse cs
     total = length cs
@@ -69,12 +71,14 @@ countSpacesFront = length . takeWhile isSpaceChar
 breakCommon :: (c -> Bool) -> Int -> [c] -> [VisibleLine c LineBreak]
 breakCommon f w [] = [emptyLine]
 breakCommon f w cs
-  | w < 1 = [VisibleLine cs SimpleBreak]
+  | w < 1 = [VisibleLine cs ParagraphEnd]
   | otherwise = breakOrEmpty cs where
     breakOrEmpty [] = []
     breakOrEmpty cs = adjust (take w cs) (drop w cs) where
       adjust line rest
-        | null rest || not (f $ head rest) =
+        | null rest =
+          [VisibleLine line ParagraphEnd]
+        | not (f $ head rest) =
           (VisibleLine line SimpleBreak):(breakOrEmpty rest)
         | otherwise = adjust (line ++ [head rest]) (tail rest)
 

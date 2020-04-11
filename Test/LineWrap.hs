@@ -33,24 +33,24 @@ allTests = [
     ("breakExact skips breaks by default", checkLineBreak
        breakExact
        "This is a test line."
-       [newLine "This is a test line."]),
+       [endLine "This is a test line."]),
     ("breakExact empty still provides line", checkLineBreak
        breakExact
        ""
-       [newLine ""]),
+       [endLine ""]),
     ("breakExact exact multiple", checkLineBreak
        (setLineWidth breakExact 5)
        "This is a test line."
-       [newLine "This ",
-        newLine "is a ",
-        newLine "test ",
-        newLine "line."]),
+       [innerLine "This ",
+        innerLine "is a ",
+        innerLine "test ",
+        endLine "line."]),
     ("breakExact not a multiple", checkLineBreak
        (setLineWidth breakExact 7)
        "This is a test line."
-       [newLine "This is",
-        newLine " a test",
-        newLine " line."]),
+       [innerLine "This is",
+        innerLine " a test",
+        endLine " line."]),
     ("breakExact restores line", do
        let breaker = setLineWidth breakExact 7
        let line = "This is a test line."
@@ -59,24 +59,24 @@ allTests = [
     ("hideLeadingSpace skips breaks by default", checkLineBreak
        hideLeadingSpace
        "This is a test line."
-       [newLine "This is a test line."]),
+       [endLine "This is a test line."]),
     ("hideLeadingSpace empty still provides line", checkLineBreak
        hideLeadingSpace
        ""
-       [newLine ""]),
+       [endLine ""]),
     ("hideLeadingSpace exact multiple", checkLineBreak
        (setLineWidth hideLeadingSpace 5)
        "This is a test line."
-       [newLine "This ",
-        newLine "is a ",
-        newLine "test ",
-        newLine "line."]),
+       [innerLine "This ",
+        innerLine "is a ",
+        innerLine "test ",
+        endLine "line."]),
     ("hideLeadingSpace not a multiple", checkLineBreak
        (setLineWidth hideLeadingSpace 7)
        "This is a test line."
-       [newLine "This is ",
-        newLine "a test ",
-        newLine "line."]),
+       [innerLine "This is ",
+        innerLine "a test ",
+        endLine "line."]),
     ("hideLeadingSpace restores line", do
        let breaker = setLineWidth hideLeadingSpace 7
        let line = "This is a test line."
@@ -84,24 +84,28 @@ allTests = [
        checkCondition (restored == line) line),
     ("hideLeadingSpace trims only trailing spaces", checkLineRender
        hideLeadingSpace
-       (newLine "  This line had extra spaces.  ")
+       (innerLine "  This line had extra spaces.  ")
        "  This line had extra spaces."),
     ("hideLeadingSpace no tweak in leading spaces", checkCursorTweak
        hideLeadingSpace
-       (newLine "  This line had extra spaces.  ")
+       (innerLine "  This line had extra spaces.  ")
        1 1),
     ("hideLeadingSpace no tweak in middle", checkCursorTweak
        hideLeadingSpace
-       (newLine "  This line had extra spaces.  ")
+       (innerLine "  This line had extra spaces.  ")
        10 10),
     ("hideLeadingSpace tweak at back", checkCursorTweak
        hideLeadingSpace
-       (newLine "  This line had extra spaces.  ")
+       (innerLine "  This line had extra spaces.  ")
        29 29),
     ("hideLeadingSpace tweak in trailing spaces", checkCursorTweak
        hideLeadingSpace
-       (newLine "  This line had extra spaces.  ")
-       31 29)
+       (innerLine "  This line had extra spaces.  ")
+       31 29),
+    ("hideLeadingSpace tweak skipped at paragraph end", checkCursorTweak
+       hideLeadingSpace
+       (endLine "  This line had extra spaces.  ")
+       31 31)
   ]
 
 checkLineBreak b x ys = do

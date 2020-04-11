@@ -140,32 +140,32 @@ allTests = [
            modifyLine DeleteText EditAfter
          ]),
     ("split line middle", do
-       let line = editLine $ VisibleLine "this is a test line" WordHyphen
+       let line = editLine $ innerLine "this is a test line"
        let (left,right) = splitLine $ setLineCursor 5 line
        checkConditions [
-           (left == (VisibleLine "this " SimpleBreak),"Left: " ++ show left),
-           (right == (VisibleLine "is a test line" WordHyphen),"Right: " ++ show right)
+           (left == (endLine "this "),"Left: " ++ show left),
+           (right == (innerLine "is a test line"),"Right: " ++ show right)
          ]),
     ("split line front", do
-       let line = editLine $ VisibleLine "this is a test line" WordHyphen
+       let line = editLine $ innerLine "this is a test line"
        let (left,right) = splitLine $ moveLineCursor MoveUp line
        checkConditions [
-           (left == (VisibleLine "" SimpleBreak),"Left: " ++ show left),
-           (right == (VisibleLine "this is a test line" WordHyphen),"Right: " ++ show right)
+           (left == (endLine ""),"Left: " ++ show left),
+           (right == (innerLine "this is a test line"),"Right: " ++ show right)
          ]),
     ("split line back", do
-       let line = editLine $ VisibleLine "this is a test line" WordHyphen
+       let line = editLine $ innerLine "this is a test line"
        let (left,right) = splitLine $ moveLineCursor MoveDown line
        checkConditions [
-           (left == (VisibleLine "this is a test line" SimpleBreak),"Left: " ++ show left),
-           (right == (VisibleLine "" WordHyphen),"Right: " ++ show right)
+           (left == (endLine "this is a test line"),"Left: " ++ show left),
+           (right == (innerLine ""),"Right: " ++ show right)
          ]),
     ("prepend preserves cursor", checkLineEdit
        "this is a test line"
        "XYthis Zis a test line" $
        composeActions [
            setLineCursor 5,
-           prependToLine (newLine "XY"),
+           prependToLine (innerLine "XY"),
            modifyLine (InsertText "Z") EditAfter
          ]),
     ("append preserves cursor", checkLineEdit
@@ -173,14 +173,14 @@ allTests = [
        "this Zis a test lineXY" $
        composeActions [
            setLineCursor 5,
-           flip appendToLine (newLine "XY"),
+           flip appendToLine (endLine "XY"),
            modifyLine (InsertText "Z") EditAfter
          ])
   ]
 
 checkLineEdit x y f = do
-  let lx = newLine x
-  let ly = newLine y
+  let lx = endLine x
+  let ly = endLine y
   let edit = f (editLine lx)
   let restored = viewLine edit
   checkCondition (restored == ly) (show restored)
