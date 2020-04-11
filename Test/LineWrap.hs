@@ -86,6 +86,10 @@ allTests = [
        hideLeadingSpace
        (innerLine "  This line had extra spaces.  ")
        "  This line had extra spaces."),
+    ("hideLeadingSpace trims skips paragraph end", checkLineRender
+       hideLeadingSpace
+       (endLine "  This line had extra spaces.  ")
+       "  This line had extra spaces.  "),
     ("hideLeadingSpace no tweak in leading spaces", checkCursorTweak
        hideLeadingSpace
        (innerLine "  This line had extra spaces.  ")
