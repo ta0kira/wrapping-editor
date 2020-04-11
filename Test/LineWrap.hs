@@ -77,6 +77,15 @@ allTests = [
        [innerLine "This is ",
         innerLine "a test ",
         endLine "line."]),
+    ("hideLeadingSpace allows extra hidden spaces at end", checkLineBreak
+       (setLineWidth hideLeadingSpace 5)
+       "Here      are some extra spaces."
+       [innerLine "Here      ",
+        innerLine "are s",
+        innerLine "ome e",
+        innerLine "xtra ",
+        innerLine "space",
+        endLine "s."]),
     ("hideLeadingSpace restores line", do
        let breaker = setLineWidth hideLeadingSpace 7
        let line = "This is a test line."
