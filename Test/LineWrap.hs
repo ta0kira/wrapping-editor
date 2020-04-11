@@ -54,7 +54,7 @@ allTests = [
     ("breakExact restores line", do
        let breaker = setLineWidth breakExact 7
        let line = "This is a test line."
-       let restored = joinLines breaker $ breakLines breaker line
+       let restored = concat $ map vlText $ breakLines breaker line
        checkCondition (restored == line) line)
   ]
 

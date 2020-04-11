@@ -113,8 +113,8 @@ editDocument parser ps = document where
   nonempty ps = ps
 
 exportDocument :: EditingDocument c -> [UnparsedPara c]
-exportDocument (EditingDocument bs e as _ _ _ _ p) =
-  reverse (map (unparseParaBefore p) bs) ++ [unparsePara p e] ++ (map (unparseParaAfter p) as)
+exportDocument (EditingDocument bs e as _ _ _ _ _) =
+  reverse (map unparseParaBefore bs) ++ [unparsePara e] ++ (map unparseParaAfter as)
 
 
 -- Private below here.
@@ -145,8 +145,8 @@ joinParaPrev (EditingDocument (b:bs) e as w h k c p) =
 resizeWidth :: Int -> EditingDocument c -> EditingDocument c
 resizeWidth w (EditingDocument bs e as _ h k c p) = (EditingDocument bs2 e2 as2 w h k c p2) where
   p2 = setLineWidth p w
-  bs2 = map (parseParaBefore p2 . unparseParaBefore p2) bs
-  as2 = map (parseParaAfter  p2 . unparseParaAfter  p2) as
+  bs2 = map (parseParaBefore p2 . unparseParaBefore) bs
+  as2 = map (parseParaAfter  p2 . unparseParaAfter)  as
   e2 = reparsePara p2 e
 
 resizeHeight :: Int -> EditingDocument c -> EditingDocument c
@@ -172,7 +172,7 @@ moveDocCursor d da@(EditingDocument bs e as w h k c p) = revised where
     | d == MoveUp =
         let
           bs2 = tail bs
-          e2 = seekParaBack $ editPara p $ unparseParaBefore p $ head bs
+          e2 = seekParaBack $ editPara p $ unparseParaBefore $ head bs
           as2 = viewParaAfter e:as
           k2 = boundOffset h (k-1) in
         -- NOTE: This doesn't preserve cursor position.
@@ -180,7 +180,7 @@ moveDocCursor d da@(EditingDocument bs e as w h k c p) = revised where
     | d == MoveDown =
         let
           bs2 = viewParaBefore e:bs
-          e2 = editPara p $ unparseParaAfter p $ head as
+          e2 = editPara p $ unparseParaAfter $ head as
           as2 = tail as
           k2 = boundOffset h (k+1) in
         -- NOTE: This doesn't preserve cursor position.

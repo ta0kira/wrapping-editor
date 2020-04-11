@@ -353,7 +353,7 @@ examplePara = UnparsedPara "This is a test paragraph to make sure that paragraph
 
 checkParaEdit p x y f = do
   let edit = f $ editPara p x
-  let restored = unparsePara p edit
+  let restored = unparsePara edit
   checkCondition (restored == y) (show restored)
 
 checkParaStructure p x (yb,yl,ya) f = do

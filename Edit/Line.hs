@@ -25,6 +25,7 @@ module Edit.Line (
   atLineFront,
   editLine,
   getLineCursor,
+  joinLines,
   lineCursorMovable,
   modifyLine,
   moveLineCursor,
@@ -52,6 +53,9 @@ editLine (VisibleLine cs b) = EditingLine [] cs 0 b
 
 viewLine :: EditingLine c b -> VisibleLine c b
 viewLine (EditingLine bs as _ b) = VisibleLine (reverse bs ++ as) b
+
+joinLines :: [VisibleLine c b] -> [c]
+joinLines = concat . map vlText
 
 getLineCursor :: EditingLine c b -> Int
 getLineCursor = elCursor

@@ -48,5 +48,4 @@ instance FixedFontParser (BreakExact c) c LineBreak where
       breakOrEmpty cs = line:(breakOrEmpty rest) where
         line = VisibleLine (take w cs) SimpleBreak
         rest = drop w cs
-  joinLines _ = concat . map vlText
   renderLine _ = vlText
