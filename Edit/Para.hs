@@ -25,6 +25,8 @@ module Edit.Para (
   appendToPara,
   atParaBack,
   atParaFront,
+  countLinesAfter,
+  countLinesBefore,
   editPara,
   getAfterLines,
   getBeforeLines,
@@ -139,6 +141,12 @@ takeLinesBefore n = reverse . take n . concat . map vpbLines
 takeLinesAfter :: Int -> [VisibleParaAfter c b] -> [VisibleLine c b]
 takeLinesAfter n = take n . concat . map vpaLines
 
+countLinesBefore :: [VisibleParaBefore c b] -> Int
+countLinesBefore = length . concat . map vpbLines
+
+countLinesAfter :: [VisibleParaAfter c b] -> Int
+countLinesAfter = length . concat . map vpaLines
+
 getParaCursor :: EditingPara c b -> Int
 getParaCursor = getLineCursor . epEditing
 
@@ -218,11 +226,11 @@ reparseParaTail parser (EditingPara bs l as) = moveBy offset revised where
   offset = getLineCursor l
   revised = EditingPara bs (editLine line) after
   (line:after) = breakLines parser $ joinLines parser (viewLine l:as)
-  moveBy k e
-    | k > 0 = moveBy (next k e) $ moveParaCursor MoveNext e
+  moveBy k e@(EditingPara bs l as)
+    | k < 1 = e
+    | not (atLineBack l) = moveBy (k-1) $ (EditingPara bs (moveLineCursor MoveNext l) as)
+    | not (null as) = moveBy k $ (EditingPara (viewLine l:bs) (editLine $ head as) (tail as))
     | otherwise = e
-  -- An extra move is required when crossing lines.
-  next k (EditingPara _ l _) = k - (if atLineBack l then 0 else 1)
 
 mergeForEdit :: FixedFontParser a c b => a -> EditingPara c b -> EditingPara c b
 mergeForEdit parser (EditingPara bs l as) = EditingPara bs2 l2 as2 where

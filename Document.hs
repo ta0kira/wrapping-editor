@@ -76,7 +76,7 @@ data EditingDocument c =
 
 instance FixedFontViewer (EditingDocument c) c where
   setViewSize d s@(w,h)
-    | w /= edWidth d && h /= edHeight d = storeCursor $ resizeWidth w $ resizeHeight h d
+    | w /= edWidth d && h /= edHeight d = storeCursor $ resizeHeight h $ resizeWidth w d
     | w /= edWidth d  = storeCursor $ resizeWidth  w d
     | h /= edHeight d = storeCursor $ resizeHeight h d
     | otherwise = d
@@ -94,7 +94,7 @@ instance FixedFontEditor (EditingDocument c) c where
     updateCursor
       | d == MovePrev || d == MoveNext || d == MoveHome || d == MoveEnd = storeCursor
       | otherwise = applyCursor
-  getCursor (EditingDocument _ e _ _ h k _ _) = (getParaCursor e,k)
+  getCursor (EditingDocument _ e _ _ h k _ _) = (getParaCursor e,min h k)
 
 editDocument :: FixedFontParser a c b => a -> [UnparsedPara c] -> EditingDocument c
 editDocument parser ps = document where
@@ -150,8 +150,13 @@ resizeWidth w (EditingDocument bs e as _ h k c p) = (EditingDocument bs2 e2 as2 
   e2 = reparsePara p2 e
 
 resizeHeight :: Int -> EditingDocument c -> EditingDocument c
-resizeHeight h (EditingDocument bs e as w _ k c p) =
-  (EditingDocument bs e as w h (boundOffset h k) c p)
+resizeHeight h da@(EditingDocument bs e as w _ k c p) =
+  (EditingDocument bs e as w h (boundOffset h $ min (countLinesAbove da) k) c p)
+
+countLinesAbove :: EditingDocument c -> Int
+countLinesAbove (EditingDocument bs e _ _ _ _ _ _) = total where
+  total = countLinesBefore bs'
+  bs' = getBeforeLines e:bs
 
 moveDocCursor :: MoveDirection -> EditingDocument c -> EditingDocument c
 moveDocCursor d da@(EditingDocument bs e as w h k c p) = revised where

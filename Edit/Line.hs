@@ -94,11 +94,11 @@ atLineBack :: EditingLine c b -> Bool
 atLineBack = null . elTextAfter
 
 appendToLine :: EditingLine c b -> VisibleLine c b -> EditingLine c b
-appendToLine (EditingLine bs as c b) (VisibleLine cs _) =
+appendToLine (EditingLine bs as c _) (VisibleLine cs b) =
   (EditingLine bs (as ++ cs) c b)
 
 prependToLine :: VisibleLine c b -> EditingLine c b -> EditingLine c b
-prependToLine (VisibleLine cs b) (EditingLine bs as c _) =
+prependToLine (VisibleLine cs _) (EditingLine bs as c b) =
   (EditingLine (bs ++ reverse cs) as (c + length cs) b)
 
 modifyLine :: EditAction c -> EditDirection -> EditingLine c b -> EditingLine c b
