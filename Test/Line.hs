@@ -140,25 +140,25 @@ allTests = [
            modifyLine DeleteText EditAfter
          ]),
     ("split line middle", do
-       let line = editLine $ VisibleLine "this is a test line" HiddenSpace
+       let line = editLine $ VisibleLine "this is a test line" WordHyphen
        let (left,right) = splitLine $ setLineCursor 5 line
        checkConditions [
            (left == (VisibleLine "this " SimpleBreak),"Left: " ++ show left),
-           (right == (VisibleLine "is a test line" HiddenSpace),"Right: " ++ show right)
+           (right == (VisibleLine "is a test line" WordHyphen),"Right: " ++ show right)
          ]),
     ("split line front", do
-       let line = editLine $ VisibleLine "this is a test line" HiddenSpace
+       let line = editLine $ VisibleLine "this is a test line" WordHyphen
        let (left,right) = splitLine $ moveLineCursor MoveUp line
        checkConditions [
            (left == (VisibleLine "" SimpleBreak),"Left: " ++ show left),
-           (right == (VisibleLine "this is a test line" HiddenSpace),"Right: " ++ show right)
+           (right == (VisibleLine "this is a test line" WordHyphen),"Right: " ++ show right)
          ]),
     ("split line back", do
-       let line = editLine $ VisibleLine "this is a test line" HiddenSpace
+       let line = editLine $ VisibleLine "this is a test line" WordHyphen
        let (left,right) = splitLine $ moveLineCursor MoveDown line
        checkConditions [
            (left == (VisibleLine "this is a test line" SimpleBreak),"Left: " ++ show left),
-           (right == (VisibleLine "" HiddenSpace),"Right: " ++ show right)
+           (right == (VisibleLine "" WordHyphen),"Right: " ++ show right)
          ]),
     ("prepend preserves cursor", checkLineEdit
        "this is a test line"

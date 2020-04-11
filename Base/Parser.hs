@@ -31,3 +31,5 @@ class Enum b => FixedFontParser a c b | a -> c b where
   setLineWidth :: a -> Int -> a
   breakLines :: a -> [c] -> [VisibleLine c b]
   renderLine :: a -> VisibleLine c b -> [c]
+  tweakCursor :: a -> VisibleLine c b -> Int -> Int
+  tweakCursor _ _ = id

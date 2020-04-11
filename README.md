@@ -23,7 +23,7 @@ editor component. The [Brick][brick] functionality is a thin layer on top of the
 basic editor. The basic editor depends on [GHC][ghc] extensions, but it has no
 dependencies otherwise.
 
-You can run the unit tests as follows:
+You can run the unit tests with:
 
 ```shell
 ghc test.hs && ./test
@@ -76,11 +76,22 @@ display = getVisible editor'
 final = unlines $ map upText $ exportDocument editor'
 ```
 
+## Included Wrapping Policies
+
+- **`breakExact`** works for all character types because it breaks lines at
+  exactly the editor width.
+
+- **`trimSpaces`** hides spaces at the end of each line so that the leading
+  edges of the paragraphs look cleaner. This has no effect on the data itself.
+  This policy works for any character type with a `SpaceChar` `instance`, which
+  identifies space characters.
+
+Wrapping is disabled for included policies when the width is less than 1.
+
 ## Creating a Custom Wrapping Policy
 
-The basic policy `breakExact` works for all character types, since it breaks
-lines strictly based on character counts. Custom wrapping  policies can be
-created with a new `instance` of `Base.FixedFontParser`.
+Custom wrapping  policies can be created with a new `instance` of
+`Base.FixedFontParser`.
 
 If you want to create a policy that hyphenates words, you can implement
 `renderLine` to conditionally append a hyphen for display purposes. This will

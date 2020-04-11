@@ -24,6 +24,7 @@ module LineWrap (
   BreakExact,
   LineBreak(..),
   breakExact,
+  trimSpaces,
 ) where
 
 import Base.Line
@@ -31,21 +32,51 @@ import Base.Para
 import Base.Parser
 
 
-data LineBreak = SimpleBreak | HiddenSpace | WordHyphen deriving (Enum,Eq,Ord,Show)
+data LineBreak = SimpleBreak | WordHyphen deriving (Enum,Eq,Ord,Show)
 
-data BreakExact c = BreakExact Int deriving (Show)
+newtype BreakExact c = BreakExact Int deriving (Show)
 
 breakExact :: BreakExact c
 breakExact = BreakExact 0
 
+newtype TrimSpaces c = TrimSpaces Int deriving (Show)
+
+trimSpaces :: TrimSpaces c
+trimSpaces = TrimSpaces 0
+
 instance FixedFontParser (BreakExact c) c LineBreak where
   setLineWidth _ w = BreakExact w
-  breakLines _ [] = [emptyLine]
-  breakLines (BreakExact w) cs
-    | w < 1 = [VisibleLine cs SimpleBreak]
-    | otherwise = breakOrEmpty cs where
-      breakOrEmpty [] = []
-      breakOrEmpty cs = line:(breakOrEmpty rest) where
-        line = VisibleLine (take w cs) SimpleBreak
-        rest = drop w cs
+  breakLines (BreakExact w) = breakCommon (const False) w
   renderLine _ = vlText
+
+instance SpaceChar c => FixedFontParser (TrimSpaces c) c LineBreak where
+  setLineWidth _ w = TrimSpaces w
+  breakLines (TrimSpaces w) = breakCommon isSpaceChar w
+  renderLine _ = reverse . trimSpacesFront . reverse . vlText
+  tweakCursor _ (VisibleLine cs _) = max 0 . min (total-post) where
+    post = countSpacesFront $ reverse cs
+    total = length cs
+
+class SpaceChar c where
+  isSpaceChar :: c -> Bool
+
+trimSpacesFront :: SpaceChar c => [c] -> [c]
+trimSpacesFront = dropWhile isSpaceChar
+
+countSpacesFront :: SpaceChar c => [c] -> Int
+countSpacesFront = length . takeWhile isSpaceChar
+
+breakCommon :: (c -> Bool) -> Int -> [c] -> [VisibleLine c LineBreak]
+breakCommon f w [] = [emptyLine]
+breakCommon f w cs
+  | w < 1 = [VisibleLine cs SimpleBreak]
+  | otherwise = breakOrEmpty cs where
+    breakOrEmpty [] = []
+    breakOrEmpty cs = adjust (take w cs) (drop w cs) where
+      adjust line rest
+        | null rest || not (f $ head rest) =
+          (VisibleLine line SimpleBreak):(breakOrEmpty rest)
+        | otherwise = adjust (line ++ [head rest]) (tail rest)
+
+instance SpaceChar Char where
+  isSpaceChar = (== ' ')

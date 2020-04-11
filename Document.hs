@@ -93,7 +93,8 @@ instance FixedFontEditor (EditingDocument c) c where
     updateCursor
       | d == MovePrev || d == MoveNext || d == MoveHome || d == MoveEnd = storeCursor
       | otherwise = applyCursor
-  getCursor (EditingDocument _ e _ _ h k _ _) = (getParaCursor e,boundOffset h k)
+  getCursor (EditingDocument _ e _ _ h k _ p) =
+    (tweakCursor p (getCurrentLine e) $ getParaCursor e,boundOffset h k)
 
 editDocument :: FixedFontParser a c b => a -> [UnparsedPara c] -> EditingDocument c
 editDocument parser ps = document where
