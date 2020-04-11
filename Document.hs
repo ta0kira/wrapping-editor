@@ -201,7 +201,7 @@ modifyDoc m d da@(EditingDocument bs e as w h k c p) = revised m d where
       EditingDocument (tail bs) (prependToPara p (head bs) e) as w h (boundOffset h (k-1)) c p
   revised DeleteText EditAfter
     | atParaBack e && not (null as) =
-      EditingDocument bs (appendToPara p e (head as)) (tail as) w h (boundOffset h (k+1)) c p
+      EditingDocument bs (appendToPara p e (head as)) (tail as) w h k c p
   revised _ _ = let e2 = (modifyPara p m d e) in EditingDocument bs e2 as w h (fixOffset e2) c p
   fixOffset e2 = boundOffset h $ k + (getCursorLine e2 - getCursorLine e)
 
