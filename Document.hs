@@ -163,6 +163,8 @@ moveDocCursor d da@(EditingDocument bs e as w h k c p) = revised where
   revised
     | paraCursorMovable d e =
       let e2 = moveParaCursor d e in (EditingDocument bs e2 as w h (fixOffset e2) c p)
+    | d == MoveDown && null as && atParaBack e =
+      EditingDocument bs e as w h (boundOffset h (k-1)) c p
     | (d == MoveUp && null bs) || (d == MoveDown && null as) =
       -- NOTE: The cursor is explicitly stored here so that the position at the
       -- front or back of the paragraph is preserved.

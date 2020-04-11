@@ -42,6 +42,10 @@ allTests = [
        "Test/testfiles/testdata.txt"
        "Test/testfiles/below-view.txt" $
        repeatAction 15 editorDownAction),
+    ("scroll below end of doc", checkEditView
+       "Test/testfiles/testdata.txt"
+       "Test/testfiles/below-bottom-view.txt" $
+       repeatAction 100 editorDownAction),
     ("page down puts edit at top and preserves cursor", checkEditView
        "Test/testfiles/testdata.txt"
        "Test/testfiles/page-down-view.txt" $
@@ -70,7 +74,8 @@ allTests = [
        "Test/testfiles/testdata.txt"
        "Test/testfiles/insert-back-view.txt" $
        composeActions [
-           repeatAction 100 editorDownAction,
+           -- 43 total lines after wrapping => down 42 then to end of line.
+           repeatAction 43 editorDownAction,
            editorRightAction,
            editorAppendAction "XYZ"
          ]),
