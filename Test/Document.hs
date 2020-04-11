@@ -59,6 +59,21 @@ allTests = [
            editorPageUpAction,
            editorAppendAction "XYZ"
          ]),
+    ("move previous at doc front", checkEditView
+       "Test/testfiles/testdata.txt"
+       "Test/testfiles/insert-front-view.txt" $
+       composeActions [
+           editorLeftAction,
+           editorAppendAction "XYZ"
+         ]),
+    ("move next at doc back", checkEditView
+       "Test/testfiles/testdata.txt"
+       "Test/testfiles/insert-back-view.txt" $
+       composeActions [
+           repeatAction 100 editorDownAction,
+           editorRightAction,
+           editorAppendAction "XYZ"
+         ]),
     ("insert in middle view", checkEditView
        "Test/testfiles/testdata.txt"
        "Test/testfiles/insert-middle-view.txt" $

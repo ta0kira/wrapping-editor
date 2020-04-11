@@ -178,8 +178,8 @@ moveDocCursor d da@(EditingDocument bs e as w h k c p) = revised where
           k2 = boundOffset h (k+1) in
         -- NOTE: This doesn't preserve cursor position.
         EditingDocument bs2 e2 as2 w h k2 c p
-    | d == MovePrev = seekBack  $ moveDocCursor MoveUp   da
-    | d == MoveNext = seekFront $ moveDocCursor MoveDown da
+    | d == MovePrev && not (null bs) = seekBack  $ moveDocCursor MoveUp   da
+    | d == MoveNext && not (null as) = seekFront $ moveDocCursor MoveDown da
     | d == MovePageUp   = editAtTop $ repeatTimes h (moveDocCursor MoveUp)   da
     | d == MovePageDown = editAtTop $ repeatTimes h (moveDocCursor MoveDown) da
     | otherwise = da
