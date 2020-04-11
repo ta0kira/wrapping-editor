@@ -62,8 +62,8 @@ import Edit.Line
 import Edit.Para
 
 
-data EditingDocument c b =
-  forall a. FixedFontParser a c b => EditingDocument {
+data EditingDocument c =
+  forall a b. FixedFontParser a c b => EditingDocument {
     edBefore :: [VisibleParaBefore c b],  -- Reversed.
     edEditing :: EditingPara c b,
     edAfter :: [VisibleParaAfter c b],
@@ -74,16 +74,20 @@ data EditingDocument c b =
     edParser :: a
   }
 
-instance FixedFontViewer (EditingDocument c b) c where
+instance FixedFontViewer (EditingDocument c) c where
   setViewSize d s@(w,h)
     | w /= edWidth d && h /= edHeight d = storeCursor $ resizeWidth w $ resizeHeight h d
     | w /= edWidth d  = storeCursor $ resizeWidth  w d
     | h /= edHeight d = storeCursor $ resizeHeight h d
     | otherwise = d
   getViewSize d = (edWidth d,edHeight d)
-  getVisible d@(EditingDocument _ _ _ _ _ _ _ p) = map (renderLine p) $ getVisibleLines d
+  getVisible (EditingDocument bs e as _ h k _ p) = visible where
+    visible = map (renderLine p) $ bs2 ++ [e2] ++ as2
+    bs2 = takeLinesBefore (min (h-1) k) (getBeforeLines e:bs)
+    e2 = getCurrentLine e
+    as2 = takeLinesAfter (h-length bs2-1) (getAfterLines e:as)
 
-instance FixedFontEditor (EditingDocument c b) c where
+instance FixedFontEditor (EditingDocument c) c where
   editText da m d = storeCursor $ modifyDoc m d da
   breakPara da d = storeCursor $ insertParaSplit d da
   moveCursor da d = updateCursor $ moveDocCursor d da where
@@ -92,7 +96,7 @@ instance FixedFontEditor (EditingDocument c b) c where
       | otherwise = applyCursor
   getCursor (EditingDocument _ e _ _ h k _ _) = (getParaCursor e,k)
 
-editDocument :: FixedFontParser a c b => a -> [UnparsedPara c] -> EditingDocument c b
+editDocument :: FixedFontParser a c b => a -> [UnparsedPara c] -> EditingDocument c
 editDocument parser ps = document where
   document = EditingDocument {
       edBefore = [],
@@ -108,7 +112,7 @@ editDocument parser ps = document where
   nonempty [] = [emptyPara]
   nonempty ps = ps
 
-exportDocument :: EditingDocument c b -> [UnparsedPara c]
+exportDocument :: EditingDocument c -> [UnparsedPara c]
 exportDocument (EditingDocument bs e as _ _ _ _ p) =
   reverse (map (unparseParaBefore p) bs) ++ [unparsePara p e] ++ (map (unparseParaAfter p) as)
 
@@ -120,42 +124,36 @@ boundOffset h k
   | h < 1 = k
   | otherwise = min (h-1) (max 0 k)
 
-storeCursor :: EditingDocument c b -> EditingDocument c b
+storeCursor :: EditingDocument c -> EditingDocument c
 storeCursor (EditingDocument bs e as w h k _ p) =
   EditingDocument bs e as w h k (getParaCursor e) p
 
-applyCursor :: EditingDocument c b -> EditingDocument c b
+applyCursor :: EditingDocument c -> EditingDocument c
 applyCursor (EditingDocument bs e as w h k c p) =
   EditingDocument bs (setParaCursor c e) as w h k c p
 
-joinParaNext :: EditingDocument c b -> EditingDocument c b
+joinParaNext :: EditingDocument c -> EditingDocument c
 joinParaNext da@(EditingDocument _ _ [] _ _ _ _ _) = da
 joinParaNext (EditingDocument bs e (a:as) w h k c p) =
   EditingDocument bs (appendToPara p e a) as w h k c p
 
-joinParaPrev :: EditingDocument c b -> EditingDocument c b
+joinParaPrev :: EditingDocument c -> EditingDocument c
 joinParaPrev da@(EditingDocument [] _ _ _ _ _ _ _) = da
 joinParaPrev (EditingDocument (b:bs) e as w h k c p) =
   EditingDocument bs (prependToPara p b e) as w h (boundOffset h (k-1)) c p
 
-getVisibleLines :: EditingDocument c b -> [VisibleLine c b]
-getVisibleLines (EditingDocument bs e as _ h k _ _) = bs2 ++ [e2] ++ as2 where
-  bs2 = takeLinesBefore (min (h-1) k) (getBeforeLines e:bs)
-  e2 = getCurrentLine e
-  as2 = takeLinesAfter (h-length bs2-1) (getAfterLines e:as)
-
-resizeWidth :: Int -> EditingDocument c b -> EditingDocument c b
+resizeWidth :: Int -> EditingDocument c -> EditingDocument c
 resizeWidth w (EditingDocument bs e as _ h k c p) = (EditingDocument bs2 e2 as2 w h k c p2) where
   p2 = setLineWidth p w
   bs2 = map (parseParaBefore p2 . unparseParaBefore p2) bs
   as2 = map (parseParaAfter  p2 . unparseParaAfter  p2) as
   e2 = reparsePara p2 e
 
-resizeHeight :: Int -> EditingDocument c b -> EditingDocument c b
+resizeHeight :: Int -> EditingDocument c -> EditingDocument c
 resizeHeight h (EditingDocument bs e as w _ k c p) =
   (EditingDocument bs e as w h (boundOffset h k) c p)
 
-moveDocCursor :: MoveDirection -> EditingDocument c b -> EditingDocument c b
+moveDocCursor :: MoveDirection -> EditingDocument c -> EditingDocument c
 moveDocCursor d da@(EditingDocument bs e as w h k c p) = revised where
   revised
     | paraCursorMovable d e =
@@ -191,7 +189,7 @@ moveDocCursor d da@(EditingDocument bs e as w h k c p) = revised where
   repeatTimes n = foldr (flip (.)) id . replicate n
   editAtTop (EditingDocument bs e as w h _ c p) = EditingDocument bs e as w h 0 c p
 
-modifyDoc :: EditAction c -> EditDirection -> EditingDocument c b -> EditingDocument c b
+modifyDoc :: EditAction c -> EditDirection -> EditingDocument c -> EditingDocument c
 modifyDoc m d da@(EditingDocument bs e as w h k c p) = revised m d where
   revised DeleteText EditBefore
     | atParaFront e && not (null bs) =
@@ -201,7 +199,7 @@ modifyDoc m d da@(EditingDocument bs e as w h k c p) = revised m d where
       EditingDocument bs (appendToPara p e (head as)) (tail as) w h (boundOffset h (k+1)) c p
   revised _ _ = EditingDocument bs (modifyPara p m d e) as w h k c p
 
-insertParaSplit :: EditDirection -> EditingDocument c b -> EditingDocument c b
+insertParaSplit :: EditDirection -> EditingDocument c -> EditingDocument c
 insertParaSplit d (EditingDocument bs e as w h k c p) = revised where
   (b,a) = splitPara p e
   revised

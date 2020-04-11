@@ -16,7 +16,6 @@ limitations under the License.
 
 -- Author: Kevin P. Barry [ta0kira@gmail.com]
 
-{-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -85,10 +84,10 @@ handleWrappingEditor (WrappingEditor n editor) event = do
            (Just ext) -> return $ viewerResizeAction (extentSize ext) editor
 
 data WrappingEditor c n =
-  forall b. () => WrappingEditor {
-    neName :: n,
-    neEditor :: EditingDocument c b
+  WrappingEditor {
+    weName :: n,
+    weEditor :: EditingDocument c
   }
 
 instance Named (WrappingEditor c n) n where
-    getName = neName
+    getName = weName
