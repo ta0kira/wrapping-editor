@@ -31,23 +31,23 @@ import Test.Common
 allTests :: [(String,IO (Maybe String))]
 allTests = [
     ("document preserved", checkEditContent
-       "Test/testfiles/testdata.txt"
-       "Test/testfiles/testdata.txt"
+       "Test/testfiles/original-long.txt"
+       "Test/testfiles/original-long.txt"
        id),
     ("default view at top", checkEditView
-       "Test/testfiles/testdata.txt"
+       "Test/testfiles/original-long.txt"
        "Test/testfiles/default-view.txt"
        id),
     ("move cursor below bottom", checkEditView
-       "Test/testfiles/testdata.txt"
+       "Test/testfiles/original-long.txt"
        "Test/testfiles/below-view.txt" $
        repeatAction 15 editorDownAction),
     ("scroll below end of doc", checkEditView
-       "Test/testfiles/testdata.txt"
+       "Test/testfiles/original-long.txt"
        "Test/testfiles/below-bottom-view.txt" $
        repeatAction 100 editorDownAction),
     ("page down puts edit at top and preserves cursor", checkEditView
-       "Test/testfiles/testdata.txt"
+       "Test/testfiles/original-long.txt"
        "Test/testfiles/page-down-view.txt" $
        composeActions [
            repeatAction 4 editorRightAction,
@@ -55,7 +55,7 @@ allTests = [
            editorAppendAction "XYZ"
          ]),
     ("page up puts edit at top and preserves cursor", checkEditView
-       "Test/testfiles/testdata.txt"
+       "Test/testfiles/original-long.txt"
        "Test/testfiles/page-up-view.txt" $
        composeActions [
            repeatAction 4 editorRightAction,
@@ -64,14 +64,14 @@ allTests = [
            editorAppendAction "XYZ"
          ]),
     ("move previous at doc front", checkEditView
-       "Test/testfiles/testdata.txt"
+       "Test/testfiles/original-long.txt"
        "Test/testfiles/insert-front-view.txt" $
        composeActions [
            editorLeftAction,
            editorAppendAction "XYZ"
          ]),
     ("move next at doc back", checkEditView
-       "Test/testfiles/testdata.txt"
+       "Test/testfiles/original-long.txt"
        "Test/testfiles/insert-back-view.txt" $
        composeActions [
            -- 43 total lines after wrapping => down 42 then to end of line.
@@ -80,7 +80,7 @@ allTests = [
            editorAppendAction "XYZ"
          ]),
     ("insert in middle view", checkEditView
-       "Test/testfiles/testdata.txt"
+       "Test/testfiles/original-long.txt"
        "Test/testfiles/insert-middle-view.txt" $
        composeActions [
            repeatAction 15 editorDownAction,
@@ -89,7 +89,7 @@ allTests = [
            editorAppendAction "XYZ"
          ]),
     ("line position preserved when passing short lines", checkEditView
-       "Test/testfiles/testdata.txt"
+       "Test/testfiles/original-long.txt"
        "Test/testfiles/insert-middle-view.txt" $
        composeActions [
            repeatAction 7 editorRightAction,
@@ -99,7 +99,7 @@ allTests = [
            editorAppendAction "XYZ"
          ]),
     ("insert in middle content", checkEditContent
-       "Test/testfiles/testdata.txt"
+       "Test/testfiles/original-long.txt"
        "Test/testfiles/insert-middle-flat.txt" $
        composeActions [
            repeatAction 15 editorDownAction,
@@ -108,7 +108,7 @@ allTests = [
            editorAppendAction "XYZ"
          ]),
     ("delete in middle view", checkEditView
-       "Test/testfiles/testdata.txt"
+       "Test/testfiles/original-long.txt"
        "Test/testfiles/delete-middle-view.txt" $
        composeActions [
            repeatAction 15 editorDownAction,
@@ -117,7 +117,7 @@ allTests = [
            repeatAction 3 editorBackspaceAction
          ]),
     ("delete in middle content", checkEditContent
-       "Test/testfiles/testdata.txt"
+       "Test/testfiles/original-long.txt"
        "Test/testfiles/delete-middle-flat.txt" $
        composeActions [
            repeatAction 15 editorDownAction,
@@ -126,14 +126,14 @@ allTests = [
            repeatAction 3 editorBackspaceAction
          ]),
     ("join with previous", checkEditView
-       "Test/testfiles/testdata.txt"
+       "Test/testfiles/original-long.txt"
        "Test/testfiles/join-prev-view.txt" $
        composeActions [
            repeatAction 9 editorDownAction,
            editorBackspaceAction
          ]),
     ("join with next", checkEditView
-       "Test/testfiles/testdata.txt"
+       "Test/testfiles/original-long.txt"
        "Test/testfiles/join-next-view.txt" $
        composeActions [
            repeatAction 9 editorDownAction,
@@ -141,7 +141,7 @@ allTests = [
            editorDeleteAction
          ]),
     ("break in middle before", checkEditView
-       "Test/testfiles/testdata.txt"
+       "Test/testfiles/original-long.txt"
        "Test/testfiles/break-before-view.txt" $
        composeActions [
            repeatAction 15 editorDownAction,
@@ -151,7 +151,7 @@ allTests = [
            editorAppendAction "XYZ"
          ]),
     ("break in middle after", checkEditView
-       "Test/testfiles/testdata.txt"
+       "Test/testfiles/original-long.txt"
        "Test/testfiles/break-after-view.txt" $
        composeActions [
            repeatAction 15 editorDownAction,
@@ -161,46 +161,176 @@ allTests = [
            editorInsertAction "XYZ"
          ]),
     ("resize smaller preserves line offset and cursor", checkEditView
-       "Test/testfiles/testdata.txt"
+       "Test/testfiles/original-long.txt"
        "Test/testfiles/resize-smaller-view.txt" $
        composeActions [
            repeatAction 15 editorDownAction,
            repeatAction 5 editorUpAction,
            repeatAction 3 editorRightAction,
-           viewerResizeAction (18,9),
+           viewerResizeAction smallerSize,
            editorInsertAction "XYZ"
          ]),
     ("resize larger preserves line offset and cursor", checkEditView
-       "Test/testfiles/testdata.txt"
+       "Test/testfiles/original-long.txt"
        "Test/testfiles/resize-larger-view.txt" $
        composeActions [
            repeatAction 15 editorDownAction,
            repeatAction 5 editorUpAction,
            repeatAction 3 editorRightAction,
-           viewerResizeAction (24,12),
+           viewerResizeAction largerSize,
            editorInsertAction "XYZ"
+         ]),
+    ("cursor defaults to top left", checkEditCursor breakExact
+       "Test/testfiles/original-long.txt" (0,0) $
+       id),
+    ("cursor in middle of view", checkEditCursor breakExact
+       "Test/testfiles/original-long.txt" (5,5) $
+       composeActions [
+           -- NOTE: Keep horizontal first here.
+           repeatAction 5 editorRightAction,
+           repeatAction 5 editorDownAction
+         ]),
+    ("cursor after insert before", checkEditCursor breakExact
+       "Test/testfiles/original-long.txt" (8,5) $
+       composeActions [
+           repeatAction 5 editorRightAction,
+           repeatAction 5 editorDownAction,
+           editorAppendAction "XYZ"
+         ]),
+    ("cursor after insert after", checkEditCursor breakExact
+       "Test/testfiles/original-long.txt" (5,5) $
+       composeActions [
+           repeatAction 5 editorRightAction,
+           repeatAction 5 editorDownAction,
+           editorInsertAction "XYZ"
+         ]),
+    ("cursor after delete before", checkEditCursor breakExact
+       "Test/testfiles/original-long.txt" (4,5) $
+       composeActions [
+           repeatAction 5 editorRightAction,
+           repeatAction 5 editorDownAction,
+           editorBackspaceAction
+         ]),
+    ("cursor after delete after", checkEditCursor breakExact
+       "Test/testfiles/original-long.txt" (5,5) $
+       composeActions [
+           repeatAction 5 editorRightAction,
+           repeatAction 5 editorDownAction,
+           editorDeleteAction
+         ]),
+    ("cursor after insert before line front", checkEditCursor breakExact
+       "Test/testfiles/original-long.txt" (3,5) $
+       composeActions [
+           repeatAction 5 editorDownAction,
+           editorAppendAction "XYZ"
+         ]),
+    ("cursor after insert after line back", checkEditCursor breakExact
+       "Test/testfiles/original-long.txt" (20,5) $
+       composeActions [
+           repeatAction 5 editorDownAction,
+           editorEndAction,
+           editorInsertAction "XYZ"
+         ]),
+    ("cursor after delete before line front", checkEditCursor breakExact
+       "Test/testfiles/original-long.txt" (19,4) $
+       composeActions [
+           repeatAction 5 editorDownAction,
+           editorBackspaceAction
+         ]),
+    ("cursor after delete after line back", checkEditCursor breakExact
+       "Test/testfiles/original-long.txt" (20,5) $
+       composeActions [
+           repeatAction 5 editorDownAction,
+           editorEndAction,
+           editorDeleteAction
+         ]),
+    ("cursor scroll to previous line", checkEditCursor breakExact
+       "Test/testfiles/original-long.txt" (20,4) $
+       composeActions [
+           repeatAction 5 editorDownAction,
+           editorLeftAction
+         ]),
+    ("cursor scroll to previous line", checkEditCursor breakExact
+       "Test/testfiles/original-long.txt" (0,6) $
+       composeActions [
+           repeatAction 5 editorDownAction,
+           editorEndAction,
+           editorRightAction
+         ]),
+    ("cursor after join with prev", checkEditCursor breakExact
+       "Test/testfiles/original-long.txt" (8,8) $
+       composeActions [
+           repeatAction 9 editorDownAction,
+           editorBackspaceAction
+         ]),
+    ("cursor after join with next", checkEditCursor breakExact
+       "Test/testfiles/original-long.txt" (8,8) $
+       composeActions [
+           repeatAction 8 editorDownAction,
+           editorEndAction,
+           editorDeleteAction
+         ]),
+    ("cursor after resize preserves vertical", checkEditCursor breakExact
+       "Test/testfiles/original-long.txt" (0,3) $
+       composeActions [
+           repeatAction 3 editorDownAction,
+           viewerResizeAction largerSize
+         ]),
+    ("cursor after resize larger truncates vertical", checkEditCursor breakExact
+       "Test/testfiles/original-short.txt" (20,2) $
+       composeActions [
+           repeatAction 3 editorDownAction,
+           viewerResizeAction largerSize
+         ]),
+    ("cursor after resize smaller accounts for new break", checkEditCursor breakExact
+       "Test/testfiles/original-long.txt" (2,4) $
+       composeActions [
+           repeatAction 4 editorDownAction,
+           editorEndAction,
+           viewerResizeAction smallerSize
+         ]),
+    ("cursor after resize larger accounts for new break", checkEditCursor breakExact
+       "Test/testfiles/original-long.txt" (16,5) $
+       composeActions [
+           repeatAction 5 editorDownAction,
+           editorEndAction,
+           viewerResizeAction largerSize
+         ]),
+    ("cursor position uses parser tweaking", checkEditCursor hideLeadingSpace
+       "Test/testfiles/original-long.txt" (20,5) $
+       composeActions [
+           repeatAction 5 editorDownAction,
+           editorEndAction,
+           editorLeftAction
          ])
   ]
 
 defaultView = (20,10)
+largerSize = (24,12)
+smallerSize = (18,9)
 
 splitParas = map UnparsedPara . lines
 
 joinParas = unlines . map upText
 
-loadDoc = viewerResizeAction defaultView . editDocument breakExact . splitParas
+loadDoc b = viewerResizeAction defaultView . editDocument b . splitParas
 
 checkEditContent fx fy f = do
-  edit <- fmap (f . loadDoc) $ readFile fx
+  edit <- fmap (f . loadDoc breakExact) $ readFile fx
   view <- readFile fy
   let restored = joinParas $ exportDocument edit
   checkCondition (restored == view) ("\n" ++ restored)
 
 checkEditView fx fy f = do
-  edit <- fmap (f . loadDoc) $ readFile fx
+  edit <- fmap (f . loadDoc breakExact) $ readFile fx
   view <- fmap (map trimSpace . lines) $ readFile fy
   let restored = map trimSpace $ getVisible edit
   checkCondition (restored == view) ("\n" ++ unlines restored)
+
+checkEditCursor b fx c f = do
+  edit <- fmap (f . loadDoc b) $ readFile fx
+  let cursor = getCursor edit
+  checkCondition (cursor == c) (show cursor)
 
 -- Just in case the text editor used to create the test file prunes whitespace
 -- from the end of the line.

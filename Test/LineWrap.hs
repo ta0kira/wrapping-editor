@@ -56,50 +56,50 @@ allTests = [
        let line = "This is a test line."
        let restored = concat $ map vlText $ breakLines breaker line
        checkCondition (restored == line) line),
-    ("trimSpaces skips breaks by default", checkLineBreak
-       trimSpaces
+    ("hideLeadingSpace skips breaks by default", checkLineBreak
+       hideLeadingSpace
        "This is a test line."
        [newLine "This is a test line."]),
-    ("trimSpaces empty still provides line", checkLineBreak
-       trimSpaces
+    ("hideLeadingSpace empty still provides line", checkLineBreak
+       hideLeadingSpace
        ""
        [newLine ""]),
-    ("trimSpaces exact multiple", checkLineBreak
-       (setLineWidth trimSpaces 5)
+    ("hideLeadingSpace exact multiple", checkLineBreak
+       (setLineWidth hideLeadingSpace 5)
        "This is a test line."
        [newLine "This ",
         newLine "is a ",
         newLine "test ",
         newLine "line."]),
-    ("trimSpaces not a multiple", checkLineBreak
-       (setLineWidth trimSpaces 7)
+    ("hideLeadingSpace not a multiple", checkLineBreak
+       (setLineWidth hideLeadingSpace 7)
        "This is a test line."
        [newLine "This is ",
         newLine "a test ",
         newLine "line."]),
-    ("trimSpaces restores line", do
-       let breaker = setLineWidth trimSpaces 7
+    ("hideLeadingSpace restores line", do
+       let breaker = setLineWidth hideLeadingSpace 7
        let line = "This is a test line."
        let restored = concat $ map vlText $ breakLines breaker line
        checkCondition (restored == line) line),
-    ("trimSpaces trims only trailing spaces", checkLineRender
-       trimSpaces
+    ("hideLeadingSpace trims only trailing spaces", checkLineRender
+       hideLeadingSpace
        (newLine "  This line had extra spaces.  ")
        "  This line had extra spaces."),
-    ("trimSpaces no tweak in leading spaces", checkCursorTweak
-       trimSpaces
+    ("hideLeadingSpace no tweak in leading spaces", checkCursorTweak
+       hideLeadingSpace
        (newLine "  This line had extra spaces.  ")
        1 1),
-    ("trimSpaces no tweak in middle", checkCursorTweak
-       trimSpaces
+    ("hideLeadingSpace no tweak in middle", checkCursorTweak
+       hideLeadingSpace
        (newLine "  This line had extra spaces.  ")
        10 10),
-    ("trimSpaces tweak at back", checkCursorTweak
-       trimSpaces
+    ("hideLeadingSpace tweak at back", checkCursorTweak
+       hideLeadingSpace
        (newLine "  This line had extra spaces.  ")
        29 29),
-    ("trimSpaces tweak in trailing spaces", checkCursorTweak
-       trimSpaces
+    ("hideLeadingSpace tweak in trailing spaces", checkCursorTweak
+       hideLeadingSpace
        (newLine "  This line had extra spaces.  ")
        31 29)
   ]

@@ -24,7 +24,7 @@ module LineWrap (
   BreakExact,
   LineBreak(..),
   breakExact,
-  trimSpaces,
+  hideLeadingSpace,
 ) where
 
 import Base.Line
@@ -41,8 +41,8 @@ breakExact = BreakExact 0
 
 newtype TrimSpaces c = TrimSpaces Int deriving (Show)
 
-trimSpaces :: TrimSpaces c
-trimSpaces = TrimSpaces 0
+hideLeadingSpace :: TrimSpaces c
+hideLeadingSpace = TrimSpaces 0
 
 instance FixedFontParser (BreakExact c) c LineBreak where
   setLineWidth _ w = BreakExact w

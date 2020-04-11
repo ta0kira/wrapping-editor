@@ -81,10 +81,10 @@ final = unlines $ map upText $ exportDocument editor'
 - **`breakExact`** works for all character types because it breaks lines at
   exactly the editor width.
 
-- **`trimSpaces`** hides spaces at the end of each line so that the leading
-  edges of the paragraphs look cleaner. This has no effect on the data itself.
-  This policy works for any character type with a `SpaceChar` `instance`, which
-  identifies space characters.
+- **`hideLeadingSpace`** hides spaces at the end of each line so that the
+  leading edges of the paragraphs look cleaner. This has no effect on the data
+  itself. This policy works for any character type with a `SpaceChar`
+  `instance`, which identifies space characters.
 
 Wrapping is disabled for included policies when the width is less than 1.
 
