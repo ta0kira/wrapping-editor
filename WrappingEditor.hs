@@ -50,7 +50,9 @@ renderWrappingEditor focus (WrappingEditor n editor) = Widget Greedy Greedy $ do
   let width = ctx^.availWidthL
   let height = ctx^.availHeightL
   -- NOTE: Resizing is a no-op if the size is unchanged.
-  let editor' = viewerResizeAction (width,height) editor
+  let editor' = if height > 0
+                   then viewerResizeAction (width,height) editor
+                   else editor
   render $ viewport n Vertical $ setCursor editor' $ textArea width height editor' where
     setCursor
       | focus = showCursor n . Location . getCursor
@@ -80,8 +82,8 @@ handleWrappingEditor (WrappingEditor n editor) event = do
     setSize editor = do
       extent <- lookupExtent n
       case extent of
-           Nothing -> return editor
-           (Just ext) -> return $ viewerResizeAction (extentSize ext) editor
+           (Just ext) | snd (extentSize ext) > 0 -> return $ viewerResizeAction (extentSize ext) editor
+           _ -> return editor
 
 data WrappingEditor c n =
   WrappingEditor {
