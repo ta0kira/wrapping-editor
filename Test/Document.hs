@@ -320,7 +320,7 @@ allTests = [
            editorEndAction,
            viewerResizeAction largerView
          ]),
-    ("cursor position uses parser tweaking", checkEditCursor hideLeadingSpace
+    ("cursor position uses parser tweaking", checkEditCursor (breakWords noHyphen)
        "Test/testfiles/original-long.txt" (20,5) $
        composeActions [
            repeatAction 5 editorDownAction,
@@ -343,18 +343,18 @@ checkEditContent fx fy f = do
   edit <- fmap (f . loadDoc breakExact) $ readFile fx
   view <- readFile fy
   let restored = joinParas $ exportDocument edit
-  checkCondition (restored == view) ("\n" ++ restored)
+  checkCondition ("\n" ++ restored) (restored == view)
 
 checkEditView fx fy f = do
   edit <- fmap (f . loadDoc breakExact) $ readFile fx
   view <- fmap (map trimSpace . lines) $ readFile fy
   let restored = map trimSpace $ getVisible edit
-  checkCondition (restored == view) ("\n" ++ unlines restored)
+  checkCondition ("\n" ++ unlines restored) (restored == view)
 
 checkEditCursor b fx c f = do
   edit <- fmap (f . loadDoc b) $ readFile fx
   let cursor = getCursor edit
-  checkCondition (cursor == c) (show cursor)
+  checkCondition (show cursor) (cursor == c)
 
 -- Just in case the text editor used to create the test file prunes whitespace
 -- from the end of the line.

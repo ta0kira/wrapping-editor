@@ -24,6 +24,7 @@ module Test.Common (
   checkConditions,
   composeActions,
   endLine,
+  hyphenLine,
   innerLine,
   repeatAction,
   runTests,
@@ -38,13 +39,17 @@ import System.IO (hPutStr,hPutStrLn,stderr)
 
 import LineWrap
 import Base.Line
+import Base.Parser
 
 
 endLine :: String -> VisibleLine Char LineBreak
-endLine cs = VisibleLine cs ParagraphEnd
+endLine = flip VisibleLine lineBreakEnd
 
 innerLine :: String -> VisibleLine Char LineBreak
-innerLine cs = VisibleLine cs SimpleBreak
+innerLine = flip VisibleLine lineBreakSimple
+
+hyphenLine :: String -> VisibleLine Char LineBreak
+hyphenLine = flip VisibleLine lineBreakHyphen
 
 composeActions :: [a -> a] -> a -> a
 composeActions = foldr (flip (.)) id
@@ -52,12 +57,12 @@ composeActions = foldr (flip (.)) id
 repeatAction :: Int -> (a -> a) -> a -> a
 repeatAction n f = composeActions (replicate n f)
 
-checkConditions :: [(Bool, String)] -> IO (Maybe String)
+checkConditions :: [(String,Bool)] -> IO (Maybe String)
 checkConditions = fmap (foldr (<|>) Nothing) . sequence . map (uncurry checkCondition)
 
-checkCondition :: Bool -> String -> IO (Maybe String)
-checkCondition True _  = testPass
-checkCondition False m = testFail m
+checkCondition :: String -> Bool -> IO (Maybe String)
+checkCondition _ True  = testPass
+checkCondition m False = testFail m
 
 testPass :: IO (Maybe String)
 testPass = return Nothing

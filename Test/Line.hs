@@ -143,22 +143,22 @@ allTests = [
        let line = editLine $ innerLine "this is a test line"
        let (left,right) = splitLine $ setLineCursor 5 line
        checkConditions [
-           (left == (endLine "this "),"Left: " ++ show left),
-           (right == (innerLine "is a test line"),"Right: " ++ show right)
+           ("Left: " ++ show left,left == (endLine "this ")),
+           ("Right: " ++ show right,right == (innerLine "is a test line"))
          ]),
     ("split line front", do
        let line = editLine $ innerLine "this is a test line"
        let (left,right) = splitLine $ moveLineCursor MoveUp line
        checkConditions [
-           (left == (endLine ""),"Left: " ++ show left),
-           (right == (innerLine "this is a test line"),"Right: " ++ show right)
+           ("Left: " ++ show left,left == (endLine "")),
+           ("Right: " ++ show right,right == (innerLine "this is a test line"))
          ]),
     ("split line back", do
        let line = editLine $ innerLine "this is a test line"
        let (left,right) = splitLine $ moveLineCursor MoveDown line
        checkConditions [
-           (left == (endLine "this is a test line"),"Left: " ++ show left),
-           (right == (innerLine ""),"Right: " ++ show right)
+           ("Left: " ++ show left,left == (endLine "this is a test line")),
+           ("Right: " ++ show right,right == (innerLine ""))
          ]),
     ("prepend preserves cursor", checkLineEdit
        "this is a test line"
@@ -183,4 +183,4 @@ checkLineEdit x y f = do
   let ly = endLine y
   let edit = f (editLine lx)
   let restored = viewLine edit
-  checkCondition (restored == ly) (show restored)
+  checkCondition (show restored) (restored == ly)

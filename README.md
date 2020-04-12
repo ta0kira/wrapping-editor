@@ -76,24 +76,26 @@ display = getVisible editor'
 final = unlines $ map upText $ exportDocument editor'
 ```
 
-## Included Wrapping Policies
+## Wrapping Policies
 
 - **`breakExact`** works for all character types because it breaks lines at
   exactly the editor width.
 
-- **`hideLeadingSpace`** hides spaces at the end of each line so that the
-  leading edges of the paragraphs look cleaner. This has no effect on the data
-  itself. This policy works for any character type with a `SpaceChar`
-  `instance`, which identifies space characters.
+- **`breakWords f`** takes a hyphenation function `f` to split words. It also
+  trims whitespace from the beginning of wrapped lines. This works for any
+  character type that has instances of `WordChar` and `HyphenChar`. (See
+  `Base.Char`.)
 
-## Creating a Custom Wrapping Policy
+  - **`breakWords noHyphen`** allows words to be broken anywhere, and doesn't
+    show hyphens. Use this to just clean up leading whitespace.
 
-Custom wrapping  policies can be created with a new `instance` of
-`Base.FixedFontParser`.
+  - **`breakWords lazyHyphen`** breaks words without any dictionary awareness,
+    and attempts to keep at least 2 characters of the word on each line.
 
-If you want to create a policy that hyphenates words, you can implement
-`renderLine` to conditionally append a hyphen for display purposes. This will
-not affect how the cursor gets displayed.
+  - Create custom word-breaking by creating a new `WordSplitter`.
+
+- Custom wrapping  policies can be created with a new instance of
+`FixedFontParser`. (See `Base.Parser`.)
 
 ## Character Support
 

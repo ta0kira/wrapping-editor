@@ -285,28 +285,28 @@ allTests = [
                   editPara commonParser examplePara
        let (top,bottom) = splitPara commonParser para
        checkConditions [
-           (upText top == "This is a test paragraph to make sure that paragr",
-            "Top: " ++ show (upText top)),
-           (upText bottom == "aph-related things work as they are supposed to.",
-            "Bottom: " ++ show (upText bottom))
+           ("Top: " ++ show (upText top),
+            upText top == "This is a test paragraph to make sure that paragr"),
+           ("Bottom: " ++ show (upText bottom),
+            upText bottom == "aph-related things work as they are supposed to.")
          ]),
     ("split paragraph front", do
        let para = seekParaFront $ editPara commonParser examplePara
        let (top,bottom) = splitPara commonParser para
        checkConditions [
-           (upText top == "",
-            "Top: " ++ show (upText top)),
-           (upText bottom == "This is a test paragraph to make sure that paragraph-related things work as they are supposed to.",
-            "Bottom: " ++ show (upText bottom))
+           ("Top: " ++ show (upText top),
+            upText top == ""),
+           ("Bottom: " ++ show (upText bottom),
+            upText bottom == "This is a test paragraph to make sure that paragraph-related things work as they are supposed to.")
          ]),
     ("split paragraph back", do
        let para = seekParaBack $ editPara commonParser examplePara
        let (top,bottom) = splitPara commonParser para
        checkConditions [
-           (upText top == "This is a test paragraph to make sure that paragraph-related things work as they are supposed to.",
-            "Top: " ++ show (upText top)),
-           (upText bottom == "",
-            "Bottom: " ++ show (upText bottom))
+           ("Top: " ++ show (upText top),
+             upText top == "This is a test paragraph to make sure that paragraph-related things work as they are supposed to."),
+           ("Bottom: " ++ show (upText bottom),
+            upText bottom == "")
          ]),
     ("prepend preserves cursor", checkParaStructure
        commonParser
@@ -354,7 +354,7 @@ examplePara = UnparsedPara "This is a test paragraph to make sure that paragraph
 checkParaEdit p x y f = do
   let edit = f $ editPara p x
   let restored = unparsePara edit
-  checkCondition (restored == y) (show restored)
+  checkCondition (show restored) (restored == y)
 
 checkParaStructure p x (yb,yl,ya) f = do
   let edit = f $ editPara p x
@@ -362,7 +362,7 @@ checkParaStructure p x (yb,yl,ya) f = do
   let line = vlText $ getCurrentLine edit
   let after = map vlText $ viewAfterLines $ getAfterLines edit
   checkConditions [
-      (before == yb,"Before: " ++ show before),
-      (line == yl,"Line: " ++ show line),
-      (after == ya,"After: " ++ show after)
+      ("Before: " ++ show before,before == yb),
+      ("Line: " ++ show line,    line == yl),
+      ("After: " ++ show after,  after == ya)
     ]

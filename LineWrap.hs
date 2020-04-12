@@ -22,72 +22,129 @@ limitations under the License.
 
 module LineWrap (
   BreakExact,
-  LineBreak(..),
+  BreakWords,
+  LineBreak,
   breakExact,
-  hideLeadingSpace,
+  breakWords,
+  lazyHyphen,
+  lineBreakEnd,
+  lineBreakHyphen,
+  lineBreakSimple,
+  noHyphen,
 ) where
 
+import Control.Applicative ((<|>))
+
+import Base.Char
 import Base.Line
 import Base.Para
 import Base.Parser
 
 
-data LineBreak = ParagraphEnd | SimpleBreak deriving (Eq,Ord,Show)
+data LineBreak = ParagraphEnd | SimpleBreak | HyphenatedWord deriving (Eq,Ord,Show)
 
-instance DefaultBreak LineBreak where
-  defaultBreak = ParagraphEnd
+lineBreakEnd :: LineBreak
+lineBreakEnd = ParagraphEnd
+
+lineBreakSimple :: LineBreak
+lineBreakSimple = SimpleBreak
+
+lineBreakHyphen :: LineBreak
+lineBreakHyphen = HyphenatedWord
 
 newtype BreakExact c = BreakExact Int deriving (Show)
 
 breakExact :: BreakExact c
 breakExact = BreakExact 0
 
-newtype TrimSpaces c = TrimSpaces Int deriving (Show)
+type WordSplitter c = Int -> Int -> [c] -> [[c]]
 
-hideLeadingSpace :: TrimSpaces c
-hideLeadingSpace = TrimSpaces 0
+data BreakWords c = BreakWords Int (WordSplitter c)
+
+breakWords :: (WordChar c, HyphenChar c) => WordSplitter c -> BreakWords c
+breakWords = BreakWords 0
+
+noHyphen :: WordSplitter c
+noHyphen _ _ _ = []
+
+lazyHyphen :: WordSplitter c
+lazyHyphen k w cs
+  | w < 4 || k > w = []
+  | k >= length cs || k < 3 = [cs]
+  | otherwise = (take (k-1) cs):(splitBy w $ drop (k-1) cs) where
+    splitBy _ [] = []
+    splitBy n cs
+      | length cs > n = (take (n-1) cs):(splitBy n $ drop (n-1) cs)
+      | otherwise = [cs]
+
+
+-- Private below here.
+
+instance DefaultBreak LineBreak where
+  defaultBreak = lineBreakEnd
 
 instance FixedFontParser (BreakExact c) c LineBreak where
   setLineWidth _ w = BreakExact w
-  breakLines (BreakExact w) = breakCommon (const False) w
+  breakLines _ [] = [emptyLine]
+  breakLines (BreakExact w) cs
+    | w < 1 = [VisibleLine cs lineBreakEnd]
+    | otherwise = breakOrEmpty cs where
+      breakOrEmpty [] = []
+      breakOrEmpty cs = continue (reverse $ take w cs) (drop w cs) where
+        continue ls [] = [VisibleLine (reverse ls) lineBreakEnd]
+        continue ls rs = (VisibleLine (reverse ls) lineBreakSimple):(breakOrEmpty rs)
   renderLine _ = vlText
 
-instance SpaceChar c => FixedFontParser (TrimSpaces c) c LineBreak where
-  setLineWidth _ w = TrimSpaces w
-  breakLines (TrimSpaces w) = breakCommon isSpaceChar w
-  renderLine (TrimSpaces w) (VisibleLine cs ParagraphEnd)
+instance (WordChar c, HyphenChar c) => FixedFontParser (BreakWords c) c LineBreak where
+  setLineWidth (BreakWords _ f) w = BreakWords w f
+  breakLines (BreakWords w f) = breakAllLines w f
+  renderLine (BreakWords w _) (VisibleLine cs ParagraphEnd)
     | w < 1 = cs
     | otherwise = take w cs
-  renderLine _ (VisibleLine cs SimpleBreak)  = reverse $ trimSpacesFront $ reverse cs
-  tweakCursor (TrimSpaces w) (VisibleLine _ ParagraphEnd)
+  renderLine _ (VisibleLine cs SimpleBreak) = reverse $ trimLeadingSpaces $ reverse cs
+  renderLine _ (VisibleLine cs HyphenatedWord) = cs ++ [hyphenChar]
+  tweakCursor (BreakWords w _) (VisibleLine _ ParagraphEnd)
     | w < 1 = id
     | otherwise = min w
-  tweakCursor _ (VisibleLine cs _) = max 0 . min (total-post) where
-    post = countSpacesFront $ reverse cs
+  tweakCursor _ (VisibleLine cs SimpleBreak) = max 0 . min (total-post) where
+    post = countLeadingSpaces $ reverse cs
     total = length cs
+  tweakCursor _ (VisibleLine cs HyphenatedWord) = id
 
-class SpaceChar c where
-  isSpaceChar :: c -> Bool
-
-trimSpacesFront :: SpaceChar c => [c] -> [c]
-trimSpacesFront = dropWhile isSpaceChar
-
-countSpacesFront :: SpaceChar c => [c] -> Int
-countSpacesFront = length . takeWhile isSpaceChar
-
-breakCommon :: (c -> Bool) -> Int -> [c] -> [VisibleLine c LineBreak]
-breakCommon f w [] = [emptyLine]
-breakCommon f w cs
-  | w < 1 = [VisibleLine cs ParagraphEnd]
+breakAllLines :: WordChar c => Int -> WordSplitter c -> [c] -> [VisibleLine c LineBreak]
+breakAllLines _ _ [] = [emptyLine]
+breakAllLines w f cs
+  | w < 1 = [VisibleLine cs lineBreakEnd]
   | otherwise = breakOrEmpty cs where
-    breakOrEmpty [] = []
-    breakOrEmpty cs = adjust (reverse $ take w cs) (drop w cs) where
-      adjust line rest
-        | null rest =
-          [VisibleLine (reverse line) ParagraphEnd]
-        | not (f $ head rest) =
-          (VisibleLine (reverse line) SimpleBreak):(breakOrEmpty rest)
-        | otherwise = adjust (head rest:line) (tail rest)
-
-instance SpaceChar Char where
-  isSpaceChar = (== ' ')
+      breakOrEmpty cs = let (Just ls) = handleSplit (reverse $ take w cs) (drop w cs) in ls
+      handleSplit line rest =
+        tryWord line rest <|>
+        trySpaces line rest <|>
+        lineDefault line rest
+      lineDefault []  _ = Just []
+      lineDefault ls [] = Just [VisibleLine (reverse ls) lineBreakEnd]
+      lineDefault ls rs = Just $ VisibleLine (reverse ls) lineBreakSimple:(breakOrEmpty rs)
+      tryWord ls@(l:_) rs@(r:_) | isWordChar l && isWordChar r = newLines where
+        ls2 = dropWhile isWordChar ls
+        rs2 = dropWhile isWordChar rs
+        wordFront = reverse $ takeWhile isWordChar ls
+        wordBack = takeWhile isWordChar rs
+        breaks = f (length wordFront) w (wordFront ++ wordBack)
+        newLines
+          -- Splitter refuses to deal with the word.
+          | null breaks = Nothing
+          -- If there is no split, move the whole word to the next line.
+          | length breaks == 1 = handleSplit ls2 (head breaks ++ rs2)
+          | otherwise = Just $ hyphenate ((reverse ls2 ++ head breaks):(tail breaks)) rs2
+        hyphenate bs rs =
+          map (flip VisibleLine lineBreakHyphen) (init bs) ++
+          -- Last break goes with the rest of the next line.
+          breakOrEmpty (last bs ++ rs)
+      tryWord _ _ = Nothing
+      trySpaces ls rs@(r:_) | isSpaceChar r = newLines where
+        ls' = reverse ls ++ takeWhile isSpaceChar rs
+        rs' = dropWhile isSpaceChar rs
+        newLines
+          | null rs'  = Just [VisibleLine ls' lineBreakEnd]
+          | otherwise = Just $ (VisibleLine ls' lineBreakSimple):(breakOrEmpty rs')
+      trySpaces _ _ = Nothing

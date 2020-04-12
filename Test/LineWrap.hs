@@ -51,34 +51,34 @@ allTests = [
        [innerLine "This is",
         innerLine " a test",
         endLine " line."]),
-    ("breakExact restores line", do
+    ("breakExact preserves data", do
        let breaker = setLineWidth breakExact 7
        let line = "This is a test line."
        let restored = concat $ map vlText $ breakLines breaker line
-       checkCondition (restored == line) line),
-    ("hideLeadingSpace skips breaks by default", checkLineBreak
-       hideLeadingSpace
+       checkCondition line (restored == line)),
+    ("noHyphen skips breaks by default", checkLineBreak
+       (breakWords noHyphen)
        "This is a test line."
        [endLine "This is a test line."]),
-    ("hideLeadingSpace empty still provides line", checkLineBreak
-       hideLeadingSpace
+    ("noHyphen empty still provides line", checkLineBreak
+       (breakWords noHyphen)
        ""
        [endLine ""]),
-    ("hideLeadingSpace exact multiple", checkLineBreak
-       (setLineWidth hideLeadingSpace 5)
+    ("noHyphen exact multiple", checkLineBreak
+       (setLineWidth (breakWords noHyphen) 5)
        "This is a test line."
        [innerLine "This ",
         innerLine "is a ",
         innerLine "test ",
         endLine "line."]),
-    ("hideLeadingSpace not a multiple", checkLineBreak
-       (setLineWidth hideLeadingSpace 7)
+    ("noHyphen not a multiple", checkLineBreak
+       (setLineWidth (breakWords noHyphen) 7)
        "This is a test line."
        [innerLine "This is ",
         innerLine "a test ",
         endLine "line."]),
-    ("hideLeadingSpace allows extra hidden spaces at end", checkLineBreak
-       (setLineWidth hideLeadingSpace 5)
+    ("noHyphen allows extra hidden spaces at end", checkLineBreak
+       (setLineWidth (breakWords noHyphen) 5)
        "Here      are some extra spaces.      "
        [innerLine "Here      ",
         innerLine "are s",
@@ -86,49 +86,109 @@ allTests = [
         innerLine "xtra ",
         innerLine "space",
         endLine "s.      "]),
-    ("hideLeadingSpace restores line", do
-       let breaker = setLineWidth hideLeadingSpace 7
-       let line = "This is a test line."
+    ("noHyphen preserves data", do
+       let breaker = setLineWidth (breakWords noHyphen) 5
+       let line = "Here      are some extra spaces.      "
        let restored = concat $ map vlText $ breakLines breaker line
-       checkCondition (restored == line) line),
-    ("hideLeadingSpace trims only trailing spaces", checkLineRender
-       hideLeadingSpace
+       checkCondition line (restored == line)),
+    ("lazyHyphen skips short words", checkWordBreaks
+       (lazyHyphen 0 7) "the" ["the"]),
+    ("lazyHyphen with single break", checkWordBreaks
+       (lazyHyphen 4 7) "hyphenate" ["hyp","henate"]),
+    ("lazyHyphen with multiple break", checkWordBreaks
+       (lazyHyphen 4 5) "hyphenation" ["hyp","hena","tion"]),
+    ("lazyHyphen skips short break", checkWordBreaks
+       (lazyHyphen 2 5) "hyphenate" ["hyphenate"]),
+    ("lazyHyphen skips avoids short end", checkWordBreaks
+       (lazyHyphen 9 10) "hyphenate" ["hyphenate"]),
+    ("lazyHyphen skips breaks by default", checkLineBreak
+       (breakWords lazyHyphen)
+       "This is a test line."
+       [endLine "This is a test line."]),
+    ("lazyHyphen empty still provides line", checkLineBreak
+       (breakWords lazyHyphen)
+       ""
+       [endLine ""]),
+    ("lazyHyphen exact multiple", checkLineBreak
+       (setLineWidth (breakWords lazyHyphen) 5)
+       "This is a test line."
+       [innerLine "This ",
+        innerLine "is a ",
+        innerLine "test ",
+        endLine "line."]),
+    ("lazyHyphen not a multiple", checkLineBreak
+       (setLineWidth (breakWords lazyHyphen) 7)
+       "This is a test line."
+       [innerLine "This is ",
+        innerLine "a test ",
+        endLine "line."]),
+    ("lazyHyphen allows extra hidden spaces at end", checkLineBreak
+       (setLineWidth (breakWords lazyHyphen) 7)
+       "Here      are some extra spaces and alongwordthatwillnotfit.      "
+       [innerLine "Here      ",
+        hyphenLine "are so",
+        hyphenLine "me ext",
+        hyphenLine "ra spa",
+        innerLine "ces and ",
+        hyphenLine "alongw",
+        hyphenLine "ordtha",
+        hyphenLine "twilln",
+        endLine "otfit.      "]),
+    ("lazyHyphen preserves data", do
+       let breaker = setLineWidth (breakWords lazyHyphen) 7
+       let line = "Here      are some extra spaces and alongwordthatwillnotfit.      "
+       let restored = concat $ map vlText $ breakLines breaker line
+       checkCondition line (restored == line)),
+    ("breakWords trims only trailing spaces", checkLineRender
+       (breakWords noHyphen)
        (innerLine "  This line had extra spaces.  ")
        "  This line had extra spaces."),
-    ("hideLeadingSpace trims allows spaces at paragraph end", checkLineRender
-       (setLineWidth hideLeadingSpace 30)
+    ("breakWords trims allows spaces at paragraph end", checkLineRender
+       (setLineWidth (breakWords noHyphen) 30)
        (endLine "  This line had extra spaces.  ")
        "  This line had extra spaces. "),
-    ("hideLeadingSpace no tweak in leading spaces", checkCursorTweak
-       hideLeadingSpace
+    ("breakWords adds a hyphen", checkLineRender
+       (breakWords lazyHyphen)
+       (hyphenLine "somet")
+       "somet-"),
+    ("breakWords adds a hyphen even with spaces", checkLineRender
+       (breakWords lazyHyphen)
+       (hyphenLine "weird ")
+       "weird -"),
+    ("breakWords no tweak in leading spaces", checkCursorTweak
+       (breakWords noHyphen)
        (innerLine "  This line had extra spaces.  ")
        1 1),
-    ("hideLeadingSpace no tweak in middle", checkCursorTweak
-       hideLeadingSpace
+    ("breakWords no tweak in middle", checkCursorTweak
+       (breakWords noHyphen)
        (innerLine "  This line had extra spaces.  ")
        10 10),
-    ("hideLeadingSpace tweak at back", checkCursorTweak
-       hideLeadingSpace
+    ("breakWords tweak at back", checkCursorTweak
+       (breakWords noHyphen)
        (innerLine "  This line had extra spaces.  ")
        29 29),
-    ("hideLeadingSpace tweak in trailing spaces", checkCursorTweak
-       hideLeadingSpace
+    ("breakWords tweak in trailing spaces", checkCursorTweak
+       (breakWords noHyphen)
        (innerLine "  This line had extra spaces.  ")
        31 29),
-    ("hideLeadingSpace tweak allows spaces at paragraph end", checkCursorTweak
-       (setLineWidth hideLeadingSpace 30)
+    ("breakWords tweak allows spaces at paragraph end", checkCursorTweak
+       (setLineWidth (breakWords noHyphen) 30)
        (endLine "  This line had extra spaces.  ")
        31 30)
   ]
 
 checkLineBreak b x ys = do
   let breaks = breakLines b x
-  checkCondition (breaks == ys) (show breaks)
+  checkCondition (show breaks) (breaks == ys)
 
 checkLineRender b x y = do
   let rendered = renderLine b x
-  checkCondition (rendered == y) (show rendered)
+  checkCondition (show rendered) (rendered == y)
 
 checkCursorTweak b x k j = do
   let tweaked = tweakCursor b x k
-  checkCondition (tweaked == j) (show tweaked)
+  checkCondition (show tweaked) (tweaked == j)
+
+checkWordBreaks f x y = do
+  let breaks = f x
+  checkCondition (show breaks) (breaks == y)
