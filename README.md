@@ -8,6 +8,7 @@ Here are some important features:
 
 - Supports dynamic viewport resizing while preserving the view position.
 - Customizable line-wrapping policies, to include special line rendering.
+- Includes a line-wrapping policy for word hyphenation.
 - Efficient editing operations for long documents.
 
 If you have any problems using this library, or if you would like to see new
