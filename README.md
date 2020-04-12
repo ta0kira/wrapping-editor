@@ -1,8 +1,8 @@
 # [Wrapping Editor for Haskell][home]
 
-This library contains a simple text-editing widget for fixed-size fonts. It can
-either be used as a [Brick][brick] `Widget` or as the basis for creating a new
-widget for another UI library.
+This library contains a simple text-editing component for fixed-size fonts. It
+can either be used as a [Brick][brick] `Widget` or as the basis for creating a
+new widget for another UI library.
 
 Here are some important features:
 
