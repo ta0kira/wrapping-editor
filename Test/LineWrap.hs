@@ -134,6 +134,19 @@ allTests = [
         hyphenLine "ordtha",
         hyphenLine "twilln",
         endLine "otfit.      "]),
+    ("lazyHyphen breaks long word in middle of line", checkLineBreak
+       (setLineWidth (breakWords lazyHyphen) 7)
+       "   averylongword"
+       [hyphenLine "   ave",
+        hyphenLine "rylong",
+        endLine "word"]),
+    ("lazyHyphen breaks word bumped to next line", checkLineBreak
+       (setLineWidth (breakWords lazyHyphen) 5)
+       "   averylongword"
+       [innerLine "   ",
+        hyphenLine "aver",
+        hyphenLine "ylon",
+        endLine "gword"]),
     ("lazyHyphen preserves data", do
        let breaker = setLineWidth (breakWords lazyHyphen) 7
        let line = "Here      are some extra spaces and alongwordthatwillnotfit.      "
