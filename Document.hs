@@ -111,6 +111,11 @@ editDocument parser ps = document where
 
 -- Private below here.
 
+instance Show (EditingDocument c) where
+  show d =
+    "EditingDocument { size: " ++ show (getViewSize d) ++
+                    ", cursor: " ++ show (getCursor d) ++ " }"
+
 exportDocument :: EditingDocument c -> [UnparsedPara c]
 exportDocument (EditingDocument bs e as _ _ _ _ _) =
   reverse (map unparseParaBefore bs) ++ [unparsePara e] ++ (map unparseParaAfter as)

@@ -41,7 +41,7 @@ import Base.Para
 import Base.Parser
 
 
-data LineBreak = ParagraphEnd | SimpleBreak | HyphenatedWord deriving (Eq,Ord,Show)
+data LineBreak = ParagraphEnd | SimpleBreak | HyphenatedWord deriving (Eq,Ord)
 
 lineBreakEnd :: LineBreak
 lineBreakEnd = ParagraphEnd
@@ -52,7 +52,7 @@ lineBreakSimple = SimpleBreak
 lineBreakHyphen :: LineBreak
 lineBreakHyphen = HyphenatedWord
 
-newtype BreakExact c = BreakExact Int deriving (Show)
+newtype BreakExact c = BreakExact Int
 
 breakExact :: BreakExact c
 breakExact = BreakExact 0
@@ -79,6 +79,17 @@ lazyHyphen k w cs
 
 
 -- Private below here.
+
+instance Show LineBreak where
+  show ParagraphEnd   = "lineBreakEnd"
+  show SimpleBreak    = "lineBreakSimple"
+  show HyphenatedWord = "lineBreakHyphen"
+
+instance Show (BreakWords c) where
+  show (BreakWords w _) = "breakWords { width: " ++ show w ++ " }"
+
+instance Show (BreakExact c) where
+  show (BreakExact w) = "breakExact { width: " ++ show w ++ " }"
 
 instance DefaultBreak LineBreak where
   defaultBreak = lineBreakEnd

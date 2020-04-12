@@ -72,8 +72,8 @@ renderWrappingEditor focus editor = doWrappingEditor edit editor where
     let height = ctx^.availHeightL
     -- NOTE: Resizing is a no-op if the size is unchanged.
     let e' = if height > 0
-                    then viewerResizeAction (width,height) e
-                    else e
+                then viewerResizeAction (width,height) e
+                else e
     render $ viewport (getName editor) Vertical $ setCursor e' $ textArea width height e' where
       setCursor
         | focus = showCursor (getName editor) . Location . getCursor
@@ -110,6 +110,12 @@ data WrappingEditor c n =
     weName :: n,
     weEditor :: a
   }
+
+instance Show n => Show (WrappingEditor c n) where
+  show (WrappingEditor name editor) =
+    "WrappingEditor { name: " ++ show name ++
+                   ", size: " ++ show (getViewSize editor) ++
+                   ", cursor: " ++ show (getCursor editor) ++ " }"
 
 instance Named (WrappingEditor c n) n where
     getName = weName

@@ -25,11 +25,11 @@ module Base.Actions (
 ) where
 
 
-data EditAction c = InsertText [c] | DeleteText deriving (Show)
+data EditAction c = InsertText [c] | DeleteText deriving (Eq,Show)
 
-data EditDirection = EditBefore | EditAfter deriving (Eq,Ord,Show)
+data EditDirection = EditBefore | EditAfter deriving (Eq,Show)
 
 data MoveDirection =
   MoveUp | MoveDown | MovePrev | MoveNext |
   MoveHome | MoveEnd | MovePageUp | MovePageDown
-  deriving (Eq,Ord,Show)
+  deriving (Eq,Show)
