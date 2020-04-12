@@ -51,12 +51,7 @@ module Document (
   -- <<< From Base
 ) where
 
-import Base.Actions
-import Base.Editor
-import Base.Line
-import Base.Para
-import Base.Parser
-import Base.Viewer
+import Base
 import Edit.Line
 import Edit.Para
 

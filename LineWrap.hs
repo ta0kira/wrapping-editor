@@ -35,10 +35,7 @@ module LineWrap (
 
 import Control.Applicative ((<|>))
 
-import Base.Char
-import Base.Line
-import Base.Para
-import Base.Parser
+import Base
 
 
 data LineBreak = ParagraphEnd | SimpleBreak | HyphenatedWord deriving (Eq,Ord)
