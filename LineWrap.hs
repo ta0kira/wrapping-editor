@@ -52,9 +52,13 @@ instance FixedFontParser (BreakExact c) c LineBreak where
 instance SpaceChar c => FixedFontParser (TrimSpaces c) c LineBreak where
   setLineWidth _ w = TrimSpaces w
   breakLines (TrimSpaces w) = breakCommon isSpaceChar w
-  renderLine _ (VisibleLine cs ParagraphEnd) = cs
+  renderLine (TrimSpaces w) (VisibleLine cs ParagraphEnd)
+    | w < 1 = cs
+    | otherwise = take w cs
   renderLine _ (VisibleLine cs SimpleBreak)  = reverse $ trimSpacesFront $ reverse cs
-  tweakCursor _ (VisibleLine _ ParagraphEnd) = id
+  tweakCursor (TrimSpaces w) (VisibleLine _ ParagraphEnd)
+    | w < 1 = id
+    | otherwise = min w
   tweakCursor _ (VisibleLine cs _) = max 0 . min (total-post) where
     post = countSpacesFront $ reverse cs
     total = length cs
@@ -74,13 +78,13 @@ breakCommon f w cs
   | w < 1 = [VisibleLine cs ParagraphEnd]
   | otherwise = breakOrEmpty cs where
     breakOrEmpty [] = []
-    breakOrEmpty cs = adjust (take w cs) (drop w cs) where
+    breakOrEmpty cs = adjust (reverse $ take w cs) (drop w cs) where
       adjust line rest
         | null rest =
-          [VisibleLine line ParagraphEnd]
+          [VisibleLine (reverse line) ParagraphEnd]
         | not (f $ head rest) =
-          (VisibleLine line SimpleBreak):(breakOrEmpty rest)
-        | otherwise = adjust (line ++ [head rest]) (tail rest)
+          (VisibleLine (reverse line) SimpleBreak):(breakOrEmpty rest)
+        | otherwise = adjust (head rest:line) (tail rest)
 
 instance SpaceChar Char where
   isSpaceChar = (== ' ')

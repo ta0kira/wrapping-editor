@@ -79,13 +79,13 @@ allTests = [
         endLine "line."]),
     ("hideLeadingSpace allows extra hidden spaces at end", checkLineBreak
        (setLineWidth hideLeadingSpace 5)
-       "Here      are some extra spaces."
+       "Here      are some extra spaces.      "
        [innerLine "Here      ",
         innerLine "are s",
         innerLine "ome e",
         innerLine "xtra ",
         innerLine "space",
-        endLine "s."]),
+        endLine "s.      "]),
     ("hideLeadingSpace restores line", do
        let breaker = setLineWidth hideLeadingSpace 7
        let line = "This is a test line."
@@ -95,10 +95,10 @@ allTests = [
        hideLeadingSpace
        (innerLine "  This line had extra spaces.  ")
        "  This line had extra spaces."),
-    ("hideLeadingSpace trims skips paragraph end", checkLineRender
-       hideLeadingSpace
+    ("hideLeadingSpace trims allows spaces at paragraph end", checkLineRender
+       (setLineWidth hideLeadingSpace 30)
        (endLine "  This line had extra spaces.  ")
-       "  This line had extra spaces.  "),
+       "  This line had extra spaces. "),
     ("hideLeadingSpace no tweak in leading spaces", checkCursorTweak
        hideLeadingSpace
        (innerLine "  This line had extra spaces.  ")
@@ -115,10 +115,10 @@ allTests = [
        hideLeadingSpace
        (innerLine "  This line had extra spaces.  ")
        31 29),
-    ("hideLeadingSpace tweak skipped at paragraph end", checkCursorTweak
-       hideLeadingSpace
+    ("hideLeadingSpace tweak allows spaces at paragraph end", checkCursorTweak
+       (setLineWidth hideLeadingSpace 30)
        (endLine "  This line had extra spaces.  ")
-       31 31)
+       31 30)
   ]
 
 checkLineBreak b x ys = do
@@ -127,7 +127,7 @@ checkLineBreak b x ys = do
 
 checkLineRender b x y = do
   let rendered = renderLine b x
-  checkCondition (rendered == y) (show y)
+  checkCondition (rendered == y) (show rendered)
 
 checkCursorTweak b x k j = do
   let tweaked = tweakCursor b x k
