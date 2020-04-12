@@ -66,9 +66,9 @@ setLineCursor k e@(EditingLine bs as c b)
   | k > c && not (null as) = setLineCursor k $ EditingLine (head as:bs) (tail as) (c+1) b
   | otherwise = e
 
-splitLine :: Enum b => EditingLine c b -> (VisibleLine c b,VisibleLine c b)
+splitLine :: DefaultBreak b => EditingLine c b -> (VisibleLine c b,VisibleLine c b)
 splitLine (EditingLine bs as c b) =
-  (VisibleLine (reverse bs) (toEnum 0),
+  (VisibleLine (reverse bs) defaultBreak,
    VisibleLine as b)
 
 lineCursorMovable :: MoveDirection -> EditingLine c b -> Bool

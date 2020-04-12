@@ -27,7 +27,7 @@ module Base.Parser (
 import Base.Line
 
 
-class Enum b => FixedFontParser a c b | a -> c b where
+class DefaultBreak b => FixedFontParser a c b | a -> c b where
   setLineWidth :: a -> Int -> a
   breakLines :: a -> [c] -> [VisibleLine c b]
   renderLine :: a -> VisibleLine c b -> [c]

@@ -32,7 +32,10 @@ import Base.Para
 import Base.Parser
 
 
-data LineBreak = ParagraphEnd | SimpleBreak deriving (Enum,Eq,Ord,Show)
+data LineBreak = ParagraphEnd | SimpleBreak deriving (Eq,Ord,Show)
+
+instance DefaultBreak LineBreak where
+  defaultBreak = ParagraphEnd
 
 newtype BreakExact c = BreakExact Int deriving (Show)
 

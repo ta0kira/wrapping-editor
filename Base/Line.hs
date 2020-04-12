@@ -19,6 +19,7 @@ limitations under the License.
 {-# LANGUAGE Safe #-}
 
 module Base.Line (
+  DefaultBreak(..),
   VisibleLine(..),
   emptyLine,
 ) where
@@ -31,5 +32,8 @@ data VisibleLine c b =
   }
   deriving (Eq,Ord,Show)
 
-emptyLine :: Enum b => VisibleLine c b
-emptyLine = VisibleLine [] (toEnum 0)
+class DefaultBreak b where
+  defaultBreak :: b
+
+emptyLine :: DefaultBreak b => VisibleLine c b
+emptyLine = VisibleLine [] defaultBreak
