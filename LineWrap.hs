@@ -87,34 +87,34 @@ instance FixedFontParser (BreakExact c) c LineBreak where
   setLineWidth _ w = BreakExact w
   breakLines _ [] = [emptyLine]
   breakLines (BreakExact w) cs
-    | w < 1 = [VisibleLine cs lineBreakEnd]
+    | w < 1 = [VisibleLine lineBreakEnd cs]
     | otherwise = breakOrEmpty cs where
       breakOrEmpty [] = []
       breakOrEmpty cs = continue (reverse $ take w cs) (drop w cs) where
-        continue ls [] = [VisibleLine (reverse ls) lineBreakEnd]
-        continue ls rs = (VisibleLine (reverse ls) lineBreakSimple):(breakOrEmpty rs)
+        continue ls [] = [VisibleLine lineBreakEnd (reverse ls)]
+        continue ls rs = (VisibleLine lineBreakSimple (reverse ls)):(breakOrEmpty rs)
   renderLine _ = vlText
 
 instance (WordChar c, HyphenChar c) => FixedFontParser (BreakWords c) c LineBreak where
   setLineWidth (BreakWords _ f) w = BreakWords w f
   breakLines (BreakWords w f) = breakAllLines w f
-  renderLine (BreakWords w _) (VisibleLine cs ParagraphEnd)
+  renderLine (BreakWords w _) (VisibleLine ParagraphEnd cs)
     | w < 1 = cs
     | otherwise = take w cs
-  renderLine _ (VisibleLine cs SimpleBreak) = reverse $ trimLeadingSpaces $ reverse cs
-  renderLine _ (VisibleLine cs HyphenatedWord) = cs ++ [hyphenChar]
-  tweakCursor (BreakWords w _) (VisibleLine _ ParagraphEnd)
+  renderLine _ (VisibleLine SimpleBreak cs) = reverse $ trimLeadingSpaces $ reverse cs
+  renderLine _ (VisibleLine HyphenatedWord cs) = cs ++ [hyphenChar]
+  tweakCursor (BreakWords w _) (VisibleLine ParagraphEnd _)
     | w < 1 = id
     | otherwise = min w
-  tweakCursor _ (VisibleLine cs SimpleBreak) = max 0 . min (total-post) where
+  tweakCursor _ (VisibleLine SimpleBreak cs) = max 0 . min (total-post) where
     post = countLeadingSpaces $ reverse cs
     total = length cs
-  tweakCursor _ (VisibleLine cs HyphenatedWord) = id
+  tweakCursor _ (VisibleLine HyphenatedWord cs) = id
 
 breakAllLines :: WordChar c => Int -> WordSplitter c -> [c] -> [VisibleLine c LineBreak]
 breakAllLines _ _ [] = [emptyLine]
 breakAllLines w f cs
-  | w < 1 = [VisibleLine cs lineBreakEnd]
+  | w < 1 = [VisibleLine lineBreakEnd cs]
   | otherwise = breakOrEmpty cs where
       breakOrEmpty cs = let (Just ls) = handleSplit (reverse $ take w cs) (drop w cs) in ls
       handleSplit line rest =
@@ -122,8 +122,8 @@ breakAllLines w f cs
         trySpaces line rest <|>
         lineDefault line rest
       lineDefault []  _ = Just []
-      lineDefault ls [] = Just [VisibleLine (reverse ls) lineBreakEnd]
-      lineDefault ls rs = Just $ VisibleLine (reverse ls) lineBreakSimple:(breakOrEmpty rs)
+      lineDefault ls [] = Just [VisibleLine lineBreakEnd (reverse ls)]
+      lineDefault ls rs = Just $ VisibleLine lineBreakSimple (reverse ls):(breakOrEmpty rs)
       tryWord ls@(l:_) rs@(r:_) | isWordChar l && isWordChar r = newLines where
         ls2 = dropWhile isWordChar ls
         rs2 = dropWhile isWordChar rs
@@ -137,7 +137,7 @@ breakAllLines w f cs
           | length breaks == 1 = handleSplit ls2 (head breaks ++ rs2)
           | otherwise = Just $ hyphenate ((reverse ls2 ++ head breaks):(tail breaks)) rs2
         hyphenate bs rs =
-          map (flip VisibleLine lineBreakHyphen) (init bs) ++
+          map (VisibleLine lineBreakHyphen) (init bs) ++
           -- Last break goes with the rest of the next line.
           breakOrEmpty (last bs ++ rs)
       tryWord _ _ = Nothing
@@ -145,6 +145,6 @@ breakAllLines w f cs
         ls' = reverse ls ++ takeWhile isSpaceChar rs
         rs' = dropWhile isSpaceChar rs
         newLines
-          | null rs'  = Just [VisibleLine ls' lineBreakEnd]
-          | otherwise = Just $ (VisibleLine ls' lineBreakSimple):(breakOrEmpty rs')
+          | null rs'  = Just [VisibleLine lineBreakEnd ls']
+          | otherwise = Just $ (VisibleLine lineBreakSimple ls'):(breakOrEmpty rs')
       trySpaces _ _ = Nothing

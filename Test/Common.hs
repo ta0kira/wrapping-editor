@@ -43,13 +43,13 @@ import Base.Parser
 
 
 endLine :: String -> VisibleLine Char LineBreak
-endLine = flip VisibleLine lineBreakEnd
+endLine = VisibleLine lineBreakEnd
 
 innerLine :: String -> VisibleLine Char LineBreak
-innerLine = flip VisibleLine lineBreakSimple
+innerLine = VisibleLine lineBreakSimple
 
 hyphenLine :: String -> VisibleLine Char LineBreak
-hyphenLine = flip VisibleLine lineBreakHyphen
+hyphenLine = VisibleLine lineBreakHyphen
 
 composeActions :: [a -> a] -> a -> a
 composeActions = foldr (flip (.)) id

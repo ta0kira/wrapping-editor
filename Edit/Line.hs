@@ -49,10 +49,10 @@ data EditingLine c b =
   deriving (Eq,Show)
 
 editLine :: VisibleLine c b -> EditingLine c b
-editLine (VisibleLine cs b) = EditingLine [] cs 0 b
+editLine (VisibleLine b cs) = EditingLine [] cs 0 b
 
 viewLine :: EditingLine c b -> VisibleLine c b
-viewLine (EditingLine bs as _ b) = VisibleLine (reverse bs ++ as) b
+viewLine (EditingLine bs as _ b) = VisibleLine b (reverse bs ++ as)
 
 joinLines :: [VisibleLine c b] -> [c]
 joinLines = concat . map vlText
@@ -68,8 +68,8 @@ setLineCursor k e@(EditingLine bs as c b)
 
 splitLine :: DefaultBreak b => EditingLine c b -> (VisibleLine c b,VisibleLine c b)
 splitLine (EditingLine bs as c b) =
-  (VisibleLine (reverse bs) defaultBreak,
-   VisibleLine as b)
+  (VisibleLine defaultBreak (reverse bs),
+   VisibleLine b as)
 
 lineCursorMovable :: MoveDirection -> EditingLine c b -> Bool
 lineCursorMovable MovePrev (EditingLine (_:_) _ _ _) = True
@@ -98,11 +98,11 @@ atLineBack :: EditingLine c b -> Bool
 atLineBack = null . elTextAfter
 
 appendToLine :: EditingLine c b -> VisibleLine c b -> EditingLine c b
-appendToLine (EditingLine bs as c _) (VisibleLine cs b) =
+appendToLine (EditingLine bs as c _) (VisibleLine b cs) =
   (EditingLine bs (as ++ cs) c b)
 
 prependToLine :: VisibleLine c b -> EditingLine c b -> EditingLine c b
-prependToLine (VisibleLine cs _) (EditingLine bs as c b) =
+prependToLine (VisibleLine _ cs) (EditingLine bs as c b) =
   (EditingLine (bs ++ reverse cs) as (c + length cs) b)
 
 modifyLine :: EditAction c -> EditDirection -> EditingLine c b -> EditingLine c b

@@ -27,8 +27,8 @@ module Base.Line (
 
 data VisibleLine c b =
   VisibleLine {
-    vlText :: [c],
-    vlBreak :: b
+    vlBreak :: b,
+    vlText :: [c]
   }
   deriving (Eq,Ord,Show)
 
@@ -36,4 +36,4 @@ class DefaultBreak b where
   defaultBreak :: b
 
 emptyLine :: DefaultBreak b => VisibleLine c b
-emptyLine = VisibleLine [] defaultBreak
+emptyLine = VisibleLine defaultBreak []
