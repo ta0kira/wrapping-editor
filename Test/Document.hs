@@ -342,7 +342,7 @@ loadDoc b = viewerResizeAction defaultView . editDocument b . splitParas
 checkEditContent fx fy f = do
   edit <- fmap (f . loadDoc breakExact) $ readFile fx
   view <- readFile fy
-  let restored = joinParas $ exportDocument edit
+  let restored = joinParas $ exportData edit
   checkCondition ("\n" ++ restored) (restored == view)
 
 checkEditView fx fy f = do

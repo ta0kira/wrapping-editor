@@ -16,15 +16,22 @@ limitations under the License.
 
 -- Author: Kevin P. Barry [ta0kira@gmail.com]
 
+{-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE Trustworthy #-}
 
 module WrappingEditor (
   WrappingEditor,
+  WrappingEditorAction,
+  WrappingEditorDoer,
+  doWrappingEditor,
   dumpWrappingEditor,
+  genericWrappingEditor,
   handleWrappingEditor,
+  mapWrappingEditor,
   newWrappingEditor,
   renderWrappingEditor,
 ) where
@@ -39,56 +46,69 @@ import Document
 
 
 newWrappingEditor :: FixedFontParser a c b => a -> n -> [[c]] -> WrappingEditor c n
-newWrappingEditor b n cs = WrappingEditor n $ editDocument b $ map UnparsedPara cs
+newWrappingEditor b n cs = genericWrappingEditor n $ editDocument b $ map UnparsedPara cs
+
+genericWrappingEditor :: (FixedFontViewer a c, FixedFontEditor a c) => n -> a -> WrappingEditor c n
+genericWrappingEditor = WrappingEditor
+
+type WrappingEditorAction c = forall a. (FixedFontViewer a c, FixedFontEditor a c) => a -> a
+
+mapWrappingEditor :: WrappingEditorAction c -> WrappingEditor c n -> WrappingEditor c n
+mapWrappingEditor f (WrappingEditor name editor) = WrappingEditor name (f editor)
+
+type WrappingEditorDoer c b = forall a. (FixedFontViewer a c, FixedFontEditor a c) => a -> b
+
+doWrappingEditor :: WrappingEditorDoer c b -> WrappingEditor c n -> b
+doWrappingEditor f (WrappingEditor _ editor) = f editor
 
 dumpWrappingEditor :: WrappingEditor c n -> [[c]]
-dumpWrappingEditor (WrappingEditor _ editor) = map upText $ exportDocument editor
+dumpWrappingEditor = map upText . doWrappingEditor exportData
 
 renderWrappingEditor :: (Ord n, Show n) => Bool -> WrappingEditor Char n -> Widget n
-renderWrappingEditor focus (WrappingEditor n editor) = Widget Greedy Greedy $ do
-  ctx <- getContext
-  let width = ctx^.availWidthL
-  let height = ctx^.availHeightL
-  -- NOTE: Resizing is a no-op if the size is unchanged.
-  let editor' = if height > 0
-                   then viewerResizeAction (width,height) editor
-                   else editor
-  render $ viewport n Vertical $ setCursor editor' $ textArea width height editor' where
-    setCursor
-      | focus = showCursor n . Location . getCursor
-      | otherwise = const id
-    textArea w h = vBox . lineFill w h . map (strFill w) . getVisible
-    strFill w cs = str $ take w $ cs ++ repeat ' '
-    lineFill w h ls = take h $ ls ++ repeat (strFill w "")
+renderWrappingEditor focus editor = doWrappingEditor edit editor where
+  edit e = Widget Greedy Greedy $ do
+    ctx <- getContext
+    let width = ctx^.availWidthL
+    let height = ctx^.availHeightL
+    -- NOTE: Resizing is a no-op if the size is unchanged.
+    let e' = if height > 0
+                    then viewerResizeAction (width,height) e
+                    else e
+    render $ viewport (getName editor) Vertical $ setCursor e' $ textArea width height e' where
+      setCursor
+        | focus = showCursor (getName editor) . Location . getCursor
+        | otherwise = const id
+      textArea w h = vBox . lineFill w h . map (strFill w) . getVisible
+      strFill w cs = str $ take w $ cs ++ repeat ' '
+      lineFill w h ls = take h $ ls ++ repeat (strFill w "")
 
 handleWrappingEditor :: (Eq n) => WrappingEditor Char n -> Event -> EventM n (WrappingEditor Char n)
-handleWrappingEditor (WrappingEditor n editor) event = do
-  let action = case event of
-                    EvKey KBS []       -> editorBackspaceAction
-                    EvKey KDel []      -> editorDeleteAction
-                    EvKey KDown []     -> editorDownAction
-                    EvKey KEnd []      -> editorEndAction
-                    EvKey KEnter []    -> editorEnterAction
-                    EvKey KHome []     -> editorHomeAction
-                    EvKey KLeft []     -> editorLeftAction
-                    EvKey KPageDown [] -> editorPageDownAction
-                    EvKey KPageUp []   -> editorPageUpAction
-                    EvKey KRight []    -> editorRightAction
-                    EvKey KUp []       -> editorUpAction
-                    EvKey (KChar c) [] | not (c `elem` "\t\r\n") -> editorAppendAction [c]
-                    _ -> id
-  editor' <- setSize editor >>= return . action
-  return $ WrappingEditor n editor' where
-    setSize editor = do
-      extent <- lookupExtent n
-      case extent of
-           (Just ext) | snd (extentSize ext) > 0 -> return $ viewerResizeAction (extentSize ext) editor
-           _ -> return editor
+handleWrappingEditor editor event = do
+  extent <- lookupExtent (getName editor)
+  return $ mapWrappingEditor (action . resizeAction extent) editor where
+    action :: EditorAction Char
+    action =
+      case event of
+           EvKey KBS []       -> editorBackspaceAction
+           EvKey KDel []      -> editorDeleteAction
+           EvKey KDown []     -> editorDownAction
+           EvKey KEnd []      -> editorEndAction
+           EvKey KEnter []    -> editorEnterAction
+           EvKey KHome []     -> editorHomeAction
+           EvKey KLeft []     -> editorLeftAction
+           EvKey KPageDown [] -> editorPageDownAction
+           EvKey KPageUp []   -> editorPageUpAction
+           EvKey KRight []    -> editorRightAction
+           EvKey KUp []       -> editorUpAction
+           EvKey (KChar c) [] | not (c `elem` "\t\r\n") -> editorAppendAction [c]
+           _ -> id
+    resizeAction (Just ext) | snd (extentSize ext) > 0 = viewerResizeAction (extentSize ext)
+    resizeAction  _ = id
 
 data WrappingEditor c n =
-  WrappingEditor {
+  forall a. (FixedFontViewer a c, FixedFontEditor a c) => WrappingEditor {
     weName :: n,
-    weEditor :: EditingDocument c
+    weEditor :: a
   }
 
 instance Named (WrappingEditor c n) n where

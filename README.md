@@ -44,6 +44,22 @@ ghc -threaded brick-example.hs && ./brick-example README.md
 Press `Esc` to exit when you are finished. The final contents of the editor will
 be sent to `stdout` without modifying the file.
 
+You can customize the widget using the following helper functions from the
+`WrappingEditor` module:
+
+- **`doWrappingEditor`** allows you to use `FixedFontEditor` and
+  `FixedFontViewer` functions to extract info from the editor, e.g., for custom
+  rendering.
+
+- **`genericWrappingEditor`** allows you to use any custom editor component that
+  instantiates both `FixedFontEditor` and `FixedFontViewer`, e.g., an editor for
+  a custom character type. (You might also need custom rendering and event
+  handling.)
+
+- **`mapWrappingEditor`** allows you to transform the editor with
+  `FixedFontEditor` and `FixedFontViewer` functions, e.g., calling editing
+  actions in a custom event handler.
+
 ## Using the Basic Editor
 
 ```haskell
@@ -57,9 +73,9 @@ paragraphs = map UnparsedPara $ lines $ "Your document contents."
 -- 2. Create an editor. This example uses the `breakExact` wrapping policy.
 editor = editDocument breakExact paragraphs
 
--- 3a. Edit the document using actions from `Base.Viewer` and `Base.Editor`.
---     Don't forget to set the viewport size! If either dimension is < 1, the
---     text will be unbounded in that direction.
+-- 3a. Edit the document using actions from `Viewer` and `Editor`. Don't forget
+-- to set the viewport size! If either dimension is < 1, the text will be
+-- unbounded in that direction.
 editor' = foldl (flip ($)) editor [
     viewerResizeAction (80,24),
     editorDownAction,
@@ -74,7 +90,7 @@ editor' = foldl (flip ($)) editor [
 display = getVisible editor'
 
 -- 4. Extract the edited contents.
-final = unlines $ map upText $ exportDocument editor'
+final = unlines $ map upText $ exportData editor'
 ```
 
 ## Wrapping Policies
@@ -84,8 +100,7 @@ final = unlines $ map upText $ exportDocument editor'
 
 - **`breakWords f`** takes a hyphenation function `f` to split words. It also
   trims whitespace from the beginning of wrapped lines. This works for any
-  character type that has instances of `WordChar` and `HyphenChar`. (See
-  `Base.Char`.)
+  character type that has instances of `WordChar` and `HyphenChar`.
 
   - **`breakWords noHyphen`** allows words to be broken anywhere, and doesn't
     show hyphens. Use this to just clean up leading whitespace.
@@ -96,7 +111,7 @@ final = unlines $ map upText $ exportDocument editor'
   - Create custom word-breaking by creating a new `WordSplitter`.
 
 - Custom wrapping  policies can be created with a new instance of
-`FixedFontParser`. (See `Base.Parser`.)
+`FixedFontParser`.
 
 ## Character Support
 

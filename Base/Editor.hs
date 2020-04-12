@@ -40,6 +40,7 @@ module Base.Editor (
 ) where
 
 import Base.Actions
+import Base.Para
 
 
 class FixedFontEditor a c | a -> c where
@@ -47,6 +48,7 @@ class FixedFontEditor a c | a -> c where
   breakPara :: a -> EditDirection -> a
   moveCursor :: a -> MoveDirection -> a
   getCursor :: a -> (Int,Int)
+  exportData :: a -> [UnparsedPara c]
 
 type EditorAction c = forall a. FixedFontEditor a c => a -> a
 

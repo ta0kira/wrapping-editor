@@ -24,7 +24,6 @@ limitations under the License.
 module Document (
   EditingDocument,
   editDocument,
-  exportDocument,
   -- From Base >>>
   EditAction(..),
   EditDirection(..),
@@ -91,6 +90,7 @@ instance FixedFontEditor (EditingDocument c) c where
       | otherwise = applyCursor
   getCursor (EditingDocument _ e _ _ h k _ p) =
     (tweakCursor p (getCurrentLine e) $ getParaCursor e,boundOffset h k)
+  exportData = exportDocument
 
 editDocument :: FixedFontParser a c b => a -> [UnparsedPara c] -> EditingDocument c
 editDocument parser ps = document where
@@ -108,12 +108,12 @@ editDocument parser ps = document where
   nonempty [] = [emptyPara]
   nonempty ps = ps
 
+
+-- Private below here.
+
 exportDocument :: EditingDocument c -> [UnparsedPara c]
 exportDocument (EditingDocument bs e as _ _ _ _ _) =
   reverse (map unparseParaBefore bs) ++ [unparsePara e] ++ (map unparseParaAfter as)
-
-
--- Private below here.
 
 boundOffset :: Int -> Int -> Int
 boundOffset h k
