@@ -38,6 +38,17 @@ allTests = [
        "Test/testfiles/original-long.txt"
        "Test/testfiles/default-view.txt"
        id),
+    ("zero width skips wrapping", checkEditView
+       "Test/testfiles/original-long.txt"
+       "Test/testfiles/no-wrap-view.txt" $
+       viewerResizeAction (0,snd defaultView)),
+    ("zero height skips truncation", checkEditView
+       "Test/testfiles/original-long.txt"
+       "Test/testfiles/no-bound-view.txt" $
+       composeActions [
+           viewerResizeAction (fst defaultView,0),
+           repeatAction 4 editorDownAction
+         ]),
     ("move cursor below bottom", checkEditView
        "Test/testfiles/original-long.txt"
        "Test/testfiles/below-view.txt" $
@@ -167,7 +178,14 @@ allTests = [
            repeatAction 15 editorDownAction,
            repeatAction 5 editorUpAction,
            repeatAction 3 editorRightAction,
-           viewerResizeAction smallerSize,
+           viewerResizeAction smallerView,
+           editorInsertAction "XYZ"
+         ]),
+    ("resize smaller truncates offset", checkEditView
+       "Test/testfiles/original-long.txt"
+       "Test/testfiles/resize-truncate-view.txt" $
+       composeActions [
+           repeatAction 9 editorDownAction,
            editorInsertAction "XYZ"
          ]),
     ("resize larger preserves line offset and cursor", checkEditView
@@ -177,7 +195,7 @@ allTests = [
            repeatAction 15 editorDownAction,
            repeatAction 5 editorUpAction,
            repeatAction 3 editorRightAction,
-           viewerResizeAction largerSize,
+           viewerResizeAction largerView,
            editorInsertAction "XYZ"
          ]),
     ("cursor defaults to top left", checkEditCursor breakExact
@@ -270,31 +288,37 @@ allTests = [
            editorEndAction,
            editorDeleteAction
          ]),
-    ("cursor after resize preserves vertical", checkEditCursor breakExact
+    ("cursor after resize preserves offset", checkEditCursor breakExact
        "Test/testfiles/original-long.txt" (0,3) $
        composeActions [
            repeatAction 3 editorDownAction,
-           viewerResizeAction largerSize
+           viewerResizeAction largerView
          ]),
-    ("cursor after resize larger truncates vertical", checkEditCursor breakExact
+    ("cursor after resize larger truncates offset", checkEditCursor breakExact
        "Test/testfiles/original-short.txt" (20,2) $
        composeActions [
            repeatAction 3 editorDownAction,
-           viewerResizeAction largerSize
+           viewerResizeAction largerView
+         ]),
+    ("cursor after resize unbounded maximizes offset", checkEditCursor breakExact
+       "Test/testfiles/original-long.txt" (0,15) $
+       composeActions [
+           repeatAction 15 editorDownAction,
+           viewerResizeAction (fst defaultView,0)
          ]),
     ("cursor after resize smaller accounts for new break", checkEditCursor breakExact
        "Test/testfiles/original-long.txt" (2,4) $
        composeActions [
            repeatAction 4 editorDownAction,
            editorEndAction,
-           viewerResizeAction smallerSize
+           viewerResizeAction smallerView
          ]),
     ("cursor after resize larger accounts for new break", checkEditCursor breakExact
        "Test/testfiles/original-long.txt" (16,5) $
        composeActions [
            repeatAction 5 editorDownAction,
            editorEndAction,
-           viewerResizeAction largerSize
+           viewerResizeAction largerView
          ]),
     ("cursor position uses parser tweaking", checkEditCursor hideLeadingSpace
        "Test/testfiles/original-long.txt" (20,5) $
@@ -306,8 +330,8 @@ allTests = [
   ]
 
 defaultView = (20,10)
-largerSize = (24,12)
-smallerSize = (18,9)
+largerView = (24,12)
+smallerView = (18,9)
 
 splitParas = map UnparsedPara . lines
 

@@ -57,8 +57,8 @@ paragraphs = map UnparsedPara $ lines $ "Your document contents."
 editor = editDocument breakExact paragraphs
 
 -- 3a. Edit the document using actions from `Base.Viewer` and `Base.Editor`.
---     Don't forget to set the viewport size! When using `breakExact`, wrapping
---     can be disabled with a view width of 0.
+--     Don't forget to set the viewport size! If either dimension is < 1, the
+--     text will be unbounded in that direction.
 editor' = foldl (flip ($)) editor [
     viewerResizeAction (80,24),
     editorDownAction,
@@ -85,8 +85,6 @@ final = unlines $ map upText $ exportDocument editor'
   leading edges of the paragraphs look cleaner. This has no effect on the data
   itself. This policy works for any character type with a `SpaceChar`
   `instance`, which identifies space characters.
-
-Wrapping is disabled for included policies when the width is less than 1.
 
 ## Creating a Custom Wrapping Policy
 
