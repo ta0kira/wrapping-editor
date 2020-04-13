@@ -12,7 +12,8 @@ Here are some important features:
 - Efficient editing operations for long documents.
 
 If you have any problems using this library, or if you would like to see new
-features, please see the [issues page][issues].
+features, please see the [issues page][issues]. Also check out the
+[library reference][library-doc].
 
 ## Installation
 
@@ -124,3 +125,4 @@ will likely be modified to support other character types.
 [ghc]: https://www.haskell.org/ghc/
 [home]: https://github.com/ta0kira/wrapping-editor
 [issues]: https://github.com/ta0kira/wrapping-editor/issues
+[library-doc]: https://ta0kira.github.io/wrapping-editor/library/index.html
