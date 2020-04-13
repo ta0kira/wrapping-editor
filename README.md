@@ -103,8 +103,8 @@ final = unlines $ map upText $ exportData editor'
   trims whitespace from the beginning of wrapped lines. This works for any
   character type that has instances of `WordChar` and `HyphenChar`.
 
-  - **`breakWords noHyphen`** allows words to be broken anywhere, and doesn't
-    show hyphens. Use this to just clean up leading whitespace.
+  - **`breakWords noHyphen`** avoids breaking words if at all possible, and
+    never uses hyphens.
 
   - **`breakWords lazyHyphen`** breaks words without any dictionary awareness,
     and attempts to keep at least 2 characters of the word on each line.

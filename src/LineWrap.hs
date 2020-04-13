@@ -85,9 +85,11 @@ data BreakWords c = BreakWords Int (WordSplitter c)
 breakWords :: (WordChar c, HyphenChar c) => WordSplitter c -> BreakWords c
 breakWords = BreakWords 0
 
--- | Skips word hyphenation, and just splits at the viewport width.
+-- | Avoids splitting words unless they are longer than a single line.
 noHyphen :: WordSplitter c
-noHyphen _ _ _ = []
+noHyphen k w cs
+  | k < w = [cs]
+  | otherwise = []
 
 -- | Hyphenates using simple aesthetics, without dictionary awareness.
 lazyHyphen :: WordSplitter c

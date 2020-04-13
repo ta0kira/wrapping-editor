@@ -80,13 +80,18 @@ allTests = [
         endLine "line."]),
     ("noHyphen allows extra hidden spaces at end", checkLineBreak
        (setLineWidth (breakWords noHyphen) 5)
-       "Here      are some extra spaces.      "
+       "Here      are some extra spaces alongwordthatwillnotfit.      "
        [innerLine "Here      ",
-        innerLine "are s",
-        innerLine "ome e",
-        innerLine "xtra ",
+        innerLine "are ",
+        innerLine "some ",
+        innerLine "extra ",
         innerLine "space",
-        endLine "s.      "]),
+        innerLine "s ",
+        innerLine "along",
+        innerLine "wordt",
+        innerLine "hatwi",
+        innerLine "llnot",
+        endLine "fit.      "]),
     ("noHyphen preserves data", do
        let breaker = setLineWidth (breakWords noHyphen) 5
        let line = "Here      are some extra spaces.      "

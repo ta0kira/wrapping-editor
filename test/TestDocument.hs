@@ -322,9 +322,9 @@ allTests = [
            viewerResizeAction largerView
          ]),
     ("cursor position uses parser tweaking", checkEditCursor (breakWords noHyphen)
-       "testfiles/original-long.txt" (20,5) $
+       "testfiles/original-long.txt" (17,0) $
        composeActions [
-           repeatAction 5 editorDownAction,
+           -- The first line has 18 chars with a space.
            editorEndAction,
            editorLeftAction
          ])
