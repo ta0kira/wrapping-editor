@@ -58,7 +58,7 @@ import Edit.Line
 import Edit.Para
 
 
--- | Generic document editor with a dynamic viewport.q
+-- | Generic document editor with a dynamic viewport.
 data EditingDocument c =
   forall a b. FixedFontParser a c b => EditingDocument {
     edBefore :: [VisibleParaBefore c b],  -- Reversed.

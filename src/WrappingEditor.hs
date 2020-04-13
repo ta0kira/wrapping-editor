@@ -47,7 +47,7 @@ import Lens.Micro
 import Document
 
 
--- | Create a new 'WrappingEditor' using a Document for editing.
+-- | Create a new 'WrappingEditor' using the default editor component.
 newWrappingEditor :: FixedFontParser a c b => a -> n -> [[c]] -> WrappingEditor c n
 newWrappingEditor b n cs = genericWrappingEditor n $ editDocument b $ map UnparsedPara cs
 
