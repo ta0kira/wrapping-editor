@@ -56,9 +56,9 @@ app = App {
 -- NOTE: This *doesn't* modify the contents of the file.
 fakeEditFile f = do
   contents <- fmap lines $ readFile f
-  -- newWrappingEditor creates an editor object. breakExact is a wrapping policy
-  -- that breaks at exactly n characters.
-  let editor = newWrappingEditor breakExact "editor" contents
+  -- newWrappingEditor creates an editor object. breakWords is semi-aware of
+  -- words, and lazyHyphen performs hyphenation.
+  let editor = newWrappingEditor (breakWords lazyHyphen) "editor" contents
   -- dumpWrappingEditor extracts the editor's contents.
   modified <- defaultMain app editor >>= return . dumpWrappingEditor
   return $ unlines modified

@@ -71,8 +71,8 @@ import Document
 --    caller so that the library can avoid end-of-line considerations.
 paragraphs = map UnparsedPara $ lines $ "Your document contents."
 
--- 2. Create an editor. This example uses the `breakExact` wrapping policy.
-editor = editDocument breakExact paragraphs
+-- 2. Create an editor. This example uses lazy word hyphenation.
+editor = editDocument (breakWords lazyHyphen) paragraphs
 
 -- 3a. Edit the document using actions from `Viewer` and `Editor`. Don't forget
 -- to set the viewport size! If either dimension is < 1, the text will be
