@@ -47,7 +47,7 @@ import Base.Para
 
 -- | Generic text editor for fixed-width fonts.
 class FixedFontEditor a c | a -> c where
-  -- | Apply an EditAction.
+  -- | Apply an edit action.
   editText :: a -> EditAction c -> EditDirection -> a
   -- | Break the current paragraph at the cursor.
   breakPara :: a -> EditDirection -> a

@@ -58,7 +58,7 @@ instance SpaceChar Char where
   isSpaceChar = (== ' ')
 
 instance WordChar Char where
-  isWordChar = isAlpha
+  isWordChar = flip any [isAlpha,(`elem` ".'")] . flip ($)
 
 instance HyphenChar Char where
   hyphenChar = '-'
