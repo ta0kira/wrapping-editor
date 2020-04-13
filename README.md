@@ -125,4 +125,4 @@ will likely be modified to support other character types.
 [ghc]: https://www.haskell.org/ghc/
 [home]: https://github.com/ta0kira/wrapping-editor
 [issues]: https://github.com/ta0kira/wrapping-editor/issues
-[library-doc]: https://ta0kira.github.io/wrapping-editor/library/index.html
+[library-doc]: https://ta0kira.github.io/wrapping-editor/library
