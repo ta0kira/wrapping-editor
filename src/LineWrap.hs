@@ -16,7 +16,7 @@ limitations under the License.
 
 -- Author: Kevin P. Barry [ta0kira@gmail.com]
 
--- | Line-wrapping implementations. (See FixedFontParser for custom wrapping.)
+-- | Line-wrapping implementations. (See 'FixedFontParser' for custom wrapping.)
 
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -64,6 +64,12 @@ breakExact :: BreakExact c
 breakExact = BreakExact 0
 
 -- | A function to split words, for use with 'BreakWords'.
+--
+--   The following must hold for all possible inputs to a 'WordSplitter' `f`:
+--
+--   prop> let splits = f k n word in concat splits == word || splits == []
+--
+--   The following primarily affect rendering:
 --
 --     * The word breaks must provide space for an additional hyphen character
 --       to be rendered if the word continues to the next line, i.e., all but

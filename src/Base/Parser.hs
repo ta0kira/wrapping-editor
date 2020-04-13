@@ -35,9 +35,17 @@ class DefaultBreak b => FixedFontParser a c b | a -> c b where
   --   in breakLines skipping line breaks.
   setLineWidth :: a -> Int -> a
   -- | Break the sequence into lines.
+  --
+  --   The following must hold for all possible inputs to a 'FixedFontParser'
+  --   `p`:
+  --
+  --   prop> concat (map vlText (breakLines p line)) == line
+  --
+  --   Implement 'renderLine' and 'tweakCursor' to make visual adjustments (such
+  --   as adding hyphens or indentation) if necessary.
   breakLines :: a -> [c] -> [VisibleLine c b]
-  -- | Render the line for viewing. Implement tweakCursor if renderLine changes
-  --   the positions of any characters on the line.
+  -- | Render the line for viewing. Implement 'tweakCursor' if 'renderLine'
+  --   changes the positions of any characters on the line.
   renderLine :: a -> VisibleLine c b -> [c]
   -- | Adjust the horizontal cursor position.
   tweakCursor :: a -> VisibleLine c b -> Int -> Int
