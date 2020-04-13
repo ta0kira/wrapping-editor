@@ -129,7 +129,7 @@ available. The editor for [Brick][brick] currently only supports `Char`, but it
 will likely be modified to support other character types.
 
 [brick]: https://github.com/jtdaugherty/brick
-[brick-example.hs]: https://github.com/ta0kira/wrapping-editor/blob/master/brick-example.hs
+[brick-example.hs]: https://github.com/ta0kira/wrapping-editor/blob/master/example/brick-example.hs
 [ghc]: https://www.haskell.org/ghc/
 [home]: https://github.com/ta0kira/wrapping-editor
 [issues]: https://github.com/ta0kira/wrapping-editor/issues
