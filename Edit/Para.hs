@@ -16,6 +16,8 @@ limitations under the License.
 
 -- Author: Kevin P. Barry [ta0kira@gmail.com]
 
+-- | This module is for internal use.
+
 {-# LANGUAGE Safe #-}
 
 module Edit.Para (

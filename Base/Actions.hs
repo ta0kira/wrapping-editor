@@ -16,6 +16,8 @@ limitations under the License.
 
 -- Author: Kevin P. Barry [ta0kira@gmail.com]
 
+-- | Descriptions for generic viewer and editor actions.
+
 {-# LANGUAGE Safe #-}
 
 module Base.Actions (
@@ -25,11 +27,26 @@ module Base.Actions (
 ) where
 
 
-data EditAction c = InsertText [c] | DeleteText deriving (Eq,Show)
+-- | Actions that modify data.
+data EditAction c =
+  InsertText [c] | -- ^ Insert a block of characters.
+  DeleteText       -- ^ Delete a single character.
+    deriving (Eq,Show)
 
-data EditDirection = EditBefore | EditAfter deriving (Eq,Show)
+-- | Modification direction, relative to the cursor.
+data EditDirection =
+  EditBefore | -- ^ Apply the edit before the cursor.
+  EditAfter    -- ^ Apply the edit after the cursor.
+    deriving (Eq,Show)
 
+-- | Actions that change the cursor position without changing data.
 data MoveDirection =
-  MoveUp | MoveDown | MovePrev | MoveNext |
-  MoveHome | MoveEnd | MovePageUp | MovePageDown
-  deriving (Eq,Show)
+  MoveUp |     -- ^ Move up one line.
+  MoveDown |   -- ^ Move down one line.
+  MovePrev |   -- ^ Move backward one character.
+  MoveNext |   -- ^ Move forward one character.
+  MoveHome |   -- ^ Implementation-defined home operation.
+  MoveEnd |    -- ^ Implementation-defined end operation.
+  MovePageUp | -- ^ Implementation-defined page-up operation.
+  MovePageDown -- ^ Implementation-defined page-down operation.
+    deriving (Eq,Show)

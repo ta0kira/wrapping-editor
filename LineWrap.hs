@@ -16,6 +16,8 @@ limitations under the License.
 
 -- Author: Kevin P. Barry [ta0kira@gmail.com]
 
+-- | Line-wrapping implementations. (See FixedFontParser for custom wrapping.)
+
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE Safe #-}
@@ -24,6 +26,7 @@ module LineWrap (
   BreakExact,
   BreakWords,
   LineBreak,
+  WordSplitter,
   breakExact,
   breakWords,
   lazyHyphen,
@@ -38,32 +41,55 @@ import Control.Applicative ((<|>))
 import Base
 
 
+-- | Line break type for a single paragraph line.
 data LineBreak = ParagraphEnd | SimpleBreak | HyphenatedWord deriving (Eq,Ord)
 
+-- | The line is at the end of the paragraph.
 lineBreakEnd :: LineBreak
 lineBreakEnd = ParagraphEnd
 
+-- | The line is nothing special.
 lineBreakSimple :: LineBreak
 lineBreakSimple = SimpleBreak
 
+-- | The line ends with a hyphenated word.
 lineBreakHyphen :: LineBreak
 lineBreakHyphen = HyphenatedWord
 
+-- | Wrapping policy that breaks at exactly the viewer width.
 newtype BreakExact c = BreakExact Int
 
+-- | Wrapping policy that breaks at exactly the viewer width.
 breakExact :: BreakExact c
 breakExact = BreakExact 0
 
-type WordSplitter c = Int -> Int -> [c] -> [[c]]
+-- | A function to split words, for use with 'BreakWords'.
+--
+--     * The word breaks must provide space for an additional hyphen character
+--       to be rendered if the word continues to the next line, i.e., all but
+--       the last item in the returned list should be one character shorter than
+--       the available space.
+--     * The splitter can refuse to process the word by returning an empty list.
+--     * Returning the whole word without breaks will bump the word to the next
+--       line. This must be avoided if the first line is full width, i.e., if
+--       the first two arguments are the same.
+type WordSplitter c = Int   -- ^ Space available on the first line.
+                   -> Int   -- ^ Space available on new lines.
+                   -> [c]   -- ^ The word to break.
+                   -> [[c]] -- ^ Word splits.
 
+-- | Wrapping policy that breaks lines based on words.
 data BreakWords c = BreakWords Int (WordSplitter c)
 
+-- | Wrapping policy that breaks lines based on words.
 breakWords :: (WordChar c, HyphenChar c) => WordSplitter c -> BreakWords c
 breakWords = BreakWords 0
 
+-- | Skips word hyphenation, and just splits at the viewport width.
 noHyphen :: WordSplitter c
 noHyphen _ _ _ = []
 
+-- | Hyphenates using simple aesthetics, without dictionary awareness.
 lazyHyphen :: WordSplitter c
 lazyHyphen k w cs
   | w < 4 || k > w = []

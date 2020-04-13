@@ -16,6 +16,8 @@ limitations under the License.
 
 -- Author: Kevin P. Barry [ta0kira@gmail.com]
 
+-- | Generic editor-viewport functionality.
+
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RankNTypes #-}
@@ -28,12 +30,20 @@ module Base.Viewer (
 ) where
 
 
+-- | Generic editor viewport for fixed-width fonts.
 class FixedFontViewer a c | a -> c where
+  -- | Sets the (width,height) size of the viewport. A width < 0 must disable
+  --   line wrapping, and a height < 0 must disable vertical bounding.
   setViewSize :: a -> (Int,Int) -> a
+  -- | Gets the (width,height) size of the viewport.
   getViewSize :: a -> (Int,Int)
+  -- | Gets the visible lines in the viewport. This does not need to completely
+  --   fill the viewport area, but it must not exceed it.
   getVisible :: a -> [[c]]
 
+-- | Any action that updates a 'FixedFontViewer'.
 type ViewerAction c = forall a. FixedFontViewer a c => a -> a
 
+-- | Action to resize the viewport.
 viewerResizeAction :: (Int,Int) -> ViewerAction c
 viewerResizeAction s v = setViewSize v s

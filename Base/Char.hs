@@ -16,6 +16,8 @@ limitations under the License.
 
 -- Author: Kevin P. Barry [ta0kira@gmail.com]
 
+-- | Features of character sets.
+
 {-# LANGUAGE Safe #-}
 
 module Base.Char (
@@ -29,14 +31,28 @@ module Base.Char (
 import Data.Char
 
 
+-- | Dealing with space characters.
 class SpaceChar c where
+  -- | Predicate for identifying space characters.
   isSpaceChar :: c -> Bool
 
+-- | Dealing with word characters.
 class SpaceChar c => WordChar c where
+  -- | Predicate for identifying word characters.
   isWordChar :: c -> Bool
 
+-- | Supporting hyphenation.
 class HyphenChar c where
+  -- | The canonical hyphen character.
   hyphenChar :: c
+
+-- | Trims spaces from the front of a sequence.
+trimLeadingSpaces :: SpaceChar c => [c] -> [c]
+trimLeadingSpaces = dropWhile isSpaceChar
+
+-- | Counts spaces at the front of a sequence.
+countLeadingSpaces :: SpaceChar c => [c] -> Int
+countLeadingSpaces = length . takeWhile isSpaceChar
 
 instance SpaceChar Char where
   isSpaceChar = (== ' ')
@@ -46,9 +62,3 @@ instance WordChar Char where
 
 instance HyphenChar Char where
   hyphenChar = '-'
-
-trimLeadingSpaces :: SpaceChar c => [c] -> [c]
-trimLeadingSpaces = dropWhile isSpaceChar
-
-countLeadingSpaces :: SpaceChar c => [c] -> Int
-countLeadingSpaces = length . takeWhile isSpaceChar

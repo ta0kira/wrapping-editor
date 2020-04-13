@@ -16,6 +16,8 @@ limitations under the License.
 
 -- Author: Kevin P. Barry [ta0kira@gmail.com]
 
+-- | Simple representation of viewable text lines.
+
 {-# LANGUAGE Safe #-}
 
 module Base.Line (
@@ -25,15 +27,19 @@ module Base.Line (
 ) where
 
 
+-- | Line meant for viewing.
 data VisibleLine c b =
   VisibleLine {
-    vlBreak :: b,
-    vlText :: [c]
+    vlBreak :: b, -- ^ The type of line break for this line.
+    vlText :: [c] -- ^ The complete data of the line.
   }
   deriving (Eq,Ord,Show)
 
+-- | Break type that has a default.
 class DefaultBreak b where
+  -- | The default break for the break type.
   defaultBreak :: b
 
+-- | Create an empty line.
 emptyLine :: DefaultBreak b => VisibleLine c b
 emptyLine = VisibleLine defaultBreak []

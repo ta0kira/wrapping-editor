@@ -16,6 +16,8 @@ limitations under the License.
 
 -- Author: Kevin P. Barry [ta0kira@gmail.com]
 
+-- | A wrapping text-editor with dynamic sizing for Brick.
+
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
@@ -45,25 +47,33 @@ import Lens.Micro
 import Document
 
 
+-- | Create a new 'WrappingEditor' using a Document for editing.
 newWrappingEditor :: FixedFontParser a c b => a -> n -> [[c]] -> WrappingEditor c n
 newWrappingEditor b n cs = genericWrappingEditor n $ editDocument b $ map UnparsedPara cs
 
+-- | Create a new 'WrappingEditor' using a custom editor component.
 genericWrappingEditor :: (FixedFontViewer a c, FixedFontEditor a c) => n -> a -> WrappingEditor c n
 genericWrappingEditor = WrappingEditor
 
+-- | Any action that updates the editor state.
 type WrappingEditorAction c = forall a. (FixedFontViewer a c, FixedFontEditor a c) => a -> a
 
+-- | Update the editor state.
 mapWrappingEditor :: WrappingEditorAction c -> WrappingEditor c n -> WrappingEditor c n
 mapWrappingEditor f (WrappingEditor name editor) = WrappingEditor name (f editor)
 
+-- | Any action that reads the editor state.
 type WrappingEditorDoer c b = forall a. (FixedFontViewer a c, FixedFontEditor a c) => a -> b
 
+-- | Read from the editor state.
 doWrappingEditor :: WrappingEditorDoer c b -> WrappingEditor c n -> b
 doWrappingEditor f (WrappingEditor _ editor) = f editor
 
+-- | Dump the final contents of the edited document.
 dumpWrappingEditor :: WrappingEditor c n -> [[c]]
 dumpWrappingEditor = map upText . doWrappingEditor exportData
 
+-- | Render the editor as a 'Widget'.
 renderWrappingEditor :: (Ord n, Show n) => Bool -> WrappingEditor Char n -> Widget n
 renderWrappingEditor focus editor = doWrappingEditor edit editor where
   edit e = Widget Greedy Greedy $ do
@@ -82,6 +92,7 @@ renderWrappingEditor focus editor = doWrappingEditor edit editor where
       strFill w cs = str $ take w $ cs ++ repeat ' '
       lineFill w h ls = take h $ ls ++ repeat (strFill w "")
 
+-- | Update the editor based on Brick events.
 handleWrappingEditor :: (Eq n) => WrappingEditor Char n -> Event -> EventM n (WrappingEditor Char n)
 handleWrappingEditor editor event = do
   extent <- lookupExtent (getName editor)
@@ -105,6 +116,7 @@ handleWrappingEditor editor event = do
     resizeAction (Just ext) | snd (extentSize ext) > 0 = viewerResizeAction (extentSize ext)
     resizeAction  _ = id
 
+-- | Editor widget for use with Brick.
 data WrappingEditor c n =
   forall a. (FixedFontViewer a c, FixedFontEditor a c) => WrappingEditor {
     weName :: n,

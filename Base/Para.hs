@@ -16,6 +16,8 @@ limitations under the License.
 
 -- Author: Kevin P. Barry [ta0kira@gmail.com]
 
+-- | Simple representation of text paragraphs.
+
 {-# LANGUAGE Safe #-}
 
 module Base.Para (
@@ -26,11 +28,13 @@ module Base.Para (
 import Base.Line
 
 
+-- | Single paragraph that has not been parsed into lines.
 data UnparsedPara c =
   UnparsedPara {
-    upText :: [c]
+    upText :: [c] -- ^ The complete and uparsed paragraph data.
   }
   deriving (Eq,Ord,Show)
 
+-- | Create an empty paragraph.
 emptyPara :: UnparsedPara c
 emptyPara = UnparsedPara []

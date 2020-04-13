@@ -16,6 +16,8 @@ limitations under the License.
 
 -- Author: Kevin P. Barry [ta0kira@gmail.com]
 
+-- | Generic document-editing components.
+
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -56,6 +58,7 @@ import Edit.Line
 import Edit.Para
 
 
+-- | Generic document editor with a dynamic viewport.q
 data EditingDocument c =
   forall a b. FixedFontParser a c b => EditingDocument {
     edBefore :: [VisibleParaBefore c b],  -- Reversed.
@@ -68,26 +71,10 @@ data EditingDocument c =
     edParser :: a
   }
 
-instance FixedFontViewer (EditingDocument c) c where
-  setViewSize d s@(w,h)
-    | w /= edWidth d  = storeCursor $ resizeHeight h $ resizeWidth w d
-    | h /= edHeight d = storeCursor $ resizeHeight h d
-    | otherwise = d
-  getViewSize d = (edWidth d,edHeight d)
-  getVisible = getVisibleLines
-
-instance FixedFontEditor (EditingDocument c) c where
-  editText da m d = storeCursor $ modifyDoc m d da
-  breakPara da d = storeCursor $ insertParaSplit d da
-  moveCursor da d = updateCursor $ moveDocCursor d da where
-    updateCursor
-      | d == MovePrev || d == MoveNext || d == MoveHome || d == MoveEnd = storeCursor
-      | otherwise = applyCursor
-  getCursor (EditingDocument _ e _ _ h k _ p) =
-    (tweakCursor p (getCurrentLine e) $ getParaCursor e,boundOffset h k)
-  exportData = exportDocument
-
-editDocument :: FixedFontParser a c b => a -> [UnparsedPara c] -> EditingDocument c
+-- | Create an editor for a document.
+editDocument :: FixedFontParser a c b => a                 -- ^ Parser used to break paragraphs into lines.
+                                      -> [UnparsedPara c]  -- ^ List of unparsed paragraphs to be edited.
+                                      -> EditingDocument c -- ^ Document editor.
 editDocument parser ps = document where
   document = EditingDocument {
       edBefore = [],
@@ -110,6 +97,25 @@ instance Show (EditingDocument c) where
   show d =
     "EditingDocument { size: " ++ show (getViewSize d) ++
                     ", cursor: " ++ show (getCursor d) ++ " }"
+
+instance FixedFontViewer (EditingDocument c) c where
+  setViewSize d s@(w,h)
+    | w /= edWidth d  = storeCursor $ resizeHeight h $ resizeWidth w d
+    | h /= edHeight d = storeCursor $ resizeHeight h d
+    | otherwise = d
+  getViewSize d = (edWidth d,edHeight d)
+  getVisible = getVisibleLines
+
+instance FixedFontEditor (EditingDocument c) c where
+  editText da m d = storeCursor $ modifyDoc m d da
+  breakPara da d = storeCursor $ insertParaSplit d da
+  moveCursor da d = updateCursor $ moveDocCursor d da where
+    updateCursor
+      | d == MovePrev || d == MoveNext || d == MoveHome || d == MoveEnd = storeCursor
+      | otherwise = applyCursor
+  getCursor (EditingDocument _ e _ _ h k _ p) =
+    (tweakCursor p (getCurrentLine e) $ getParaCursor e,boundOffset h k)
+  exportData = exportDocument
 
 exportDocument :: EditingDocument c -> [UnparsedPara c]
 exportDocument (EditingDocument bs e as _ _ _ _ _) =
