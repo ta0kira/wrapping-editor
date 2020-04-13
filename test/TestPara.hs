@@ -18,7 +18,7 @@ limitations under the License.
 
 {-# LANGUAGE Safe #-}
 
-module Test.Para (
+module TestPara (
   allTests,
 ) where
 
@@ -28,7 +28,8 @@ import Base.Line
 import Base.Para
 import Base.Parser
 import Edit.Para
-import Test.Common
+
+import Common
 
 
 allTests :: [(String,IO (Maybe String))]

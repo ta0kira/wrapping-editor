@@ -21,11 +21,11 @@ limitations under the License.
 import System.Directory
 import System.IO
 
-import Test.Common (runTests)
-import qualified Test.Document as TestDocument (allTests)
-import qualified Test.Line as TestLine (allTests)
-import qualified Test.LineWrap as TestLineWrap (allTests)
-import qualified Test.Para as TestPara (allTests)
+import Common (runTests)
+import qualified TestDocument as TestDocument (allTests)
+import qualified TestLine as TestLine (allTests)
+import qualified TestLineWrap as TestLineWrap (allTests)
+import qualified TestPara as TestPara (allTests)
 
 
 main = do

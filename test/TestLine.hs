@@ -18,7 +18,7 @@ limitations under the License.
 
 {-# LANGUAGE Safe #-}
 
-module Test.Line (
+module TestLine (
   allTests,
 ) where
 
@@ -26,7 +26,8 @@ import LineWrap
 import Base.Actions
 import Base.Line
 import Edit.Line
-import Test.Common
+
+import Common
 
 
 allTests :: [(String,IO (Maybe String))]

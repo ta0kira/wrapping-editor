@@ -18,14 +18,15 @@ limitations under the License.
 
 {-# LANGUAGE Safe #-}
 
-module Test.LineWrap (
+module TestLineWrap (
   allTests,
 ) where
 
 import LineWrap
 import Base.Line
 import Base.Parser
-import Test.Common
+
+import Common
 
 
 allTests :: [(String,IO (Maybe String))]

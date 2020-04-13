@@ -27,7 +27,7 @@ dependencies otherwise.
 You can run the unit tests with:
 
 ```shell
-ghc test.hs && ./test
+( cd test && ghc -i../src test.hs && ./test )
 ```
 
 ## Using with [Brick][brick]
@@ -38,7 +38,7 @@ See [brick-example.hs][brick-example.hs] for an example program that uses
 You can run the example with:
 
 ```shell
-ghc -threaded brick-example.hs && ./brick-example README.md
+ghc -isrc -threaded example/brick-example.hs && example/brick-example README.md
 ```
 
 Press `Esc` to exit when you are finished. The final contents of the editor will

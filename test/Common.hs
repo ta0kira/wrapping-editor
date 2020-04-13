@@ -19,7 +19,7 @@ limitations under the License.
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE Safe #-}
 
-module Test.Common (
+module Common (
   checkCondition,
   checkConditions,
   composeActions,
