@@ -22,20 +22,20 @@ limitations under the License.
 
 module Base.Char (
   HyphenChar(..),
-  SpaceChar(..),
+  WhitespaceChar(..),
   WordChar(..),
 ) where
 
 import Data.Char
 
 
--- | Dealing with space characters.
-class SpaceChar c where
-  -- | Predicate for identifying space characters.
+-- | Dealing with whitespace characters.
+class WhitespaceChar c where
+  -- | Predicate for identifying whitespace characters.
   defaultIsWhitespace :: c -> Bool
 
 -- | Dealing with word characters.
-class SpaceChar c => WordChar c where
+class WhitespaceChar c => WordChar c where
   -- | Predicate for identifying word characters.
   defaultIsWordChar :: c -> Bool
 
@@ -44,7 +44,7 @@ class HyphenChar c where
   -- | The canonical hyphen character.
   defaultHyphen :: c
 
-instance SpaceChar Char where
+instance WhitespaceChar Char where
   defaultIsWhitespace = (== ' ')
 
 instance WordChar Char where

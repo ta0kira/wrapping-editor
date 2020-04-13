@@ -16,7 +16,8 @@ limitations under the License.
 
 -- Author: Kevin P. Barry [ta0kira@gmail.com]
 
--- | A wrapping text-editor with dynamic sizing for Brick.
+-- | A wrapping text-editor with dynamic sizing for
+--   <https://github.com/jtdaugherty/brick Brick>.
 
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE FlexibleContexts #-}

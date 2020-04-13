@@ -70,15 +70,24 @@ instance WordSplitter (NoSplit c) c
 class WordSplitter a c | a -> c where
   -- | Determine where to break a word.
   --
-  --     * The word breaks must provide space for an additional hyphen character
-  --       to be rendered if the word continues to the next line.
-  --     * The splitter can refuse to process the word by returning 'Nothing'.
-  --     * Returning an empty list will bump the word to the next line.
+  --   * The splitter can refuse to process the word by returning 'Nothing'.
+  --   * The segment sizes must provide space for a hyphen if 'appendHyphen'
+  --     extends the line.
+  --   * Once the word has been split up by 'BreakWords', the segments are
+  --     processed as follows:
+  --
+  --       1. The last segment is prepended to the next line to be parsed. This
+  --          means that if the word is not split, it gets deferred to the
+  --          next line.
+  --       2. If there are more segments, the first is appended to the current
+  --          line being parsed.
+  --       3. All remaining segments are put on separate lines between the
+  --          current and next lines.
   splitWord :: a
-             -> Int         -- ^ Space available on the first line.
-             -> Int         -- ^ Space available on new lines.
-             -> [c]         -- ^ The word to break.
-             -> Maybe [Int] -- ^ List of break sizes.
+            -> Int         -- ^ Space available on the first line.
+            -> Int         -- ^ Space available on new lines.
+            -> [c]         -- ^ The word to break.
+            -> Maybe [Int] -- ^ List of segment sizes.
   splitWord _ _ _ _ = Nothing
   -- | Predicate for characters that should be treated as a part of a word.
   isWordChar :: a -> c -> Bool

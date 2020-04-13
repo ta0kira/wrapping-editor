@@ -34,7 +34,7 @@ You can run the unit tests with:
 ## Using with [Brick][brick]
 
 See [brick-example.hs][brick-example.hs] for an example program that uses
-`WrappingEditor`.
+[`WrappingEditor`][WrappingEditor].
 
 You can run the example with:
 
@@ -48,18 +48,18 @@ be sent to `stdout` without modifying the file.
 You can customize the widget using the following helper functions from the
 `WrappingEditor` module:
 
-- **`doWrappingEditor`** allows you to use `FixedFontEditor` and
-  `FixedFontViewer` functions to extract info from the editor, e.g., for custom
-  rendering.
+- [**`doWrappingEditor`**][doWrappingEditor] allows you to use `FixedFontEditor`
+  and `FixedFontViewer` functions to extract info from the editor, e.g., for
+  custom rendering.
 
-- **`genericWrappingEditor`** allows you to use any custom editor component that
-  instantiates both `FixedFontEditor` and `FixedFontViewer`, e.g., an editor for
-  a custom character type. (You might also need custom rendering and event
-  handling.)
+- [**`genericWrappingEditor`**][genericWrappingEditor] allows you to use any
+  custom editor component that instantiates both `FixedFontEditor` and
+  `FixedFontViewer`, e.g., an editor for a custom character type. (You might
+  also need custom rendering and event handling.)
 
-- **`mapWrappingEditor`** allows you to transform the editor with
-  `FixedFontEditor` and `FixedFontViewer` functions, e.g., calling editing
-  actions in a custom event handler.
+- [**`mapWrappingEditor`**][mapWrappingEditor] allows you to transform the
+  editor with `FixedFontEditor` and `FixedFontViewer` functions, e.g., calling
+  editing actions in a custom event handler.
 
 ## Using the Basic Editor
 
@@ -96,23 +96,31 @@ final = unlines $ map upText $ exportData editor'
 
 ## Wrapping Policies
 
-- **`breakExact`** works for all character types because it breaks lines at
-  exactly the editor width.
+- [**`breakExact`**][breakExact] works for all character types because it breaks
+  lines at exactly the editor width.
 
-- **`breakWords f`** takes a hyphenation function `f` to split words. It also
-  trims whitespace from the beginning of wrapped lines. This works for any
-  character type that has instances of `WordChar` and `HyphenChar`.
+- [**`breakWords p`**][breakWords] takes a [`WordSplitter`][WordSplitter] policy
+  `p` to split words. Character support depends on the existence of a
+  [`WordSplitter`][WordSplitter] for the character type. In theory, it supports
+  all character types.
 
-  - **`breakWords noHyphen`** avoids breaking words if at all possible, and
-    never uses hyphens.
+  - [**`noHyphen`**][noHyphen] avoids splitting words if at all possible, and it
+    never uses hyphens. This policy requires a [`WordChar`][WordChar] instance
+    for the character type.
 
-  - **`breakWords lazyHyphen`** breaks words without any dictionary awareness,
-    and attempts to keep at least 2 characters of the word on each line.
+  - [**`lazyHyphen`**][lazyHyphen] splits words without any dictionary
+    awareness, and attempts to keep at least 2 characters of the word on each
+    line. This policy requires [`WordChar`][WordChar] and
+    [`HyphenChar`][HyphenChar] instances for the character type.
 
-  - Create custom word-breaking by creating a new `WordSplitter`.
+  - Create custom word-splitting by creating a new
+    [`WordSplitter`][WordSplitter]. This can be used for supporting new
+    character types, adding dictionary awareness, expanding the characters that
+    are considered to be a part of words, etc.
 
-- Custom wrapping  policies can be created with a new instance of
-`FixedFontParser`.
+- Create a completely new wrapping policy with an instance of
+  [`FixedFontParser`][FixedFontParser]. This can be used for things that
+  `breakWords` cannot support, e.g., line indentation and tab expansion.
 
 ## Character Support
 
@@ -126,3 +134,16 @@ will likely be modified to support other character types.
 [home]: https://github.com/ta0kira/wrapping-editor
 [issues]: https://github.com/ta0kira/wrapping-editor/issues
 [library-doc]: https://ta0kira.github.io/wrapping-editor/library
+
+[breakExact]: https://ta0kira.github.io/wrapping-editor/library/LineWrap.html#v:breakExact
+[breakWords]: https://ta0kira.github.io/wrapping-editor/library/LineWrap.html#v:breakWords
+[doWrappingEditor]: https://ta0kira.github.io/wrapping-editor/library/WrappingEditor.html#v:doWrappingEditor
+[FixedFontParser]: https://ta0kira.github.io/wrapping-editor/library/Base-Parser.html#t:FixedFontParser
+[genericWrappingEditor]: https://ta0kira.github.io/wrapping-editor/library/WrappingEditor.html#v:genericWrappingEditor
+[HyphenChar]: https://ta0kira.github.io/wrapping-editor/library/Base-Char.html#t:HyphenChar
+[lazyHyphen]:  https://ta0kira.github.io/wrapping-editor/library/LineWrap.html#v:lazyHyphen
+[mapWrappingEditor]: https://ta0kira.github.io/wrapping-editor/library/WrappingEditor.html#v:mapWrappingEditor
+[noHyphen]: https://ta0kira.github.io/wrapping-editor/library/LineWrap.html#v:noHyphen
+[WordChar]: https://ta0kira.github.io/wrapping-editor/library/Base-Char.html#t:WordChar
+[WordSplitter]: https://ta0kira.github.io/wrapping-editor/library/LineWrap.html#t:WordSplitter
+[WrappingEditor]: https://ta0kira.github.io/wrapping-editor/library/WrappingEditor.html#t:WrappingEditor
