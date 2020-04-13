@@ -65,24 +65,15 @@ breakExact = BreakExact 0
 
 -- | A function to split words, for use with 'BreakWords'.
 --
---   The following must hold for all possible inputs to a 'WordSplitter' `f`:
---
---   prop> let splits = f k n word in concat splits == word || splits == []
---
---   The following primarily affect rendering:
---
 --     * The word breaks must provide space for an additional hyphen character
---       to be rendered if the word continues to the next line, i.e., all but
---       the last item in the returned list should be one character shorter than
---       the available space.
---     * The splitter can refuse to process the word by returning an empty list.
---     * Returning the whole word without breaks will bump the word to the next
---       line. This must be avoided if the first line is full width, i.e., if
---       the first two arguments are the same.
-type WordSplitter c = Int   -- ^ Space available on the first line.
-                   -> Int   -- ^ Space available on new lines.
-                   -> [c]   -- ^ The word to break.
-                   -> [[c]] -- ^ Word splits.
+--       to be rendered if the word continues to the next line.
+--     * The splitter can refuse to process the word by returning 'Nothing'.
+--     * Returning an empty list will bump the word to the next line. This must
+--       be avoided if the first line is full width to avoid infinite recursion.
+type WordSplitter c = Int         -- ^ Space available on the first line.
+                   -> Int         -- ^ Space available on new lines.
+                   -> [c]         -- ^ The word to break.
+                   -> Maybe [Int] -- ^ List of break sizes.
 
 -- | Wrapping policy that breaks lines based on words.
 data BreakWords c = BreakWords Int (WordSplitter c)
@@ -93,20 +84,19 @@ breakWords = BreakWords 0
 
 -- | Avoids splitting words unless they are longer than a single line.
 noHyphen :: WordSplitter c
-noHyphen k w cs
-  | k < w = [cs]
-  | otherwise = []
+noHyphen k w cs = if k < w then Just [] else Nothing
 
 -- | Hyphenates using simple aesthetics, without dictionary awareness.
 lazyHyphen :: WordSplitter c
 lazyHyphen k w cs
-  | w < 4 || k > w = []
-  | k >= length cs || k < 3 = [cs]
-  | otherwise = (take (k-1) cs):(splitBy w $ drop (k-1) cs) where
-    splitBy _ [] = []
-    splitBy n cs
-      | length cs > n = (take (n-1) cs):(splitBy n $ drop (n-1) cs)
-      | otherwise = [cs]
+  | w < 4 || k > w          = Nothing
+  | k >= length cs || k < 3 = Just []
+  | otherwise = Just $ (k-1):(replicate count size) where
+      size = w-1
+      remainder = length cs-(k-1)
+      -- Uses remainder-2 because the last line needs no hyphen. This is the
+      -- same as iteratively breaking off w-1 until the remainder is < w+1.
+      count = (remainder-2) `div` size
 
 
 -- Private below here.
@@ -167,21 +157,18 @@ breakAllLines w f cs
       lineDefault ls [] = Just [VisibleLine lineBreakEnd (reverse ls)]
       lineDefault ls rs = Just $ VisibleLine lineBreakSimple (reverse ls):(breakOrEmpty rs)
       tryWord ls@(l:_) rs@(r:_) | isWordChar l && isWordChar r = newLines where
+        newLines = do
+          breaks <- f (length wordFront) w word
+          return $ case breaks of
+                        []     -> VisibleLine lineBreakSimple (reverse ls2):(breakOrEmpty (word ++ rs2))
+                        (b:bs) -> VisibleLine lineBreakHyphen (reverse ls2 ++ take b word):(hyphenate (drop b word) bs)
         ls2 = dropWhile isWordChar ls
         rs2 = dropWhile isWordChar rs
         wordFront = reverse $ takeWhile isWordChar ls
         wordBack = takeWhile isWordChar rs
-        breaks = f (length wordFront) w (wordFront ++ wordBack)
-        newLines
-          -- Splitter refuses to deal with the word.
-          | null breaks = Nothing
-          -- If there is no split, move the whole word to the next line.
-          | length breaks == 1 = handleSplit ls2 (head breaks ++ rs2)
-          | otherwise = Just $ hyphenate ((reverse ls2 ++ head breaks):(tail breaks)) rs2
-        hyphenate bs rs =
-          map (VisibleLine lineBreakHyphen) (init bs) ++
-          -- Last break goes with the rest of the next line.
-          breakOrEmpty (last bs ++ rs)
+        word = wordFront ++ wordBack
+        hyphenate word bs | null word || null bs = breakOrEmpty (word ++ rs2)
+        hyphenate word (b:bs) = (VisibleLine lineBreakHyphen (take b word)):(hyphenate (drop b word) bs)
       tryWord _ _ = Nothing
       trySpaces ls rs@(r:_) | isSpaceChar r = newLines where
         ls' = reverse ls ++ takeWhile isSpaceChar rs

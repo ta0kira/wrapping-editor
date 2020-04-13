@@ -56,7 +56,7 @@ allTests = [
        let breaker = setLineWidth breakExact 7
        let line = "This is a test line."
        let restored = concat $ map vlText $ breakLines breaker line
-       checkCondition line (restored == line)),
+       checkCondition (show restored) (restored == line)),
     ("noHyphen skips breaks by default", checkLineBreak
        (breakWords noHyphen)
        "This is a test line."
@@ -96,17 +96,17 @@ allTests = [
        let breaker = setLineWidth (breakWords noHyphen) 5
        let line = "Here      are some extra spaces.      "
        let restored = concat $ map vlText $ breakLines breaker line
-       checkCondition line (restored == line)),
+       checkCondition (show restored) (restored == line)),
     ("lazyHyphen skips short words", checkWordBreaks
-       (lazyHyphen 0 7) "the" ["the"]),
+       (lazyHyphen 0 7) "the" $ Just []),
     ("lazyHyphen with single break", checkWordBreaks
-       (lazyHyphen 4 7) "hyphenate" ["hyp","henate"]),
+       (lazyHyphen 4 7) "hyphenate" $ Just [3]),
     ("lazyHyphen with multiple break", checkWordBreaks
-       (lazyHyphen 4 5) "hyphenation" ["hyp","hena","tion"]),
+       (lazyHyphen 4 5) "hyphenation" $ Just [3,4]),
     ("lazyHyphen skips short break", checkWordBreaks
-       (lazyHyphen 2 5) "hyphenate" ["hyphenate"]),
+       (lazyHyphen 2 5) "hyphenate" $ Just []),
     ("lazyHyphen skips avoids short end", checkWordBreaks
-       (lazyHyphen 9 10) "hyphenate" ["hyphenate"]),
+       (lazyHyphen 9 10) "hyphenate" $ Just []),
     ("lazyHyphen skips breaks by default", checkLineBreak
        (breakWords lazyHyphen)
        "This is a test line."
@@ -128,18 +128,18 @@ allTests = [
        [innerLine "This is ",
         innerLine "a test ",
         endLine "line."]),
-    ("lazyHyphen allows extra hidden spaces at end", checkLineBreak
+    ("lazyHyphen allows extra hidden spaces after last break", checkLineBreak
        (setLineWidth (breakWords lazyHyphen) 7)
        "Here      are some extra spaces and alongwordthatwillnotfit.      "
-       [innerLine "Here      ",
-        hyphenLine "are so",
-        hyphenLine "me ext",
-        hyphenLine "ra spa",
-        innerLine "ces and ",
-        hyphenLine "alongw",
-        hyphenLine "ordtha",
-        hyphenLine "twilln",
-        endLine "otfit.      "]),
+        [innerLine "Here      ",
+         hyphenLine "are so",
+         hyphenLine "me ext",
+         hyphenLine "ra spa",
+         innerLine "ces and ",
+         hyphenLine "alongw",
+         hyphenLine "ordtha",
+         hyphenLine "twilln",
+         endLine "otfit.      "]),
     ("lazyHyphen breaks long word in middle of line", checkLineBreak
        (setLineWidth (breakWords lazyHyphen) 7)
        "   averylongword"
@@ -157,7 +157,7 @@ allTests = [
        let breaker = setLineWidth (breakWords lazyHyphen) 7
        let line = "Here      are some extra spaces and alongwordthatwillnotfit.      "
        let restored = concat $ map vlText $ breakLines breaker line
-       checkCondition line (restored == line)),
+       checkCondition (show restored) (restored == line)),
     ("breakWords trims only trailing spaces", checkLineRender
        (breakWords noHyphen)
        (innerLine "  This line had extra spaces.  ")
