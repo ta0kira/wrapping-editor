@@ -37,6 +37,7 @@ module LineWrap (
 ) where
 
 import Control.Applicative ((<|>))
+import Control.Monad (when)
 
 import Base
 
@@ -68,8 +69,7 @@ breakExact = BreakExact 0
 --     * The word breaks must provide space for an additional hyphen character
 --       to be rendered if the word continues to the next line.
 --     * The splitter can refuse to process the word by returning 'Nothing'.
---     * Returning an empty list will bump the word to the next line. This must
---       be avoided if the first line is full width to avoid infinite recursion.
+--     * Returning an empty list will bump the word to the next line.
 type WordSplitter c = Int         -- ^ Space available on the first line.
                    -> Int         -- ^ Space available on new lines.
                    -> [c]         -- ^ The word to break.
@@ -159,6 +159,8 @@ breakAllLines w f cs
       tryWord ls@(l:_) rs@(r:_) | isWordChar l && isWordChar r = newLines where
         newLines = do
           breaks <- f (length wordFront) w word
+          -- Safety fallback for misbehaving splitters.
+          when (null breaks && length wordFront == w) Nothing
           return $ case breaks of
                         []     -> VisibleLine lineBreakSimple (reverse ls2):(breakOrEmpty (word ++ rs2))
                         (b:bs) -> VisibleLine lineBreakHyphen (reverse ls2 ++ take b word):(hyphenate (drop b word) bs)
