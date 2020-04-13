@@ -98,15 +98,15 @@ allTests = [
        let restored = concat $ map vlText $ breakLines breaker line
        checkCondition (show restored) (restored == line)),
     ("lazyHyphen skips short words", checkWordBreaks
-       (lazyHyphen 0 7) "the" $ Just []),
+       (splitWord lazyHyphen 0 7) "the" $ Just []),
     ("lazyHyphen with single break", checkWordBreaks
-       (lazyHyphen 4 7) "hyphenate" $ Just [3]),
+       (splitWord lazyHyphen 4 7) "hyphenate" $ Just [3]),
     ("lazyHyphen with multiple break", checkWordBreaks
-       (lazyHyphen 4 5) "hyphenation" $ Just [3,4]),
+       (splitWord lazyHyphen 4 5) "hyphenation" $ Just [3,4]),
     ("lazyHyphen skips short break", checkWordBreaks
-       (lazyHyphen 2 5) "hyphenate" $ Just []),
+       (splitWord lazyHyphen 2 5) "hyphenate" $ Just []),
     ("lazyHyphen skips avoids short end", checkWordBreaks
-       (lazyHyphen 9 10) "hyphenate" $ Just []),
+       (splitWord lazyHyphen 9 10) "hyphenate" $ Just []),
     ("lazyHyphen skips breaks by default", checkLineBreak
        (breakWords lazyHyphen)
        "This is a test line."

@@ -347,7 +347,7 @@ allTests = [
          ])
   ]
 
-commonParser :: BreakExact Char
+commonParser :: BreakWords Char
 commonParser = setLineWidth breakExact 15
 
 examplePara = UnparsedPara "This is a test paragraph to make sure that paragraph-related things work as they are supposed to."

@@ -70,11 +70,12 @@ testPass = return Nothing
 testFail :: String -> IO (Maybe String)
 testFail m = return (Just m)
 
-runTests :: String -> [(String,IO (Maybe String))] -> IO ()
+runTests :: String -> [(String,IO (Maybe String))] -> IO Int
 runTests setName tests = do
   results <- fmap catMaybes $ sequence $ map runTest $ zip [1..] tests
   hPutStrLn stderr $ resultSummary results
   when (not $ null results) $ hPutStr stderr $ unlines results
+  return (length results)
   where
     resultSummary rs = "*** " ++ setName ++ ": " ++
                        show (length tests - length rs) ++ " passed, " ++

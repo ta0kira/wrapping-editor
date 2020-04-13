@@ -24,8 +24,6 @@ module Base.Char (
   HyphenChar(..),
   SpaceChar(..),
   WordChar(..),
-  countLeadingSpaces,
-  trimLeadingSpaces,
 ) where
 
 import Data.Char
@@ -34,31 +32,23 @@ import Data.Char
 -- | Dealing with space characters.
 class SpaceChar c where
   -- | Predicate for identifying space characters.
-  isSpaceChar :: c -> Bool
+  defaultIsWhitespace :: c -> Bool
 
 -- | Dealing with word characters.
 class SpaceChar c => WordChar c where
   -- | Predicate for identifying word characters.
-  isWordChar :: c -> Bool
+  defaultIsWordChar :: c -> Bool
 
 -- | Supporting hyphenation.
 class HyphenChar c where
   -- | The canonical hyphen character.
-  hyphenChar :: c
-
--- | Trims spaces from the front of a sequence.
-trimLeadingSpaces :: SpaceChar c => [c] -> [c]
-trimLeadingSpaces = dropWhile isSpaceChar
-
--- | Counts spaces at the front of a sequence.
-countLeadingSpaces :: SpaceChar c => [c] -> Int
-countLeadingSpaces = length . takeWhile isSpaceChar
+  defaultHyphen :: c
 
 instance SpaceChar Char where
-  isSpaceChar = (== ' ')
+  defaultIsWhitespace = (== ' ')
 
 instance WordChar Char where
-  isWordChar = flip any [isAlpha,(`elem` ".'")] . flip ($)
+  defaultIsWordChar = flip any [isAlpha,(`elem` ".'")] . flip ($)
 
 instance HyphenChar Char where
-  hyphenChar = '-'
+  defaultHyphen = '-'

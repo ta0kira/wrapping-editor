@@ -18,7 +18,9 @@ limitations under the License.
 
 {-# LANGUAGE Safe #-}
 
+import Control.Monad
 import System.Directory
+import System.Exit
 import System.IO
 
 import Common (runTests)
@@ -31,7 +33,12 @@ import qualified TestPara as TestPara (allTests)
 main = do
   cwd <- getCurrentDirectory
   hPutStrLn stderr $ "Running from " ++ cwd
-  runTests "LineWrap Tests" TestLineWrap.allTests
-  runTests "Line Tests" TestLine.allTests
-  runTests "Para Tests" TestPara.allTests
-  runTests "Document Tests" TestDocument.allTests
+  failures <- fmap sum $ sequence [
+      runTests "LineWrap Tests" TestLineWrap.allTests,
+      runTests "Line Tests"     TestLine.allTests,
+      runTests "Para Tests"     TestPara.allTests,
+      runTests "Document Tests" TestDocument.allTests
+    ]
+  when (failures > 0) $ do
+    hPutStrLn stderr $ "### TEST FAILURES: " ++ show failures ++ " ###"
+    exitFailure
