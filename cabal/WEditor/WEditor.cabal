@@ -70,7 +70,7 @@ library
   other-extensions:    ExistentialQuantification,
                        FlexibleContexts,
                        FlexibleInstances,
-                       FunctionalDependencies
+                       FunctionalDependencies,
                        MultiParamTypeClasses,
                        RankNTypes,
                        Safe

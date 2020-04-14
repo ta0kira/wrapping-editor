@@ -13,7 +13,7 @@ name:                WEditorBrick
 version:             0.1.0.0
 
 -- A short (one-line) description of the package.
-synopsis:            Text editor widget with dynamic line-wrapping for use with Brick.
+synopsis:            Text-editor widget with dynamic line-wrapping for use with Brick.
 
 -- A longer description of the package.
 -- description:
