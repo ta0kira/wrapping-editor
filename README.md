@@ -20,7 +20,11 @@ features, please see the [issues page][issues]. Also check out the
 This library currently does not have any sort of release process, but it can be
 built and installed locally using [`cabal`][cabal].
 
-1. Clone the [repository on GitHub][home], if you don't already have the source.
+1. Clone the [repository from GitHub][home], if you don't already have it.
+
+   ```shell
+   git clone https://github.com/ta0kira/wrapping-editor.git && cd wrapping-editor
+   ```
 
 2. Clean up previously-installed versions of the package, if you're using GHC.
 
