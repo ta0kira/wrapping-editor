@@ -22,12 +22,9 @@ module TestPara (
   allTests,
 ) where
 
-import LineWrap
-import Base.Actions
-import Base.Line
-import Base.Para
-import Base.Parser
-import Edit.Para
+import WEditor.LineWrap
+import WEditor.Base
+import WEditor.Internal.Para
 
 import Common
 

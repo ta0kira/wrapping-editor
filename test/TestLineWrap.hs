@@ -22,9 +22,8 @@ module TestLineWrap (
   allTests,
 ) where
 
-import LineWrap
-import Base.Line
-import Base.Parser
+import WEditor.Base
+import WEditor.LineWrap
 
 import Common
 

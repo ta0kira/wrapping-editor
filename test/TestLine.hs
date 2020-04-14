@@ -22,10 +22,9 @@ module TestLine (
   allTests,
 ) where
 
-import LineWrap
-import Base.Actions
-import Base.Line
-import Edit.Line
+import WEditor.Base
+import WEditor.LineWrap
+import WEditor.Internal.Line
 
 import Common
 

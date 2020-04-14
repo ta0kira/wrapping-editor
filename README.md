@@ -64,8 +64,8 @@ You can customize the widget using the following helper functions from the
 ## Using the Basic Editor
 
 ```haskell
-import LineWrap
-import Document
+import WEditor.LineWrap
+import WEditor.Document
 
 -- 1. Split your doc into paragraphs. Paragraph splitting is handled by the
 --    caller so that the library can avoid end-of-line considerations.
@@ -135,15 +135,15 @@ will likely be modified to support other character types.
 [issues]: https://github.com/ta0kira/wrapping-editor/issues
 [library-doc]: https://ta0kira.github.io/wrapping-editor/library
 
-[breakExact]: https://ta0kira.github.io/wrapping-editor/library/LineWrap.html#v:breakExact
-[breakWords]: https://ta0kira.github.io/wrapping-editor/library/LineWrap.html#v:breakWords
-[doWrappingEditor]: https://ta0kira.github.io/wrapping-editor/library/WrappingEditor.html#v:doWrappingEditor
-[FixedFontParser]: https://ta0kira.github.io/wrapping-editor/library/Base-Parser.html#t:FixedFontParser
-[genericWrappingEditor]: https://ta0kira.github.io/wrapping-editor/library/WrappingEditor.html#v:genericWrappingEditor
-[HyphenChar]: https://ta0kira.github.io/wrapping-editor/library/Base-Char.html#t:HyphenChar
-[lazyHyphen]:  https://ta0kira.github.io/wrapping-editor/library/LineWrap.html#v:lazyHyphen
-[mapWrappingEditor]: https://ta0kira.github.io/wrapping-editor/library/WrappingEditor.html#v:mapWrappingEditor
-[noHyphen]: https://ta0kira.github.io/wrapping-editor/library/LineWrap.html#v:noHyphen
-[WordChar]: https://ta0kira.github.io/wrapping-editor/library/Base-Char.html#t:WordChar
-[WordSplitter]: https://ta0kira.github.io/wrapping-editor/library/LineWrap.html#t:WordSplitter
-[WrappingEditor]: https://ta0kira.github.io/wrapping-editor/library/WrappingEditor.html#t:WrappingEditor
+[breakExact]: https://ta0kira.github.io/wrapping-editor/library/WEditor-LineWrap.html#v:breakExact
+[breakWords]: https://ta0kira.github.io/wrapping-editor/library/WEditor-LineWrap.html#v:breakWords
+[doWrappingEditor]: https://ta0kira.github.io/wrapping-editor/library/WEditorBrick-WrappingEditor.html#v:doWrappingEditor
+[FixedFontParser]: https://ta0kira.github.io/wrapping-editor/library/WEditor-Base-Parser.html#t:FixedFontParser
+[genericWrappingEditor]: https://ta0kira.github.io/wrapping-editor/library/WEditorBrick-WrappingEditor.html#v:genericWrappingEditor
+[HyphenChar]: https://ta0kira.github.io/wrapping-editor/library/WEditor-Base-Char.html#t:HyphenChar
+[lazyHyphen]:  https://ta0kira.github.io/wrapping-editor/library/WEditor-LineWrap.html#v:lazyHyphen
+[mapWrappingEditor]: https://ta0kira.github.io/wrapping-editor/library/WEditorBrick-WrappingEditor.html#v:mapWrappingEditor
+[noHyphen]: https://ta0kira.github.io/wrapping-editor/library/WEditor-LineWrap.html#v:noHyphen
+[WordChar]: https://ta0kira.github.io/wrapping-editor/library/WEditor-Base-Char.html#t:WordChar
+[WordSplitter]: https://ta0kira.github.io/wrapping-editor/library/WEditor-LineWrap.html#t:WordSplitter
+[WrappingEditor]: https://ta0kira.github.io/wrapping-editor/library/WEditorBrick-WrappingEditor.html#t:WrappingEditor

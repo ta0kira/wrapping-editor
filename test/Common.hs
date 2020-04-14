@@ -37,9 +37,8 @@ import Control.Monad (when)
 import Data.Maybe (catMaybes)
 import System.IO (hPutStr,hPutStrLn,stderr)
 
-import LineWrap
-import Base.Line
-import Base.Parser
+import WEditor.Base
+import WEditor.LineWrap
 
 
 endLine :: String -> VisibleLine Char LineBreak

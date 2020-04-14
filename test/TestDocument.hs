@@ -23,8 +23,8 @@ module TestDocument (
   allTests,
 ) where
 
-import LineWrap
-import Document
+import WEditor.Document
+import WEditor.LineWrap
 
 import Common
 

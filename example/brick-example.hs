@@ -30,9 +30,8 @@ import Brick.Main
 import Brick.Types
 import Graphics.Vty (defAttr)
 import Graphics.Vty.Input
-
-import LineWrap        -- For the line-wrapping policy.
-import WrappingEditor  -- For the wrapping editor Brick widget.
+import WEditor.LineWrap             -- For the line-wrapping policy.
+import WEditorBrick.WrappingEditor  -- For the wrapping editor Brick widget.
 
 
 -- Delegate most events to a single handler.
