@@ -17,15 +17,36 @@ features, please see the [issues page][issues]. Also check out the
 
 ## Installation
 
-This library currently does not have any sort of release process. Please clone
-the [repository on GitHub][home] for now.
+This library currently does not have any sort of release process, but it can be
+built and installed locally using [`cabal`][cabal].
 
-Note that you __*do not*__ need to install [Brick][brick] to use the basic
-editor component. The [Brick][brick] functionality is a thin layer on top of the
-basic editor. The basic editor depends on [GHC][ghc] extensions, but it has no
-dependencies otherwise.
+1. Clone the [repository on GitHub][home], if you don't already have the source.
 
-You can run the unit tests with:
+2. Clean up previously-installed versions of the package, if you're using GHC.
+
+   ```shell
+   ghc-pkg unregister WEditorBrick || true
+   ghc-pkg unregister WEditor || true
+   ```
+
+3. Install the base `WEditor` package, which contains the base editor.
+
+   ```shell
+   cd cabal/WEditor
+   cabal configure && cabal install
+   ```
+
+   You can stop here unless you intend to use the [Brick][brick] `Widget`.
+
+4. Install the `WEditorBrick` package, which contains the [Brick][brick]
+   `Widget`. Keep in mind that this might automatically install [Brick][brick].
+
+   ```shell
+   cd ../WEditorBrick
+   cabal configure && cabal install
+   ```
+
+You can run the unit tests on the local source using the following command:
 
 ```shell
 ( cd test && ghc -i../src test.hs && ./test )
@@ -39,7 +60,7 @@ See [brick-example.hs][brick-example.hs] for an example program that uses
 You can run the example with:
 
 ```shell
-ghc -isrc -threaded example/brick-example.hs && example/brick-example README.md
+ghc -threaded example/brick-example.hs && example/brick-example README.md
 ```
 
 Press `Esc` to exit when you are finished. The final contents of the editor will
@@ -130,6 +151,7 @@ will likely be modified to support other character types.
 
 [brick]: https://github.com/jtdaugherty/brick
 [brick-example.hs]: https://github.com/ta0kira/wrapping-editor/blob/master/example/brick-example.hs
+[cabal]: https://www.haskell.org/cabal/#install-upgrade
 [ghc]: https://www.haskell.org/ghc/
 [home]: https://github.com/ta0kira/wrapping-editor
 [issues]: https://github.com/ta0kira/wrapping-editor/issues
