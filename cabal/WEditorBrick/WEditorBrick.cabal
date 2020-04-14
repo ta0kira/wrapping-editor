@@ -69,7 +69,7 @@ library
                        brick >=0.52 && <0.53,
                        vty >=5.25 && <5.26,
                        microlens >=0.4 && <0.5,
-                       WEditor >= 0.1
+                       WEditor >= 0.1 && < 0.2
 
   -- Directories containing source files.
   -- hs-source-dirs:
