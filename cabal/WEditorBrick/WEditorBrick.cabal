@@ -65,10 +65,10 @@ library
                        Trustworthy
 
   -- Other library packages from which modules are imported.
-  build-depends:       base >=4.9 && <4.10,
-                       brick >=0.52 && <0.53,
-                       vty >=5.25 && <5.26,
-                       microlens >=0.4 && <0.5,
+  build-depends:       base < 4.13,
+                       brick >=0.47 && < 0.53,
+                       vty >=5.24,
+                       microlens >=0.3,
                        WEditor >= 0.1 && < 0.2
 
   -- Directories containing source files.
