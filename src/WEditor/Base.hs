@@ -21,8 +21,6 @@ limitations under the License.
 {-# LANGUAGE Safe #-}
 
 module WEditor.Base (
--- | Descriptions for generic viewer and editor actions.
-  module WEditor.Base.Actions,
   -- | Features of character sets.
   module WEditor.Base.Char,
   -- | Generic text-editing functionality.
@@ -37,7 +35,6 @@ module WEditor.Base (
   module WEditor.Base.Viewer,
 ) where
 
-import WEditor.Base.Actions
 import WEditor.Base.Char
 import WEditor.Base.Editor
 import WEditor.Base.Line

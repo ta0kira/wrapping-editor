@@ -57,7 +57,7 @@ module WEditor.Internal.Para (
   viewParaBefore,
 ) where
 
-import WEditor.Base.Actions
+import WEditor.Base.Editor
 import WEditor.Base.Line
 import WEditor.Base.Para
 import WEditor.Base.Parser

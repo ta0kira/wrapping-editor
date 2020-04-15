@@ -37,7 +37,7 @@ module WEditor.Internal.Line (
   viewLine,
 ) where
 
-import WEditor.Base.Actions
+import WEditor.Base.Editor
 import WEditor.Base.Line
 
 

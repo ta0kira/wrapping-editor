@@ -24,7 +24,10 @@ limitations under the License.
 {-# LANGUAGE Safe #-}
 
 module WEditor.Base.Editor (
+  EditAction(..),
+  EditDirection(..),
   EditorAction,
+  MoveDirection(..),
   FixedFontEditor(..),
   editorAppendAction,
   editorBackspaceAction,
@@ -41,7 +44,6 @@ module WEditor.Base.Editor (
   editorUpAction,
 ) where
 
-import WEditor.Base.Actions
 import WEditor.Base.Para
 
 
@@ -57,6 +59,30 @@ class FixedFontEditor a c | a -> c where
   getCursor :: a -> (Int,Int)
   -- | Export the modified data.
   exportData :: a -> [UnparsedPara c]
+
+-- | Actions that modify data.
+data EditAction c =
+  InsertText [c] | -- ^ Insert a block of characters.
+  DeleteText       -- ^ Delete a single character.
+    deriving (Eq,Show)
+
+-- | Modification direction, relative to the cursor.
+data EditDirection =
+  EditBefore | -- ^ Apply the edit before the cursor.
+  EditAfter    -- ^ Apply the edit after the cursor.
+    deriving (Eq,Show)
+
+-- | Actions that change the cursor position without changing data.
+data MoveDirection =
+  MoveUp |     -- ^ Move up one line.
+  MoveDown |   -- ^ Move down one line.
+  MovePrev |   -- ^ Move backward one character.
+  MoveNext |   -- ^ Move forward one character.
+  MoveHome |   -- ^ Implementation-defined home operation.
+  MoveEnd |    -- ^ Implementation-defined end operation.
+  MovePageUp | -- ^ Implementation-defined page-up operation.
+  MovePageDown -- ^ Implementation-defined page-down operation.
+    deriving (Eq,Show)
 
 -- | Any action that updates a 'FixedFontEditor'.
 type EditorAction c = forall a. FixedFontEditor a c => a -> a

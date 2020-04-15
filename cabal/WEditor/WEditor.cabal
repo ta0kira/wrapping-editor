@@ -52,7 +52,6 @@ cabal-version:       >=1.10
 library
   -- Modules exported by the library.
   exposed-modules:     WEditor.Base,
-                       WEditor.Base.Actions,
                        WEditor.Base.Char,
                        WEditor.Base.Editor,
                        WEditor.Base.Line,

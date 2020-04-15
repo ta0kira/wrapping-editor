@@ -53,7 +53,7 @@ built and installed locally using [`cabal`][cabal].
 You can run the unit tests on the local source using the following command:
 
 ```shell
-( cd test && ghc -i../src test.hs && ./test )
+( cd test && ghc -i../src -hide-package=WEditor test.hs && ./test )
 ```
 
 ## Using with [Brick][brick]
