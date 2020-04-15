@@ -41,6 +41,7 @@ module WEditor.Base.Editor (
   editorPageDownAction,
   editorPageUpAction,
   editorRightAction,
+  editorSetEditAction,
   editorUpAction,
 ) where
 
@@ -55,8 +56,16 @@ class FixedFontEditor a c | a -> c where
   breakPara :: a -> EditDirection -> a
   -- | Apply a cursor movement.
   moveCursor :: a -> MoveDirection -> a
-  -- | Get the cursor position, relative to the viewport if applicable.
+  -- | Get the (row,col) cursor position relative to the viewport.
   getCursor :: a -> (Int,Int)
+  -- | Get the absolute (paragraph,char) edit position.
+  getEditPoint :: a -> (Int,Int)
+  -- | Set the absolute (paragraph,char) edit position.
+  setEditPoint :: a -> (Int,Int) -> a
+  -- | Get the number of characters in the current paragraph.
+  getParaSize :: a -> Int
+  -- | Get the number of paragraphs in the document.
+  getParaCount :: a -> Int
   -- | Export the modified data.
   exportData :: a -> [UnparsedPara c]
 
@@ -106,6 +115,10 @@ editorAppendAction cs e = editText e (InsertText cs) EditBefore
 -- | Action to insert after the cursor.
 editorInsertAction :: [c] -> EditorAction c
 editorInsertAction cs e = editText e (InsertText cs) EditAfter
+
+-- | Action to set the absolute (paragraph,char) edit position.
+editorSetEditAction :: (Int,Int) -> EditorAction c
+editorSetEditAction (p,c) e = setEditPoint e (p,c)
 
 -- | Action for the up-arrow key.
 editorUpAction :: EditorAction c

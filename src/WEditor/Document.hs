@@ -114,7 +114,11 @@ instance FixedFontEditor (EditingDocument c) c where
       | d == MovePrev || d == MoveNext || d == MoveHome || d == MoveEnd = storeCursor
       | otherwise = applyCursor
   getCursor (EditingDocument _ e _ _ h k _ p) =
-    (tweakCursor p (getCurrentLine e) $ getParaCursor e,boundOffset h k)
+    (tweakCursor p (getCurrentLine e) $ getParaCursorChar e,boundOffset h k)
+  getEditPoint = getDocEditPoint
+  setEditPoint = flip setDocEditPoint
+  getParaSize (EditingDocument _ e _ _ _ _ _ _) = getParaCharCount e
+  getParaCount da@(EditingDocument bs _ as _ _ _ _ _) = 1 + length bs + length as
   exportData = exportDocument
 
 exportDocument :: EditingDocument c -> [UnparsedPara c]
@@ -128,11 +132,11 @@ boundOffset h k
 
 storeCursor :: EditingDocument c -> EditingDocument c
 storeCursor (EditingDocument bs e as w h k _ p) =
-  EditingDocument bs e as w h k (getParaCursor e) p
+  EditingDocument bs e as w h k (getParaCursorChar e) p
 
 applyCursor :: EditingDocument c -> EditingDocument c
 applyCursor (EditingDocument bs e as w h k c p) =
-  EditingDocument bs (setParaCursor c e) as w h k c p
+  EditingDocument bs (setParaCursorChar c e) as w h k c p
 
 joinParaNext :: EditingDocument c -> EditingDocument c
 joinParaNext da@(EditingDocument _ _ [] _ _ _ _ _) = da
@@ -210,7 +214,7 @@ moveDocCursor d da@(EditingDocument bs e as w h k c p) = revised where
     | d == MovePageUp   = editAtTop $ repeatTimes h (moveDocCursor MoveUp)   da
     | d == MovePageDown = editAtTop $ repeatTimes h (moveDocCursor MoveDown) da
     | otherwise = da
-  fixOffset e2 = boundOffset h $ k + (getCursorLine e2 - getCursorLine e)
+  fixOffset e2 = boundOffset h $ k + (getParaCursorLine e2 - getParaCursorLine e)
   seekBack  (EditingDocument bs e as w h k c p) = EditingDocument bs (seekParaBack e)  as w h k c p
   seekFront (EditingDocument bs e as w h k c p) = EditingDocument bs (seekParaFront e) as w h k c p
   repeatTimes n = foldr (flip (.)) id . replicate n
@@ -225,7 +229,7 @@ modifyDoc m d da@(EditingDocument bs e as w h k c p) = revised m d where
     | atParaBack e && not (null as) =
       EditingDocument bs (appendToPara p e (head as)) (tail as) w h k c p
   revised _ _ = let e2 = (modifyPara p m d e) in EditingDocument bs e2 as w h (fixOffset e2) c p
-  fixOffset e2 = boundOffset h $ k + (getCursorLine e2 - getCursorLine e)
+  fixOffset e2 = boundOffset h $ k + (getParaCursorLine e2 - getParaCursorLine e)
 
 insertParaSplit :: EditDirection -> EditingDocument c -> EditingDocument c
 insertParaSplit d (EditingDocument bs e as w h k c p) = revised where
@@ -233,3 +237,21 @@ insertParaSplit d (EditingDocument bs e as w h k c p) = revised where
   revised
     | d == EditBefore = EditingDocument (parseParaBefore p b:bs) (editPara p a) as w h (boundOffset h (k+1)) c p
     | d == EditAfter  = EditingDocument bs (seekParaBack $ editPara p b) (parseParaAfter p a:as) w h k c p
+
+getDocEditPoint :: EditingDocument c -> (Int,Int)
+getDocEditPoint (EditingDocument bs e _ _ _ _ _ _) = (length bs,getParaEditChar e)
+
+setEditPara :: Int -> EditingDocument c -> EditingDocument c
+setEditPara n (EditingDocument bs e as w h k c p) = revised where
+  revised = EditingDocument bs2 e2 as2 w h k c p
+  (bs2,e2,as2) = shift bs e as
+  shift bs e as
+    | length bs < n = shift (viewParaBefore e:bs) (editPara p $ unparseParaAfter $ head as)  (tail as)
+    | length bs > n = shift (tail bs)             (editPara p $ unparseParaBefore $ head bs) (viewParaAfter e:as)
+    | otherwise = (bs,e,as)
+
+setEditChar :: Int -> EditingDocument c -> EditingDocument c
+setEditChar n (EditingDocument bs e as w h k c p) = EditingDocument bs (setParaCursorChar n e) as w h k c p
+
+setDocEditPoint :: (Int,Int) -> EditingDocument c -> EditingDocument c
+setDocEditPoint (n,m) = storeCursor . setEditChar m . setEditPara n

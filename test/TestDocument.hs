@@ -199,133 +199,133 @@ allTests = [
            viewerResizeAction largerView,
            editorInsertAction "XYZ"
          ]),
-    ("cursor defaults to top left", checkEditCursor breakExact
-       "testfiles/original-long.txt" (0,0) $
+    ("cursor/edit defaults to top left", checkEditCursor breakExact
+       "testfiles/original-long.txt" (0,0) (0,0) $
        id),
-    ("cursor in middle of view", checkEditCursor breakExact
-       "testfiles/original-long.txt" (5,5) $
+    ("cursor/edit in middle of view", checkEditCursor breakExact
+       "testfiles/original-long.txt" (5,5) (2,25) $
        composeActions [
            -- NOTE: Keep horizontal first here.
            repeatAction 5 editorRightAction,
            repeatAction 5 editorDownAction
          ]),
-    ("cursor after insert before", checkEditCursor breakExact
-       "testfiles/original-long.txt" (8,5) $
+    ("cursor/edit after insert before", checkEditCursor breakExact
+       "testfiles/original-long.txt" (8,5) (2,28) $
        composeActions [
            repeatAction 5 editorRightAction,
            repeatAction 5 editorDownAction,
            editorAppendAction "XYZ"
          ]),
-    ("cursor after insert after", checkEditCursor breakExact
-       "testfiles/original-long.txt" (5,5) $
+    ("cursor/edit after insert after", checkEditCursor breakExact
+       "testfiles/original-long.txt" (5,5) (2,25) $
        composeActions [
            repeatAction 5 editorRightAction,
            repeatAction 5 editorDownAction,
            editorInsertAction "XYZ"
          ]),
-    ("cursor after delete before", checkEditCursor breakExact
-       "testfiles/original-long.txt" (4,5) $
+    ("cursor/edit after delete before", checkEditCursor breakExact
+       "testfiles/original-long.txt" (4,5) (2,24) $
        composeActions [
            repeatAction 5 editorRightAction,
            repeatAction 5 editorDownAction,
            editorBackspaceAction
          ]),
-    ("cursor after delete after", checkEditCursor breakExact
-       "testfiles/original-long.txt" (5,5) $
+    ("cursor/edit after delete after", checkEditCursor breakExact
+       "testfiles/original-long.txt" (5,5) (2,25) $
        composeActions [
            repeatAction 5 editorRightAction,
            repeatAction 5 editorDownAction,
            editorDeleteAction
          ]),
-    ("cursor after insert before line front", checkEditCursor breakExact
-       "testfiles/original-long.txt" (3,5) $
+    ("cursor/edit after insert before line front", checkEditCursor breakExact
+       "testfiles/original-long.txt" (3,5) (2,23) $
        composeActions [
            repeatAction 5 editorDownAction,
            editorAppendAction "XYZ"
          ]),
-    ("cursor after insert after line back", checkEditCursor breakExact
-       "testfiles/original-long.txt" (20,5) $
+    ("cursor/edit after insert after line back", checkEditCursor breakExact
+       "testfiles/original-long.txt" (20,5) (2,40) $
        composeActions [
            repeatAction 5 editorDownAction,
            editorEndAction,
            editorInsertAction "XYZ"
          ]),
-    ("cursor after delete before line front", checkEditCursor breakExact
-       "testfiles/original-long.txt" (19,4) $
+    ("cursor/edit after delete before line front", checkEditCursor breakExact
+       "testfiles/original-long.txt" (19,4) (2,19) $
        composeActions [
            repeatAction 5 editorDownAction,
            editorBackspaceAction
          ]),
-    ("cursor after delete after line back", checkEditCursor breakExact
-       "testfiles/original-long.txt" (20,5) $
+    ("cursor/edit after delete after line back", checkEditCursor breakExact
+       "testfiles/original-long.txt" (20,5) (2,40) $
        composeActions [
            repeatAction 5 editorDownAction,
            editorEndAction,
            editorDeleteAction
          ]),
-    ("cursor scroll to previous line", checkEditCursor breakExact
-       "testfiles/original-long.txt" (20,4) $
+    ("cursor/edit scroll to previous line", checkEditCursor breakExact
+       "testfiles/original-long.txt" (20,4) (2,20) $
        composeActions [
            repeatAction 5 editorDownAction,
            editorLeftAction
          ]),
-    ("cursor scroll to previous line", checkEditCursor breakExact
-       "testfiles/original-long.txt" (0,6) $
+    ("cursor/edit scroll to next line", checkEditCursor breakExact
+       "testfiles/original-long.txt" (0,6) (2,40) $
        composeActions [
            repeatAction 5 editorDownAction,
            editorEndAction,
            editorRightAction
          ]),
-    ("cursor after join with prev", checkEditCursor breakExact
-       "testfiles/original-long.txt" (8,8) $
+    ("cursor/edit after join with prev", checkEditCursor breakExact
+       "testfiles/original-long.txt" (8,8) (2,88) $
        composeActions [
            repeatAction 9 editorDownAction,
            editorBackspaceAction
          ]),
-    ("cursor after join with next", checkEditCursor breakExact
-       "testfiles/original-long.txt" (8,8) $
+    ("cursor/edit after join with next", checkEditCursor breakExact
+       "testfiles/original-long.txt" (8,8) (2,88) $
        composeActions [
            repeatAction 8 editorDownAction,
            editorEndAction,
            editorDeleteAction
          ]),
-    ("cursor after resize preserves offset", checkEditCursor breakExact
-       "testfiles/original-long.txt" (0,3) $
+    ("cursor/edit after resize preserves offset", checkEditCursor breakExact
+       "testfiles/original-long.txt" (0,3) (1,0) $
        composeActions [
            repeatAction 3 editorDownAction,
            viewerResizeAction largerView
          ]),
-    ("cursor after resize larger truncates offset", checkEditCursor breakExact
-       "testfiles/original-short.txt" (20,2) $
+    ("cursor/edit after resize larger truncates offset", checkEditCursor breakExact
+       "testfiles/original-short.txt" (20,2) (1,20) $
        composeActions [
            repeatAction 3 editorDownAction,
            viewerResizeAction largerView
          ]),
-    ("cursor after resize unbounded maximizes offset", checkEditCursor breakExact
-       "testfiles/original-long.txt" (0,15) $
+    ("cursor/edit after resize unbounded maximizes offset", checkEditCursor breakExact
+       "testfiles/original-long.txt" (0,15) (4,60) $
        composeActions [
            repeatAction 15 editorDownAction,
            viewerResizeAction (fst defaultView,0)
          ]),
-    ("cursor after resize smaller accounts for new break", checkEditCursor breakExact
-       "testfiles/original-long.txt" (2,4) $
+    ("cursor/edit after resize smaller accounts for new break", checkEditCursor breakExact
+       "testfiles/original-long.txt" (2,4) (2,20) $
        composeActions [
            repeatAction 4 editorDownAction,
            editorEndAction,
            viewerResizeAction smallerView
          ]),
-    ("cursor after resize larger accounts for new break", checkEditCursor breakExact
-       "testfiles/original-long.txt" (16,5) $
+    ("cursor/edit after resize larger accounts for new break", checkEditCursor breakExact
+       "testfiles/original-long.txt" (16,5) (2,40) $
        composeActions [
            repeatAction 5 editorDownAction,
            editorEndAction,
            viewerResizeAction largerView
          ]),
-    ("cursor position uses parser tweaking", checkEditCursor (breakWords noHyphen)
-       "testfiles/original-long.txt" (17,0) $
+    ("cursor/edit position uses parser tweaking", checkEditCursor (breakWords noHyphen)
+       "testfiles/original-long.txt" (17,0) (0,18) $
        composeActions [
            -- The first line has 18 chars with a space.
-           editorEndAction,
+           editorDownAction,
            editorLeftAction
          ])
   ]
@@ -352,10 +352,12 @@ checkEditView fx fy f = do
   let restored = map trimSpace $ getVisible edit
   checkCondition ("\n" ++ unlines restored) (restored == view)
 
-checkEditCursor b fx c f = do
+checkEditCursor b fx c e f = do
   edit <- fmap (f . loadDoc b) $ readFile fx
   let cursor = getCursor edit
-  checkCondition (show cursor) (cursor == c)
+  let point = getEditPoint edit
+  checkCondition ("Cursor: " ++ show cursor) (cursor == c)
+  checkCondition ("Edit: " ++ show point)    (point == e)
 
 -- Just in case the text editor used to create the test file prunes whitespace
 -- from the end of the line.
