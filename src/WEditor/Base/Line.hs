@@ -21,9 +21,7 @@ limitations under the License.
 {-# LANGUAGE Safe #-}
 
 module WEditor.Base.Line (
-  DefaultBreak(..),
   VisibleLine(..),
-  emptyLine,
 ) where
 
 
@@ -39,7 +37,3 @@ data VisibleLine c b =
 class DefaultBreak b where
   -- | The default break for the break type.
   defaultBreak :: b
-
--- | Create an empty line.
-emptyLine :: DefaultBreak b => VisibleLine c b
-emptyLine = VisibleLine defaultBreak []

@@ -44,11 +44,12 @@ import Brick.Types
 import Brick.Widgets.Core
 import Graphics.Vty.Input
 import Lens.Micro
+import WEditor.Base
 import WEditor.Document
 
 
 -- | Create a new 'WrappingEditor' using the default editor component.
-newWrappingEditor :: FixedFontParser a c b => a -> n -> [[c]] -> WrappingEditor c n
+newWrappingEditor :: FixedFontParser a c => a -> n -> [[c]] -> WrappingEditor c n
 newWrappingEditor b n cs = genericWrappingEditor n $ editDocument b $ map UnparsedPara cs
 
 -- | Create a new 'WrappingEditor' using a custom editor component.

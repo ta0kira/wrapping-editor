@@ -65,7 +65,7 @@ library
                        Trustworthy
 
   -- Other library packages from which modules are imported.
-  build-depends:       base < 4.13,
+  build-depends:       base < 4.14,
                        brick >=0.47 && < 0.53,
                        vty >=5.24,
                        microlens >=0.3,

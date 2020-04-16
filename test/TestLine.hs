@@ -141,21 +141,21 @@ allTests = [
          ]),
     ("split line middle", do
        let line = editLine $ innerLine "this is a test line"
-       let (left,right) = splitLine $ setLineCursor 5 line
+       let (left,right) = splitLine lineBreakEnd $ setLineCursor 5 line
        checkConditions [
            ("Left: " ++ show left,left == (endLine "this ")),
            ("Right: " ++ show right,right == (innerLine "is a test line"))
          ]),
     ("split line front", do
        let line = editLine $ innerLine "this is a test line"
-       let (left,right) = splitLine $ moveLineCursor MoveUp line
+       let (left,right) = splitLine lineBreakEnd $ moveLineCursor MoveUp line
        checkConditions [
            ("Left: " ++ show left,left == (endLine "")),
            ("Right: " ++ show right,right == (innerLine "this is a test line"))
          ]),
     ("split line back", do
        let line = editLine $ innerLine "this is a test line"
-       let (left,right) = splitLine $ moveLineCursor MoveDown line
+       let (left,right) = splitLine lineBreakEnd $ moveLineCursor MoveDown line
        checkConditions [
            ("Left: " ++ show left,left == (endLine "this is a test line")),
            ("Right: " ++ show right,right == (innerLine ""))

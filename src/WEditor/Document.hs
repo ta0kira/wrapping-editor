@@ -19,6 +19,7 @@ limitations under the License.
 -- | Generic document-editing components.
 
 {-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE Safe #-}
@@ -61,10 +62,10 @@ import WEditor.Internal.Para
 
 -- | Generic document editor with a dynamic viewport.
 data EditingDocument c =
-  forall a b. FixedFontParser a c b => EditingDocument {
-    edBefore :: [VisibleParaBefore c b],  -- Reversed.
-    edEditing :: EditingPara c b,
-    edAfter :: [VisibleParaAfter c b],
+  forall a. FixedFontParser a c => EditingDocument {
+    edBefore :: [VisibleParaBefore c (BreakType a)],  -- Reversed.
+    edEditing :: EditingPara c (BreakType a),
+    edAfter :: [VisibleParaAfter c (BreakType a)],
     edWidth :: Int,
     edHeight :: Int,
     edOffset :: Int,
@@ -73,9 +74,9 @@ data EditingDocument c =
   }
 
 -- | Create an editor for a document.
-editDocument :: FixedFontParser a c b => a                 -- ^ Parser used to break paragraphs into lines.
-                                      -> [UnparsedPara c]  -- ^ List of unparsed paragraphs to be edited.
-                                      -> EditingDocument c -- ^ Document editor.
+editDocument :: FixedFontParser a c => a                 -- ^ Parser used to break paragraphs into lines.
+                                    -> [UnparsedPara c]  -- ^ List of unparsed paragraphs to be edited.
+                                    -> EditingDocument c -- ^ Document editor.
 editDocument parser ps = document where
   document = EditingDocument {
       edBefore = [],

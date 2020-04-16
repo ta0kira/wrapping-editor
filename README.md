@@ -18,7 +18,8 @@ features, please see the [issues page][issues]. Also check out the
 ## Installation
 
 This library currently does not have any sort of release process, but it can be
-built and installed locally using [`cabal`][cabal].
+built and installed locally using [`cabal`][cabal]. (This procedure is not
+ideal; I'm waiting for upload access to Hackage to make things easier.)
 
 1. Clone the [repository from GitHub][home], if you don't already have it.
 

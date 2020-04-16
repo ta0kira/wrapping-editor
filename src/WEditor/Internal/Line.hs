@@ -69,9 +69,9 @@ setLineCursor k e@(EditingLine bs as b) = EditingLine bs2 as2 b where
     | k > n && not (null as) = seek (n+1) (head as:bs) (tail as)
     | otherwise = (bs,as)
 
-splitLine :: DefaultBreak b => EditingLine c b -> (VisibleLine c b,VisibleLine c b)
-splitLine (EditingLine bs as b) =
-  (VisibleLine defaultBreak (reverse bs),
+splitLine :: b -> EditingLine c b -> (VisibleLine c b,VisibleLine c b)
+splitLine b0 (EditingLine bs as b) =
+  (VisibleLine b0 (reverse bs),
    VisibleLine b as)
 
 lineCursorMovable :: MoveDirection -> EditingLine c b -> Bool

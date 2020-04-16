@@ -23,6 +23,7 @@ limitations under the License.
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE Safe #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module WEditor.LineWrap (
   BreakWords,
@@ -132,9 +133,6 @@ instance Show (BreakWords c) where
     "breakWords { width: " ++ show w ++
                ", split: " ++ show s ++ " }"
 
-instance DefaultBreak LineBreak where
-  defaultBreak = lineBreakEnd
-
 instance WordChar c => WordSplitter (NoHyphen c) c where
   splitWord _ k w _ = if k < w then Just [] else Nothing
   isWordChar _ = defaultIsWordChar
@@ -154,7 +152,9 @@ instance (WordChar c, HyphenChar c) => WordSplitter (LazyHyphen c) c where
   isWhitespace _ = defaultIsWhitespace
   appendHyphen _ = (++[defaultHyphen])
 
-instance FixedFontParser (BreakWords c) c LineBreak where
+instance FixedFontParser (BreakWords c) c where
+  type BreakType (BreakWords c) = LineBreak
+  defaultBreak _ = lineBreakEnd
   setLineWidth (BreakWords _ s) w = BreakWords w s
   breakLines (BreakWords w s) = breakAllLines w s
   renderLine (BreakWords w _) (VisibleLine ParagraphEnd cs)
@@ -172,7 +172,7 @@ instance FixedFontParser (BreakWords c) c LineBreak where
   tweakCursor _ (VisibleLine HyphenatedWord cs) = id
 
 breakAllLines :: WordSplitter a c => Int -> a -> [c] -> [VisibleLine c LineBreak]
-breakAllLines _ _ [] = [emptyLine]
+breakAllLines _ _ [] = [VisibleLine lineBreakEnd []]
 breakAllLines w s cs
   | w < 1 = [VisibleLine lineBreakEnd cs]
   | otherwise = breakOrEmpty cs where

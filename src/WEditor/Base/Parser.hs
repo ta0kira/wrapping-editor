@@ -21,16 +21,23 @@ limitations under the License.
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE Safe #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module WEditor.Base.Parser (
   FixedFontParser(..),
+  emptyLine,
 ) where
 
 import WEditor.Base.Line
 
 
 -- | Line parser for fixed-width fonts.
-class DefaultBreak b => FixedFontParser a c b | a -> c b where
+class FixedFontParser a c | a -> c where
+  -- | Type used to differentiate between line-break types.
+  type BreakType a :: *
+  -- | An acceptable fallback line-break type.
+  defaultBreak :: a -> BreakType a
   -- | Change the max line width used for parsing. A width of zero must result
   --   in breakLines skipping line breaks.
   setLineWidth :: a -> Int -> a
@@ -43,10 +50,14 @@ class DefaultBreak b => FixedFontParser a c b | a -> c b where
   --
   --   Implement 'renderLine' and 'tweakCursor' to make visual adjustments (such
   --   as adding hyphens or indentation) if necessary.
-  breakLines :: a -> [c] -> [VisibleLine c b]
+  breakLines :: a -> [c] -> [VisibleLine c (BreakType a)]
   -- | Render the line for viewing. Implement 'tweakCursor' if 'renderLine'
   --   changes the positions of any characters on the line.
-  renderLine :: a -> VisibleLine c b -> [c]
+  renderLine :: a -> VisibleLine c (BreakType a) -> [c]
   -- | Adjust the horizontal cursor position.
-  tweakCursor :: a -> VisibleLine c b -> Int -> Int
+  tweakCursor :: a -> VisibleLine c (BreakType a) -> Int -> Int
   tweakCursor _ _ = id
+
+-- | Create an empty line.
+emptyLine :: FixedFontParser a c => a -> VisibleLine c (BreakType a)
+emptyLine p = VisibleLine (defaultBreak p) []
