@@ -327,6 +327,24 @@ allTests = [
            -- The first line has 18 chars with a space.
            editorDownAction,
            editorLeftAction
+         ]),
+    ("edit position is truncated within paragraph", checkEditCursor breakExact
+       "testfiles/original-long.txt" (2,0) (3,42) $
+       editorSetPositionAction (3,60)),
+    ("negative edit position within paragraph", checkEditCursor breakExact
+       "testfiles/original-long.txt" (0,0) (0,0) $
+       editorSetPositionAction (0,-5)),
+    ("edit position is truncated within document", checkEditCursor breakExact
+       "testfiles/original-long.txt" (10,0) (12,10) $
+       editorSetPositionAction (30,10)),
+    ("negative edit position within document", checkEditCursor breakExact
+       "testfiles/original-long.txt" (0,0) (0,0) $
+       editorSetPositionAction (-5,0)),
+    ("edit position can traverse upward", checkEditCursor breakExact
+       "testfiles/original-long.txt" (20,9) (3,40) $
+       composeActions [
+           repeatAction 40 editorDownAction,
+           editorSetPositionAction (3,40)
          ])
   ]
 
@@ -355,9 +373,11 @@ checkEditView fx fy f = do
 checkEditCursor b fx c e f = do
   edit <- fmap (f . loadDoc b) $ readFile fx
   let cursor = getCursor edit
-  let point = getEditPoint edit
-  checkCondition ("Cursor: " ++ show cursor) (cursor == c)
-  checkCondition ("Edit: " ++ show point)    (point == e)
+  let point  = getEditPoint edit
+  checkConditions [
+      ("Cursor: " ++ show cursor,cursor == c),
+      ("Edit: "   ++ show point, point == e)
+    ]
 
 -- Just in case the text editor used to create the test file prunes whitespace
 -- from the end of the line.

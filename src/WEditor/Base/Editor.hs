@@ -41,7 +41,7 @@ module WEditor.Base.Editor (
   editorPageDownAction,
   editorPageUpAction,
   editorRightAction,
-  editorSetEditAction,
+  editorSetPositionAction,
   editorUpAction,
 ) where
 
@@ -59,6 +59,10 @@ class FixedFontEditor a c | a -> c where
   -- | Get the (row,col) cursor position relative to the viewport.
   getCursor :: a -> (Int,Int)
   -- | Get the absolute (paragraph,char) edit position.
+  -- |
+  -- | The position can be restored after cursor movements with 'moveCursor';
+  -- | however, calling 'editText' invalidates this position. Thus, it should
+  -- | not be relied on for automated document editing.
   getEditPoint :: a -> (Int,Int)
   -- | Set the absolute (paragraph,char) edit position.
   setEditPoint :: a -> (Int,Int) -> a
@@ -117,8 +121,8 @@ editorInsertAction :: [c] -> EditorAction c
 editorInsertAction cs e = editText e (InsertText cs) EditAfter
 
 -- | Action to set the absolute (paragraph,char) edit position.
-editorSetEditAction :: (Int,Int) -> EditorAction c
-editorSetEditAction (p,c) e = setEditPoint e (p,c)
+editorSetPositionAction :: (Int,Int) -> EditorAction c
+editorSetPositionAction (p,c) e = setEditPoint e (p,c)
 
 -- | Action for the up-arrow key.
 editorUpAction :: EditorAction c

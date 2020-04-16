@@ -48,6 +48,7 @@ module WEditor.Document (
   editorPageDownAction,
   editorPageUpAction,
   editorRightAction,
+  editorSetPositionAction,
   editorUpAction,
   viewerResizeAction,
   -- <<< From Base
@@ -116,7 +117,7 @@ instance FixedFontEditor (EditingDocument c) c where
   getCursor (EditingDocument _ e _ _ h k _ p) =
     (tweakCursor p (getCurrentLine e) $ getParaCursorChar e,boundOffset h k)
   getEditPoint = getDocEditPoint
-  setEditPoint = flip setDocEditPoint
+  setEditPoint da (p,c) = storeCursor $ setDocEditPoint (p,c) da
   getParaSize (EditingDocument _ e _ _ _ _ _ _) = getParaCharCount e
   getParaCount da@(EditingDocument bs _ as _ _ _ _ _) = 1 + length bs + length as
   exportData = exportDocument
@@ -243,15 +244,17 @@ getDocEditPoint (EditingDocument bs e _ _ _ _ _ _) = (length bs,getParaEditChar 
 
 setEditPara :: Int -> EditingDocument c -> EditingDocument c
 setEditPara n (EditingDocument bs e as w h k c p) = revised where
-  revised = EditingDocument bs2 e2 as2 w h k c p
+  revised = resizeHeight h $ EditingDocument bs2 e2 as2 w h k c p
   (bs2,e2,as2) = shift bs e as
   shift bs e as
-    | length bs < n = shift (viewParaBefore e:bs) (editPara p $ unparseParaAfter $ head as)  (tail as)
-    | length bs > n = shift (tail bs)             (editPara p $ unparseParaBefore $ head bs) (viewParaAfter e:as)
+    | length bs < n && not (null as) =
+      shift (viewParaBefore e:bs) (editPara p $ unparseParaAfter $ head as)  (tail as)
+    | length bs > n && not (null bs) =
+      shift (tail bs)             (editPara p $ unparseParaBefore $ head bs) (viewParaAfter e:as)
     | otherwise = (bs,e,as)
 
 setEditChar :: Int -> EditingDocument c -> EditingDocument c
-setEditChar n (EditingDocument bs e as w h k c p) = EditingDocument bs (setParaCursorChar n e) as w h k c p
+setEditChar n (EditingDocument bs e as w h k c p) = EditingDocument bs (setParaEditChar n e) as w h k c p
 
 setDocEditPoint :: (Int,Int) -> EditingDocument c -> EditingDocument c
-setDocEditPoint (n,m) = storeCursor . setEditChar m . setEditPara n
+setDocEditPoint (p,c) = setEditChar c . setEditPara p
