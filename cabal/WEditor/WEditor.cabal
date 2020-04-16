@@ -46,7 +46,10 @@ build-type:          Simple
 extra-source-files:  ChangeLog.md
 
 -- Constraint on the version of Cabal needed to build this package.
-cabal-version:       >=1.10
+cabal-version:       >= 2.0
+
+-- Data files for unit tests.
+extra-source-files: test/testfiles/*.txt
 
 
 library
@@ -76,7 +79,7 @@ library
                        TypeFamilies
 
   -- Other library packages from which modules are imported.
-  build-depends:       base < 4.14
+  build-depends:       base >= 4.0 && < 4.14
 
   -- Directories containing source files.
   -- hs-source-dirs:
@@ -84,3 +87,37 @@ library
   -- Base language which the package is written in.
   default-language:    Haskell2010
 
+
+library WEditor-internal
+  exposed-modules:     WEditor.Base,
+                       WEditor.Base.Char,
+                       WEditor.Base.Editor,
+                       WEditor.Base.Line,
+                       WEditor.Base.Para
+                       WEditor.Base.Parser,
+                       WEditor.Base.Viewer,
+                       WEditor.Document,
+                       WEditor.LineWrap,
+                       WEditor.Internal.Line,
+                       WEditor.Internal.Para
+
+  build-depends:       base
+
+
+test-suite WEditor-test
+  type:                exitcode-stdio-1.0
+
+  main-is:             test.hs
+
+  other-modules:       Common,
+                       TestDocument,
+                       TestLine,
+                       TestLineWrap,
+                       TestPara
+
+  hs-source-dirs:      test
+
+  build-depends:       base,
+                       directory >= 1.0,
+                       filepath >= 1.0,
+                       WEditor-internal
