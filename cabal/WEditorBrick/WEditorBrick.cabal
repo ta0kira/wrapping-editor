@@ -14,7 +14,7 @@ license:             Apache-2.0
 license-file:        LICENSE
 author:              Kevin P. Barry
 maintainer:          ta0kira@gmail.com
-category:            Text
+category:            Graphics
 build-type:          Simple
 
 cabal-version:       2.0
