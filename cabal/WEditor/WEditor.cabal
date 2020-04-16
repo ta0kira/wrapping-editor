@@ -72,7 +72,8 @@ library
                        FunctionalDependencies,
                        MultiParamTypeClasses,
                        RankNTypes,
-                       Safe
+                       Safe,
+                       TypeFamilies
 
   -- Other library packages from which modules are imported.
   build-depends:       base < 4.14

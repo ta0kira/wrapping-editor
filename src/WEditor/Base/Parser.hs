@@ -20,8 +20,8 @@ limitations under the License.
 
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE Safe #-}
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE Safe #-}
 {-# LANGUAGE TypeFamilies #-}
 
 module WEditor.Base.Parser (
