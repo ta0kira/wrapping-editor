@@ -127,7 +127,8 @@ instance Show n => Show (WrappingEditor c n) where
   show (WrappingEditor name editor) =
     "WrappingEditor { name: " ++ show name ++
                    ", size: " ++ show (getViewSize editor) ++
-                   ", cursor: " ++ show (getCursor editor) ++ " }"
+                   ", cursor: " ++ show (getCursor editor) ++
+                   ", point: " ++ show (getEditPoint editor) ++ " }"
 
 instance Named (WrappingEditor c n) n where
     getName = weName

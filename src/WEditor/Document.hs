@@ -97,7 +97,8 @@ editDocument parser ps = document where
 instance Show (EditingDocument c) where
   show d =
     "EditingDocument { size: " ++ show (getViewSize d) ++
-                    ", cursor: " ++ show (getCursor d) ++ " }"
+                    ", cursor: " ++ show (getCursor d) ++
+                    ", point: " ++ show (getEditPoint d) ++ " }"
 
 instance FixedFontViewer (EditingDocument c) c where
   setViewSize d s@(w,h)
