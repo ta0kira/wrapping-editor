@@ -17,45 +17,28 @@ features, please see the [issues page][issues]. Also check out the
 
 ## Installation
 
-This library currently does not have any sort of release process, but it can be
-built and installed locally using [`cabal`][cabal]. (This procedure is not
-ideal; I'm waiting for upload access to Hackage to make things easier.)
+This library can be installed from [Hackage][hackage] using [`cabal`][cabal].
 
-1. Clone the [repository from GitHub][home], if you don't already have it.
+1. Installing just the [generic editor][hackage-WEditor]:
 
    ```shell
-   git clone https://github.com/ta0kira/wrapping-editor.git && cd wrapping-editor
+   # cabal < 2.0
+   cabal install WEditor
+
+   # cabal >= 2.0
+   cabal install --lib WEditor
    ```
 
-2. Clean up previously-installed versions of the package, if you're using GHC.
+1. Installing the [Brick `Widget`][hackage-WEditorBrick] (also installs
+   [Brick][brick]!):
 
    ```shell
-   ghc-pkg unregister WEditorBrick || true
-   ghc-pkg unregister WEditor || true
+   # cabal < 2.0
+   cabal install WEditorBrick
+
+   # cabal >= 2.0
+   cabal install --lib WEditorBrick
    ```
-
-3. Install the base `WEditor` package, which contains the base editor.
-
-   ```shell
-   cd cabal/WEditor
-   cabal configure && cabal install
-   ```
-
-   You can stop here unless you intend to use the [Brick][brick] `Widget`.
-
-4. Install the `WEditorBrick` package, which contains the [Brick][brick]
-   `Widget`. Keep in mind that this might automatically install [Brick][brick].
-
-   ```shell
-   cd ../WEditorBrick
-   cabal configure && cabal install
-   ```
-
-You can run the unit tests on the local source using the following command:
-
-```shell
-( cd test && ghc -i../src -hide-package=WEditor test.hs && ./test )
-```
 
 ## Using with [Brick][brick]
 
@@ -158,6 +141,9 @@ will likely be modified to support other character types.
 [brick-example.hs]: https://github.com/ta0kira/wrapping-editor/blob/master/example/brick-example.hs
 [cabal]: https://www.haskell.org/cabal/#install-upgrade
 [ghc]: https://www.haskell.org/ghc/
+[hackage]: http://hackage.haskell.org
+[hackage-WEditor]: http://hackage.haskell.org/package/WEditor
+[hackage-WEditorBrick]: http://hackage.haskell.org/package/WEditorBrick
 [home]: https://github.com/ta0kira/wrapping-editor
 [issues]: https://github.com/ta0kira/wrapping-editor/issues
 [library-doc]: https://ta0kira.github.io/wrapping-editor/library
