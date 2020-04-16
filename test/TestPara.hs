@@ -40,7 +40,7 @@ allTests = [
        commonParser
        examplePara
        ([],
-        "This is a test ",
+        ("This is a test ",0,0),
         ["paragraph to ma",
          "ke sure that pa",
          "ragraph-related",
@@ -55,7 +55,7 @@ allTests = [
          "paragraph to ma",
          "ke sure that pa",
          "ragraph-related"],
-        " things work as",
+        (" things work as",0,60),
         [" they are suppo",
          "sed to."]) $
         repeatAction 4 (moveParaCursor MoveDown)),
@@ -68,14 +68,14 @@ allTests = [
          "ragraph-related",
          " things work as",
          " they are suppo"],
-        "sed to.",
+        ("sed to.",7,97),
         []) $
         repeatAction 20 (moveParaCursor MoveDown)),
     ("move cursor above top", checkParaStructure
        commonParser
        examplePara
        ([],
-        "This is a test ",
+        ("This is a test ",0,0),
         ["paragraph to ma",
          "ke sure that pa",
          "ragraph-related",
@@ -87,7 +87,7 @@ allTests = [
        commonParser
        examplePara
        ([],
-        "XYZThis is a te",
+        ("XYZThis is a te",3,3),
         ["st paragraph to",
          " make sure that",
          " paragraph-rela",
@@ -108,7 +108,7 @@ allTests = [
          "ragraph-related",
          " things work as",
          " they are suppo"],
-        "sed to.XYZ",
+        ("sed to.XYZ",10,100),
         []) $
        composeActions [
            repeatAction 7 (moveParaCursor MoveDown),
@@ -119,7 +119,7 @@ allTests = [
        examplePara
        (["This is a test ",
          "paragraph to ma"],
-        "ke sure that pa",
+        ("ke sure that pa",0,30),
         ["ragraph-related",
          " things work as",
          " they are suppo",
@@ -130,7 +130,7 @@ allTests = [
        examplePara
        (["This is a test ",
          "paragraph to ma"],
-        "ke sure that pa",
+        ("ke sure that pa",15,45),
         ["ragraph-related",
          " things work as",
          " they are suppo",
@@ -143,7 +143,7 @@ allTests = [
        commonParser
        examplePara
        ([],
-        "XYZThis is a te",
+        ("XYZThis is a te",3,3),
         ["st paragraph to",
          " make sure that",
          " paragraph-rela",
@@ -165,7 +165,7 @@ allTests = [
          "ragraph-related",
          " things work as",
          " they are suppo"],
-        "sed to.XYZ",
+        ("sed to.XYZ",10,100),
         []) $
        composeActions [
            repeatAction 5 (moveParaCursor MoveDown),
@@ -180,7 +180,7 @@ allTests = [
          "paragraph to ma",
          "ke sure that pa",
          "ragraph-related"],
-        " thiXYZngs work",
+        (" thiXYZngs work",7,67),
         [" as they are su",
          "pposed to."]) $
        composeActions [
@@ -192,7 +192,7 @@ allTests = [
        commonParser
        examplePara
        ([],
-        "his is a test p",
+        ("his is a test p",0,0),
         ["aragraph to mak",
          "e sure that par",
          "agraph-related ",
@@ -207,7 +207,7 @@ allTests = [
        commonParser
        examplePara
        ([],
-        "This is a test ",
+        ("This is a test ",0,0),
         ["paragraph to ma",
          "ke sure that pa",
          "ragraph-related",
@@ -227,7 +227,7 @@ allTests = [
          "ragraph-related",
          " things work as",
          " they are suppo"],
-        "sed to",
+        ("sed to",6,96),
         []) $
        composeActions [
            seekParaBack,
@@ -242,7 +242,7 @@ allTests = [
          "ragraph-related",
          " things work as",
          " they are suppo"],
-        "sed to.",
+        ("sed to.",7,97),
         []) $
        composeActions [
            seekParaBack,
@@ -254,7 +254,7 @@ allTests = [
        (["This is a test ",
          "paragraph to ma",
          "ke sure that pa"],
-        "ragraph-relate ",
+        ("ragraph-relate ",14,59),
         ["things work as ",
          "they are suppos",
          "ed to."]) $
@@ -262,20 +262,20 @@ allTests = [
            repeatAction 4 (moveParaCursor MoveDown),
            modifyPara commonParser DeleteText EditBefore
          ]),
-    ("delete after line end", checkParaStructure
+    ("delete after line back", checkParaStructure
        commonParser
        examplePara
        (["This is a test ",
          "paragraph to ma",
          "ke sure that pa"],
-        "ragraph-relate ",
+        ("ragraph-related",15,60),
         ["things work as ",
          "they are suppos",
          "ed to."]) $
        composeActions [
            repeatAction 4 (moveParaCursor MoveDown),
            moveParaCursor MovePrev,
-           modifyPara commonParser DeleteText EditBefore
+           modifyPara commonParser DeleteText EditAfter
          ]),
     ("split paragraph middle", do
        let para = repeatAction 3 (moveParaCursor MoveDown) $
@@ -314,7 +314,7 @@ allTests = [
          " is a test para",
          "graph to make s",
          "ure that paragr"],
-        "aphXYZ-related ",
+        ("aphXYZ-related ",6,81),
         ["things work as ",
          "they are suppos",
          "ed to."]) $
@@ -330,7 +330,7 @@ allTests = [
        (["This is a test ",
          "paragraph to ma",
          "ke sure that pa"],
-        "ragraphXYZ-rela",
+        ("ragraphXYZ-rela",10,55),
         ["ted things work",
           " as they are su",
           "pposed to. This",
@@ -354,13 +354,17 @@ checkParaEdit p x y f = do
   let restored = unparsePara edit
   checkCondition (show restored) (restored == y)
 
-checkParaStructure p x (yb,yl,ya) f = do
+checkParaStructure p x (yb,(yl,c,e),ya) f = do
   let edit = f $ editPara p x
   let before = map vlText $ viewBeforeLines $ getBeforeLines edit
   let line = vlText $ getCurrentLine edit
   let after = map vlText $ viewAfterLines $ getAfterLines edit
+  let cursor = getParaCursorChar edit
+  let point = getParaEditChar edit
   checkConditions [
       ("Before: " ++ show before,before == yb),
-      ("Line: " ++ show line,    line == yl),
-      ("After: " ++ show after,  after == ya)
+      ("Line: "   ++ show line,  line == yl),
+      ("After: "  ++ show after, after == ya),
+      ("Cursor: " ++ show cursor,cursor == c),
+      ("Edit: "   ++ show point, point == e)
     ]
