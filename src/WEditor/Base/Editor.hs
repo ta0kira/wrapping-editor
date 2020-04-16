@@ -60,9 +60,9 @@ class FixedFontEditor a c | a -> c where
   getCursor :: a -> (Int,Int)
   -- | Get the absolute (paragraph,char) edit position.
   --
-  --   The position can be restored after cursor movements with 'moveCursor';
-  --   however, calling 'editText' invalidates this position. Thus, it should
-  --   not be relied on for automated document editing.
+  --   The position can be restored after cursor movements by calling
+  --   'setEditPoint'; however, calling 'editText' or 'breakPara' invalidates
+  --   this position.
   getEditPoint :: a -> (Int,Int)
   -- | Set the absolute (paragraph,char) edit position.
   setEditPoint :: a -> (Int,Int) -> a
