@@ -76,8 +76,8 @@ dumpWrappingEditor = map upText . doWrappingEditor exportData
 
 -- | Render the editor as a 'Widget'.
 renderWrappingEditor :: (Ord n, Show n) => Bool -> WrappingEditor Char n -> Widget n
-renderWrappingEditor focus editor = doWrappingEditor edit editor where
-  edit e = Widget Greedy Greedy $ do
+renderWrappingEditor focus editor = doWrappingEditor view editor where
+  view e = Widget Greedy Greedy $ do
     ctx <- getContext
     let width = ctx^.availWidthL
     let height = ctx^.availHeightL
@@ -98,7 +98,7 @@ handleWrappingEditor :: (Eq n) => WrappingEditor Char n -> Event -> EventM n (Wr
 handleWrappingEditor editor event = do
   extent <- lookupExtent (getName editor)
   return $ mapWrappingEditor (action . resizeAction extent) editor where
-    action :: EditorAction Char
+    action :: WrappingEditorAction Char
     action =
       case event of
            EvKey KBS []       -> editorBackspaceAction
