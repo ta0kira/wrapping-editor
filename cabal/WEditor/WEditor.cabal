@@ -10,7 +10,7 @@ description:
   .
   * Dynamic line wrapping that preserves the cursor and edit positions.
   * Customizable line-wrapping policies and word-hyphenation policies.
-  * Automatic management of a fixed-size viewable area.
+  * Automatic management of a dynamically-sized viewable area.
   * Support for novel character types.
 
 homepage:            https://github.com/ta0kira/wrapping-editor
