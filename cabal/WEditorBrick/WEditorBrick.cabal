@@ -40,3 +40,19 @@ library
                        WEditor >= 0.1 && < 0.2
 
   default-language:    Haskell2010
+
+
+executable brick-example
+  hs-source-dirs:      example
+
+  main-is:             brick-example.hs
+
+  ghc-options:         -threaded
+
+  build-depends:       base,
+                       brick,
+                       vty,
+                       WEditorBrick,
+                       WEditor
+
+  default-language:    Haskell2010

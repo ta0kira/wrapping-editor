@@ -48,7 +48,8 @@ See [brick-example.hs][brick-example.hs] for an example program that uses
 You can run the example with:
 
 ```shell
-ghc -threaded example/brick-example.hs && example/brick-example README.md
+ghc -threaded example/WEditorBrick/brick-example.hs
+example/WEditorBrick/brick-example README.md
 ```
 
 Press `Esc` to exit when you are finished. The final contents of the editor will
