@@ -9,3 +9,5 @@
 * **[breaking]** Shortens function names in the `WrappingEditor` module.
 
 * **[new]** Adds `updateEditorExtent` to better support custom event-handlers.
+
+* **[new]** Adds key bindings for vertical scrolling actions.

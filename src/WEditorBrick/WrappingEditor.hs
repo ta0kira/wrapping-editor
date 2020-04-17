@@ -107,6 +107,16 @@ updateEditorExtent editor = do
     resize  _ = id
 
 -- | Update the editor based on Brick events.
+--
+--   In addition to the canonical typing events, this editor also supports:
+--
+--     * `PageUp`, `PageDown`, `Home`, and `End` keys.
+--     * `Alt`+`Up` shifts the view upward one line.
+--     * `Alt`+`Down` shifts the view downward one line.
+--     * `Alt`+`Home` shifts the view to hide empty space at the bottom.
+--
+--   To disable over override any of these keys, intercept them in the main
+--   handler for the `App`.
 handleEditor :: Eq n => WrappingEditor Char n -> Event -> EventM n (WrappingEditor Char n)
 handleEditor editor event = do
   extent <- lookupExtent (getName editor)
@@ -114,17 +124,20 @@ handleEditor editor event = do
     action :: WrappingEditorAction Char
     action =
       case event of
-           EvKey KBS []       -> editorBackspaceAction
-           EvKey KDel []      -> editorDeleteAction
-           EvKey KDown []     -> editorDownAction
-           EvKey KEnd []      -> editorEndAction
-           EvKey KEnter []    -> editorEnterAction
-           EvKey KHome []     -> editorHomeAction
-           EvKey KLeft []     -> editorLeftAction
-           EvKey KPageDown [] -> editorPageDownAction
-           EvKey KPageUp []   -> editorPageUpAction
-           EvKey KRight []    -> editorRightAction
-           EvKey KUp []       -> editorUpAction
+           EvKey KBS []        -> editorBackspaceAction
+           EvKey KDel []       -> editorDeleteAction
+           EvKey KDown []      -> editorDownAction
+           EvKey KEnd []       -> editorEndAction
+           EvKey KEnter []     -> editorEnterAction
+           EvKey KHome []      -> editorHomeAction
+           EvKey KLeft []      -> editorLeftAction
+           EvKey KPageDown []  -> editorPageDownAction
+           EvKey KPageUp []    -> editorPageUpAction
+           EvKey KRight []     -> editorRightAction
+           EvKey KUp []        -> editorUpAction
+           EvKey KDown [MMeta] -> viewerShiftDownAction 1
+           EvKey KUp [MMeta]   -> viewerShiftUpAction   1
+           EvKey KHome [MMeta] -> viewerFillAction
            EvKey (KChar c) [] | not (c `elem` "\t\r\n") -> editorAppendAction [c]
            _ -> id
 
