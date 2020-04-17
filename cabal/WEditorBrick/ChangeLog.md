@@ -7,3 +7,5 @@
 ## 0.2.0.0  -- ????-??-??
 
 * **[breaking]** Shortens function names in the `WrappingEditor` module.
+
+* **[new]** Adds `updateEditorExtent` to better support custom event-handlers.

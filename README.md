@@ -69,7 +69,8 @@ You can customize the widget using the following helper functions from the
 
 - [**`mapEditor`**][mapEditor] allows you to transform the editor with
   `FixedFontEditor` and `FixedFontViewer` functions, e.g., calling editing
-  actions in a custom event handler.
+  actions in a custom event handler. (If you use a custom event handler, call
+  [`updateEditorExtent`][updateEditorExtent] *before* applying editor actions.)
 
 ## Using the Basic Editor
 
@@ -149,15 +150,16 @@ will likely be modified to support other character types.
 [issues]: https://github.com/ta0kira/wrapping-editor/issues
 [library-doc]: https://ta0kira.github.io/wrapping-editor/library
 
-[breakExact]: https://ta0kira.github.io/wrapping-editor/library/WEditor-LineWrap.html#v:breakExact
-[breakWords]: https://ta0kira.github.io/wrapping-editor/library/WEditor-LineWrap.html#v:breakWords
-[doEditor]: https://ta0kira.github.io/wrapping-editor/library/WEditorBrick-WrappingEditor.html#v:doEditor
 [FixedFontParser]: https://ta0kira.github.io/wrapping-editor/library/WEditor-Base-Parser.html#t:FixedFontParser
-[genericEditor]: https://ta0kira.github.io/wrapping-editor/library/WEditorBrick-WrappingEditor.html#v:genericEditor
 [HyphenChar]: https://ta0kira.github.io/wrapping-editor/library/WEditor-Base-Char.html#t:HyphenChar
-[lazyHyphen]:  https://ta0kira.github.io/wrapping-editor/library/WEditor-LineWrap.html#v:lazyHyphen
-[mapEditor]: https://ta0kira.github.io/wrapping-editor/library/WEditorBrick-WrappingEditor.html#v:mapEditor
-[noHyphen]: https://ta0kira.github.io/wrapping-editor/library/WEditor-LineWrap.html#v:noHyphen
 [WordChar]: https://ta0kira.github.io/wrapping-editor/library/WEditor-Base-Char.html#t:WordChar
 [WordSplitter]: https://ta0kira.github.io/wrapping-editor/library/WEditor-LineWrap.html#t:WordSplitter
 [WrappingEditor]: https://ta0kira.github.io/wrapping-editor/library/WEditorBrick-WrappingEditor.html#t:WrappingEditor
+[breakExact]: https://ta0kira.github.io/wrapping-editor/library/WEditor-LineWrap.html#v:breakExact
+[breakWords]: https://ta0kira.github.io/wrapping-editor/library/WEditor-LineWrap.html#v:breakWords
+[doEditor]: https://ta0kira.github.io/wrapping-editor/library/WEditorBrick-WrappingEditor.html#v:doEditor
+[genericEditor]: https://ta0kira.github.io/wrapping-editor/library/WEditorBrick-WrappingEditor.html#v:genericEditor
+[lazyHyphen]:  https://ta0kira.github.io/wrapping-editor/library/WEditor-LineWrap.html#v:lazyHyphen
+[mapEditor]: https://ta0kira.github.io/wrapping-editor/library/WEditorBrick-WrappingEditor.html#v:mapEditor
+[noHyphen]: https://ta0kira.github.io/wrapping-editor/library/WEditor-LineWrap.html#v:noHyphen
+[updateEditorExtent]: https://ta0kira.github.io/wrapping-editor/library/WEditorBrick-WrappingEditor.html#v:updateEditorExtent

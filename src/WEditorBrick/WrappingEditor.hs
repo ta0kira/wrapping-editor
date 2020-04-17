@@ -37,6 +37,7 @@ module WEditorBrick.WrappingEditor (
   mapEditor,
   newEditor,
   renderEditor,
+  updateEditorExtent,
 ) where
 
 import Brick.Main
@@ -93,11 +94,23 @@ renderEditor focus editor = doEditor view editor where
       strFill w cs = str $ take w $ cs ++ repeat ' '
       lineFill w h ls = take h $ ls ++ repeat (strFill w "")
 
+-- | Updates the viewport size based on the most-recent rendering of the editor.
+--
+--   Call this before any custom event-handling logic so that the viewport is
+--   the correct size. This will ensure that vertical cursor movements match
+--   what the user expects.
+updateEditorExtent :: Eq n => WrappingEditor c n -> (EventM n (WrappingEditor c n))
+updateEditorExtent editor = do
+  extent <- lookupExtent (getName editor)
+  return $ mapEditor (resize extent) editor where
+    resize (Just ext) | snd (extentSize ext) > 0 = viewerResizeAction (extentSize ext)
+    resize  _ = id
+
 -- | Update the editor based on Brick events.
-handleEditor :: (Eq n) => WrappingEditor Char n -> Event -> EventM n (WrappingEditor Char n)
+handleEditor :: Eq n => WrappingEditor Char n -> Event -> EventM n (WrappingEditor Char n)
 handleEditor editor event = do
   extent <- lookupExtent (getName editor)
-  return $ mapEditor (action . resizeAction extent) editor where
+  updateEditorExtent editor >>= return . mapEditor action where
     action :: WrappingEditorAction Char
     action =
       case event of
@@ -114,8 +127,6 @@ handleEditor editor event = do
            EvKey KUp []       -> editorUpAction
            EvKey (KChar c) [] | not (c `elem` "\t\r\n") -> editorAppendAction [c]
            _ -> id
-    resizeAction (Just ext) | snd (extentSize ext) > 0 = viewerResizeAction (extentSize ext)
-    resizeAction  _ = id
 
 -- | Editor widget for use with Brick.
 data WrappingEditor c n =
