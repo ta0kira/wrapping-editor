@@ -94,7 +94,7 @@ renderEditor focus editor = doEditor view editor where
       strFill w cs = str $ take w $ cs ++ repeat ' '
       lineFill w h ls = take h $ ls ++ repeat (strFill w "")
 
--- | Updates the viewport size based on the most-recent rendering of the editor.
+-- | Update the viewport size based on the most-recent rendering of the editor.
 --
 --   Call this before any custom event-handling logic so that the viewport is
 --   the correct size. This will ensure that vertical cursor movements match
@@ -108,7 +108,7 @@ updateEditorExtent editor = do
 
 -- | Update the editor based on Brick events.
 --
---   In addition to the canonical typing events, this editor also supports:
+--   In addition to the canonical typing events, this handler also supports:
 --
 --     * `PageUp`, `PageDown`, `Home`, and `End` keys.
 --     * `Alt`+`Up` shifts the view upward one line.

@@ -276,7 +276,7 @@ setDocEditPoint (p,c) = setEditChar c . setEditPara p
 updateDocView :: ViewAction -> EditingDocument c -> EditingDocument c
 updateDocView _ da@(EditingDocument _ _ _ _ h _ _ _) | h <= 0 = da
 updateDocView FillView da@(EditingDocument bs e as w h k c p) = revised where
-  revised = EditingDocument bs e as w h (boundOffset h k2) c p
+  revised = EditingDocument bs e as w h (boundOffset h (min before k2)) c p
   before = paraLinesBefore da
   after  = paraLinesAfter  da
   k2 = if after >= h-k-1  -- The view is already full.
