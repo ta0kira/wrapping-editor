@@ -169,33 +169,31 @@ resizeHeight :: Int -> EditingDocument c -> EditingDocument c
 resizeHeight h da@(EditingDocument bs e as w _ k c p) =
   (EditingDocument bs e as w h offset c p) where
     offset
-      | h < 1 = paraLinesBefore da
+      | h < 1     = length $ catLinesBefore $ getBeforeLines e:bs
       | otherwise = boundOffset h $ min (paraLinesBefore da) k
 
 paraLinesBefore :: EditingDocument c -> Int
-paraLinesBefore (EditingDocument bs e _ _ _ _ _ _) = total where
-  total = countLinesBefore bs'
+paraLinesBefore (EditingDocument bs e _ _ h _ _ _) = total where
+  total = countLinesBefore h bs'
   bs' = getBeforeLines e:bs
 
 paraLinesAfter :: EditingDocument c -> Int
-paraLinesAfter (EditingDocument _ e as _ _ _ _ _) = total where
-  total = countLinesAfter as'
+paraLinesAfter (EditingDocument _ e as _ h _ _ _) = total where
+  total = countLinesAfter h as'
   as' = getAfterLines e:as
 
 getVisibleLines :: EditingDocument c -> [[c]]
 getVisibleLines (EditingDocument bs e as _ h k _ p) = visible where
   visible = map (renderLine p) $ bs2 ++ [e2] ++ as2
-  bs2 = takeLinesBefore getBefore before
+  bs2
+    | h < 1     = reverse $ catLinesBefore before
+    | otherwise = reverse $ take (boundOffset h k) $ catLinesBefore before
   e2 = getCurrentLine e
-  as2 = takeLinesAfter getAfter after
+  as2
+    | h < 1     = catLinesAfter after
+    | otherwise = take (h-length bs2-1) $ catLinesAfter after
   before = getBeforeLines e:bs
   after = getAfterLines e:as
-  getBefore
-    | h < 1 = countLinesBefore before
-    | otherwise = boundOffset h k
-  getAfter
-    | h < 1 = countLinesAfter after
-    | otherwise = h-length bs2-1
 
 moveDocCursor :: MoveDirection -> EditingDocument c -> EditingDocument c
 moveDocCursor d da@(EditingDocument bs e as w h k c p) = revised where

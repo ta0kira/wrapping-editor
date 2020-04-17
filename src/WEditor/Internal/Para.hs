@@ -28,6 +28,8 @@ module WEditor.Internal.Para (
   appendToPara,
   atParaBack,
   atParaFront,
+  catLinesAfter,
+  catLinesBefore,
   countLinesAfter,
   countLinesBefore,
   editPara,
@@ -50,8 +52,6 @@ module WEditor.Internal.Para (
   setParaCursorChar,
   setParaEditChar,
   splitPara,
-  takeLinesAfter,
-  takeLinesBefore,
   unparsePara,
   unparseParaAfter,
   unparseParaBefore,
@@ -148,19 +148,17 @@ getCurrentLine = viewLine . epEditing
 getAfterLines :: EditingPara c b -> VisibleParaAfter c b
 getAfterLines = VisibleParaAfter . epAfter
 
-takeLinesBefore :: Int -> [VisibleParaBefore c b] -> [VisibleLine c b]
-takeLinesBefore n = reverse . take n . concat . map vpbLines
+catLinesBefore :: [VisibleParaBefore c b] -> [VisibleLine c b]
+catLinesBefore = concat . map vpbLines
 
-takeLinesAfter :: Int -> [VisibleParaAfter c b] -> [VisibleLine c b]
-takeLinesAfter n = take n . concat . map vpaLines
+catLinesAfter :: [VisibleParaAfter c b] -> [VisibleLine c b]
+catLinesAfter = concat . map vpaLines
 
--- TODO: Add an upper bound, to avoid unnecessary traversal.
-countLinesBefore :: [VisibleParaBefore c b] -> Int
-countLinesBefore = length . concat . map vpbLines
+countLinesBefore :: Int -> [VisibleParaBefore c b] -> Int
+countLinesBefore n = length . take n . catLinesBefore
 
--- TODO: Add an upper bound, to avoid unnecessary traversal.
-countLinesAfter :: [VisibleParaAfter c b] -> Int
-countLinesAfter = length . concat . map vpaLines
+countLinesAfter :: Int -> [VisibleParaAfter c b] -> Int
+countLinesAfter n = length . take n . catLinesAfter
 
 getParaCursorLine :: EditingPara c b -> Int
 getParaCursorLine = length . epBefore
