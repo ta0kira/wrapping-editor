@@ -40,13 +40,12 @@ handleEventsWith handler x (VtyEvent e) = continue =<< handler x e
 
 -- An app containing nothing but a single editor widget.
 app = App {
-  -- renderWrappingEditor renders the current editor in a viewport with the same
-  -- name as the editor. True means that the editor has focus.
-  appDraw = \edit -> [renderWrappingEditor True edit],
+  -- renderEditor renders the current editor in a viewport with the same name as
+  -- the editor. True means that the editor has focus.
+  appDraw = \edit -> [renderEditor True edit],
   appChooseCursor = const listToMaybe,
-  -- handleWrappingEditor handles editor events such as cursor movements and
-  -- typing actions.
-  appHandleEvent = handleEventsWith handleWrappingEditor,
+  -- handleEditor handles editor events such as cursor movements and typing.
+  appHandleEvent = handleEventsWith handleEditor,
   appStartEvent = return,
   appAttrMap = const (attrMap defAttr [])
 }
@@ -55,11 +54,11 @@ app = App {
 -- NOTE: This *doesn't* modify the contents of the file.
 fakeEditFile f = do
   contents <- fmap lines $ readFile f
-  -- newWrappingEditor creates an editor object. breakWords is semi-aware of
-  -- words, and lazyHyphen performs hyphenation.
-  let editor = newWrappingEditor (breakWords lazyHyphen) "editor" contents
-  -- dumpWrappingEditor extracts the editor's contents.
-  modified <- defaultMain app editor >>= return . dumpWrappingEditor
+  -- newEditor creates an editor object. breakWords is semi-aware of words, and
+  -- lazyHyphen performs hyphenation.
+  let editor = newEditor (breakWords lazyHyphen) "editor" contents
+  -- dumpEditor extracts the editor's contents.
+  modified <- defaultMain app editor >>= return . dumpEditor
   return $ unlines modified
 
 main = do

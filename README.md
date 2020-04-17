@@ -58,18 +58,18 @@ be sent to `stdout` without modifying the file.
 You can customize the widget using the following helper functions from the
 `WrappingEditor` module:
 
-- [**`doWrappingEditor`**][doWrappingEditor] allows you to use `FixedFontEditor`
-  and `FixedFontViewer` functions to extract info from the editor, e.g., for
-  custom rendering.
+- [**`doEditor`**][doEditor] allows you to use `FixedFontEditor` and
+  `FixedFontViewer` functions to extract info from the editor, e.g., for custom
+  rendering.
 
-- [**`genericWrappingEditor`**][genericWrappingEditor] allows you to use any
-  custom editor component that instantiates both `FixedFontEditor` and
-  `FixedFontViewer`, e.g., an editor for a custom character type. (You might
-  also need custom rendering and event handling.)
+- [**`genericEditor`**][genericEditor] allows you to use any custom editor
+  component that instantiates both `FixedFontEditor` and `FixedFontViewer`,
+  e.g., an editor for a custom character type. (You might also need custom
+  rendering and event handling.)
 
-- [**`mapWrappingEditor`**][mapWrappingEditor] allows you to transform the
-  editor with `FixedFontEditor` and `FixedFontViewer` functions, e.g., calling
-  editing actions in a custom event handler.
+- [**`mapEditor`**][mapEditor] allows you to transform the editor with
+  `FixedFontEditor` and `FixedFontViewer` functions, e.g., calling editing
+  actions in a custom event handler.
 
 ## Using the Basic Editor
 
@@ -151,12 +151,12 @@ will likely be modified to support other character types.
 
 [breakExact]: https://ta0kira.github.io/wrapping-editor/library/WEditor-LineWrap.html#v:breakExact
 [breakWords]: https://ta0kira.github.io/wrapping-editor/library/WEditor-LineWrap.html#v:breakWords
-[doWrappingEditor]: https://ta0kira.github.io/wrapping-editor/library/WEditorBrick-WrappingEditor.html#v:doWrappingEditor
+[doEditor]: https://ta0kira.github.io/wrapping-editor/library/WEditorBrick-WrappingEditor.html#v:doEditor
 [FixedFontParser]: https://ta0kira.github.io/wrapping-editor/library/WEditor-Base-Parser.html#t:FixedFontParser
-[genericWrappingEditor]: https://ta0kira.github.io/wrapping-editor/library/WEditorBrick-WrappingEditor.html#v:genericWrappingEditor
+[genericEditor]: https://ta0kira.github.io/wrapping-editor/library/WEditorBrick-WrappingEditor.html#v:genericEditor
 [HyphenChar]: https://ta0kira.github.io/wrapping-editor/library/WEditor-Base-Char.html#t:HyphenChar
 [lazyHyphen]:  https://ta0kira.github.io/wrapping-editor/library/WEditor-LineWrap.html#v:lazyHyphen
-[mapWrappingEditor]: https://ta0kira.github.io/wrapping-editor/library/WEditorBrick-WrappingEditor.html#v:mapWrappingEditor
+[mapEditor]: https://ta0kira.github.io/wrapping-editor/library/WEditorBrick-WrappingEditor.html#v:mapEditor
 [noHyphen]: https://ta0kira.github.io/wrapping-editor/library/WEditor-LineWrap.html#v:noHyphen
 [WordChar]: https://ta0kira.github.io/wrapping-editor/library/WEditor-Base-Char.html#t:WordChar
 [WordSplitter]: https://ta0kira.github.io/wrapping-editor/library/WEditor-LineWrap.html#t:WordSplitter

@@ -3,3 +3,7 @@
 ## 0.1.0.0  -- 2020-04-14
 
 * First version. Released on an unsuspecting world.
+
+## 0.2.0.0  -- ????-??-??
+
+* **[breaking]** Shortens function names in the `WrappingEditor` module.

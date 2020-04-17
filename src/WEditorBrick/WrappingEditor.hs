@@ -30,13 +30,13 @@ module WEditorBrick.WrappingEditor (
   WrappingEditor,
   WrappingEditorAction,
   WrappingEditorDoer,
-  doWrappingEditor,
-  dumpWrappingEditor,
-  genericWrappingEditor,
-  handleWrappingEditor,
-  mapWrappingEditor,
-  newWrappingEditor,
-  renderWrappingEditor,
+  doEditor,
+  dumpEditor,
+  genericEditor,
+  handleEditor,
+  mapEditor,
+  newEditor,
+  renderEditor,
 ) where
 
 import Brick.Main
@@ -49,34 +49,34 @@ import WEditor.Document
 
 
 -- | Create a new 'WrappingEditor' using the default editor component.
-newWrappingEditor :: FixedFontParser a c => a -> n -> [[c]] -> WrappingEditor c n
-newWrappingEditor b n cs = genericWrappingEditor n $ editDocument b $ map UnparsedPara cs
+newEditor :: FixedFontParser a c => a -> n -> [[c]] -> WrappingEditor c n
+newEditor b n cs = genericEditor n $ editDocument b $ map UnparsedPara cs
 
 -- | Create a new 'WrappingEditor' using a custom editor component.
-genericWrappingEditor :: (FixedFontViewer a c, FixedFontEditor a c) => n -> a -> WrappingEditor c n
-genericWrappingEditor = WrappingEditor
+genericEditor :: (FixedFontViewer a c, FixedFontEditor a c) => n -> a -> WrappingEditor c n
+genericEditor = WrappingEditor
 
 -- | Any action that updates the editor state.
 type WrappingEditorAction c = forall a. (FixedFontViewer a c, FixedFontEditor a c) => a -> a
 
 -- | Update the editor state.
-mapWrappingEditor :: WrappingEditorAction c -> WrappingEditor c n -> WrappingEditor c n
-mapWrappingEditor f (WrappingEditor name editor) = WrappingEditor name (f editor)
+mapEditor :: WrappingEditorAction c -> WrappingEditor c n -> WrappingEditor c n
+mapEditor f (WrappingEditor name editor) = WrappingEditor name (f editor)
 
 -- | Any action that reads the editor state.
 type WrappingEditorDoer c b = forall a. (FixedFontViewer a c, FixedFontEditor a c) => a -> b
 
 -- | Read from the editor state.
-doWrappingEditor :: WrappingEditorDoer c b -> WrappingEditor c n -> b
-doWrappingEditor f (WrappingEditor _ editor) = f editor
+doEditor :: WrappingEditorDoer c b -> WrappingEditor c n -> b
+doEditor f (WrappingEditor _ editor) = f editor
 
 -- | Dump the final contents of the edited document.
-dumpWrappingEditor :: WrappingEditor c n -> [[c]]
-dumpWrappingEditor = map upText . doWrappingEditor exportData
+dumpEditor :: WrappingEditor c n -> [[c]]
+dumpEditor = map upText . doEditor exportData
 
 -- | Render the editor as a 'Widget'.
-renderWrappingEditor :: (Ord n, Show n) => Bool -> WrappingEditor Char n -> Widget n
-renderWrappingEditor focus editor = doWrappingEditor view editor where
+renderEditor :: (Ord n, Show n) => Bool -> WrappingEditor Char n -> Widget n
+renderEditor focus editor = doEditor view editor where
   view e = Widget Greedy Greedy $ do
     ctx <- getContext
     let width = ctx^.availWidthL
@@ -94,10 +94,10 @@ renderWrappingEditor focus editor = doWrappingEditor view editor where
       lineFill w h ls = take h $ ls ++ repeat (strFill w "")
 
 -- | Update the editor based on Brick events.
-handleWrappingEditor :: (Eq n) => WrappingEditor Char n -> Event -> EventM n (WrappingEditor Char n)
-handleWrappingEditor editor event = do
+handleEditor :: (Eq n) => WrappingEditor Char n -> Event -> EventM n (WrappingEditor Char n)
+handleEditor editor event = do
   extent <- lookupExtent (getName editor)
-  return $ mapWrappingEditor (action . resizeAction extent) editor where
+  return $ mapEditor (action . resizeAction extent) editor where
     action :: WrappingEditorAction Char
     action =
       case event of
