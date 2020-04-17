@@ -154,9 +154,11 @@ takeLinesBefore n = reverse . take n . concat . map vpbLines
 takeLinesAfter :: Int -> [VisibleParaAfter c b] -> [VisibleLine c b]
 takeLinesAfter n = take n . concat . map vpaLines
 
+-- TODO: Add an upper bound, to avoid unnecessary traversal.
 countLinesBefore :: [VisibleParaBefore c b] -> Int
 countLinesBefore = length . concat . map vpbLines
 
+-- TODO: Add an upper bound, to avoid unnecessary traversal.
 countLinesAfter :: [VisibleParaAfter c b] -> Int
 countLinesAfter = length . concat . map vpaLines
 

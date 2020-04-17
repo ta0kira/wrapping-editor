@@ -11,3 +11,7 @@
   block indentation) works properly when paragraph breaks are inserted. This
   does not affect compilation or behavior of code that isn't using custom
   line-wrapping policies.
+
+* **[breaking]** Adds vertical shifting of the viewable text area. This only
+  affects compilation of custom `FixedFontViewer`, and otherwise extends the
+  available functionality of existing code.

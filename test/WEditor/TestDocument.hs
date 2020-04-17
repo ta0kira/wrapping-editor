@@ -77,6 +77,63 @@ allTests = [
            editorPageUpAction,
            editorAppendAction "XYZ"
          ]),
+    ("fill view ignores already full", checkEditView
+       "original-long.txt"
+       "fill-noop-view.txt" $
+       composeActions [
+           editorPageDownAction,
+           repeatAction 4 editorDownAction,
+           viewerFillAction
+         ]),
+    ("fill view with short text", checkEditView
+       "original-short.txt"
+       "fill-short-view.txt" $
+       composeActions [
+           editorPageDownAction,
+           -- Manually shift the view up by one line.
+           editorUpAction,
+           editorDownAction,
+           viewerFillAction
+         ]),
+    ("fill view starting past end", checkEditView
+       "original-long.txt"
+       "fill-end-view.txt" $
+       composeActions [
+           repeatAction 5 editorPageDownAction,
+           repeatAction 2 editorUpAction,
+           viewerFillAction
+         ]),
+    ("shift view up within bounds", checkEditView
+       "original-long.txt"
+       "shift-up-bounded-view.txt" $
+       composeActions [
+           editorPageDownAction,
+           repeatAction 4 editorDownAction,
+           viewerShiftUpAction 4
+         ]),
+    ("shift view down within bounds", checkEditView
+       "original-long.txt"
+       "shift-down-bounded-view.txt" $
+       composeActions [
+           editorPageDownAction,
+           repeatAction 4 editorDownAction,
+           viewerShiftDownAction 4
+         ]),
+    ("shift view up past doc front", checkEditView
+       "original-long.txt"
+       "shift-up-unbounded-view.txt" $
+       composeActions [
+           repeatAction 4 editorDownAction,
+           viewerShiftUpAction 4
+         ]),
+    ("shift view down past doc back", checkEditView
+       "original-long.txt"
+       "shift-down-unbounded-view.txt" $
+       composeActions [
+           repeatAction 5 editorPageDownAction,
+           repeatAction 4 editorUpAction,
+           viewerShiftDownAction 7
+         ]),
     ("move previous at doc front", checkEditView
        "original-long.txt"
        "insert-front-view.txt" $

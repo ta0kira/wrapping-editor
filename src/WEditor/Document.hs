@@ -51,7 +51,10 @@ module WEditor.Document (
   editorRightAction,
   editorSetPositionAction,
   editorUpAction,
+  viewerFillAction,
   viewerResizeAction,
+  viewerShiftUpAction,
+  viewerShiftDownAction,
   -- <<< From Base
 ) where
 
@@ -61,6 +64,9 @@ import WEditor.Internal.Para
 
 
 -- | Generic document editor with a dynamic viewport.
+--
+--   This editor bounds vertical view scrolling (see 'ViewAction') to keep the
+--   cursor within view.
 data EditingDocument c =
   forall a. FixedFontParser a c => EditingDocument {
     edBefore :: [VisibleParaBefore c (BreakType a)],  -- Reversed.
@@ -108,6 +114,7 @@ instance FixedFontViewer (EditingDocument c) c where
     | otherwise = d
   getViewSize d = (edWidth d,edHeight d)
   getVisible = getVisibleLines
+  updateView = flip updateDocView
 
 instance FixedFontEditor (EditingDocument c) c where
   editText da m d = storeCursor $ modifyDoc m d da
@@ -162,13 +169,18 @@ resizeHeight :: Int -> EditingDocument c -> EditingDocument c
 resizeHeight h da@(EditingDocument bs e as w _ k c p) =
   (EditingDocument bs e as w h offset c p) where
     offset
-      | h < 1 = countLinesAbove da
-      | otherwise = boundOffset h $ min (countLinesAbove da) k
+      | h < 1 = paraLinesBefore da
+      | otherwise = boundOffset h $ min (paraLinesBefore da) k
 
-countLinesAbove :: EditingDocument c -> Int
-countLinesAbove (EditingDocument bs e _ _ _ _ _ _) = total where
+paraLinesBefore :: EditingDocument c -> Int
+paraLinesBefore (EditingDocument bs e _ _ _ _ _ _) = total where
   total = countLinesBefore bs'
   bs' = getBeforeLines e:bs
+
+paraLinesAfter :: EditingDocument c -> Int
+paraLinesAfter (EditingDocument _ e as _ _ _ _ _) = total where
+  total = countLinesAfter as'
+  as' = getAfterLines e:as
 
 getVisibleLines :: EditingDocument c -> [[c]]
 getVisibleLines (EditingDocument bs e as _ h k _ p) = visible where
@@ -260,3 +272,17 @@ setEditChar n (EditingDocument bs e as w h k c p) = EditingDocument bs (setParaE
 
 setDocEditPoint :: (Int,Int) -> EditingDocument c -> EditingDocument c
 setDocEditPoint (p,c) = setEditChar c . setEditPara p
+
+updateDocView :: ViewAction -> EditingDocument c -> EditingDocument c
+updateDocView _ da@(EditingDocument _ _ _ _ h _ _ _) | h <= 0 = da
+updateDocView FillView da@(EditingDocument bs e as w h k c p) = revised where
+  revised = EditingDocument bs e as w h (boundOffset h k2) c p
+  before = paraLinesBefore da
+  after  = paraLinesAfter  da
+  k2 = if after >= h-k-1  -- The view is already full.
+          then k
+          else h-after-1  -- k2+after=h-1, i.e., a full viewport.
+updateDocView (ShiftVertical n) da@(EditingDocument bs e as w h k c p) = revised where
+  revised = EditingDocument bs e as w h (boundOffset h k2) c p
+  before = paraLinesBefore da
+  k2 = min before (k-n)

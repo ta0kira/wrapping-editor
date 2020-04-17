@@ -25,21 +25,33 @@ limitations under the License.
 
 module WEditor.Base.Viewer (
   FixedFontViewer(..),
+  ViewAction(..),
   ViewerAction,
+  viewerFillAction,
   viewerResizeAction,
+  viewerShiftUpAction,
+  viewerShiftDownAction,
 ) where
 
 
 -- | Generic editor viewport for fixed-width fonts.
 class FixedFontViewer a c | a -> c where
-  -- | Sets the (width,height) size of the viewport. A width < 0 must disable
+  -- | Set the (width,height) size of the viewport. A width < 0 must disable
   --   line wrapping, and a height < 0 must disable vertical bounding.
   setViewSize :: a -> (Int,Int) -> a
-  -- | Gets the (width,height) size of the viewport.
+  -- | Get the (width,height) size of the viewport.
   getViewSize :: a -> (Int,Int)
-  -- | Gets the visible lines in the viewport. This does not need to completely
+  -- | Get the visible lines in the viewport. This does not need to completely
   --   fill the viewport area, but it must not exceed it.
   getVisible :: a -> [[c]]
+  -- | Apply a view change.
+  updateView :: a -> ViewAction -> a
+
+-- | Actions that modify the view without affecting editing.
+data ViewAction =
+  ShiftVertical Int | -- ^ Shift the vertical offset. Negative values shift up.
+  FillView            -- ^ Attempt to fill the entire viewport.
+    deriving (Eq,Show)
 
 -- | Any action that updates a 'FixedFontViewer'.
 type ViewerAction c = forall a. FixedFontViewer a c => a -> a
@@ -47,3 +59,14 @@ type ViewerAction c = forall a. FixedFontViewer a c => a -> a
 -- | Action to resize the viewport.
 viewerResizeAction :: (Int,Int) -> ViewerAction c
 viewerResizeAction s v = setViewSize v s
+
+-- | Action to shift the view upward.
+viewerShiftUpAction :: Int -> ViewerAction c
+viewerShiftUpAction n v = updateView v (ShiftVertical (-n))
+
+-- | Action to shift the view downward.
+viewerShiftDownAction :: Int -> ViewerAction c
+viewerShiftDownAction n v = updateView v (ShiftVertical n)
+
+viewerFillAction :: ViewerAction c
+viewerFillAction v = updateView v FillView
