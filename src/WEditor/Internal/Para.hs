@@ -182,7 +182,7 @@ setParaEditChar k p
   | otherwise = p
 
 splitPara :: FixedFontParser a c => a -> EditingPara c (BreakType a) -> (UnparsedPara c,UnparsedPara c)
-splitPara parser (EditingPara bs l as _) = let (b,a) = splitLine (defaultBreak parser) l in
+splitPara parser (EditingPara bs l as _) = let (b,a) = splitLineAtCursor (splitLine parser) l in
   (unparseParaBefore $ VisibleParaBefore (b:bs) 0,
    unparseParaAfter  $ VisibleParaAfter  (a:as))
 

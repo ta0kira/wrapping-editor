@@ -32,8 +32,3 @@ data VisibleLine c b =
     vlText :: [c] -- ^ The complete data of the line.
   }
   deriving (Eq,Ord,Show)
-
--- | Break type that has a default.
-class DefaultBreak b where
-  -- | The default break for the break type.
-  defaultBreak :: b

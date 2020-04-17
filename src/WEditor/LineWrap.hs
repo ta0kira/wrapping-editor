@@ -154,9 +154,12 @@ instance (WordChar c, HyphenChar c) => WordSplitter (LazyHyphen c) c where
 
 instance FixedFontParser (BreakWords c) c where
   type BreakType (BreakWords c) = LineBreak
-  defaultBreak _ = lineBreakEnd
   setLineWidth (BreakWords _ s) w = BreakWords w s
   breakLines (BreakWords w s) = breakAllLines w s
+  splitLine _ k (VisibleLine b cs) =
+    (VisibleLine lineBreakEnd (take k cs),
+     VisibleLine b            (drop k cs))
+  emptyLine _ = VisibleLine lineBreakEnd []
   renderLine (BreakWords w _) (VisibleLine ParagraphEnd cs)
     | w < 1 = cs
     | otherwise = take w cs

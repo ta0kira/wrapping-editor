@@ -33,7 +33,7 @@ module WEditor.Internal.Line (
   moveLineCursor,
   prependToLine,
   setLineCursor,
-  splitLine,
+  splitLineAtCursor,
   viewLine,
 ) where
 
@@ -69,10 +69,9 @@ setLineCursor k e@(EditingLine bs as b) = EditingLine bs2 as2 b where
     | k > n && not (null as) = seek (n+1) (head as:bs) (tail as)
     | otherwise = (bs,as)
 
-splitLine :: b -> EditingLine c b -> (VisibleLine c b,VisibleLine c b)
-splitLine b0 (EditingLine bs as b) =
-  (VisibleLine b0 (reverse bs),
-   VisibleLine b as)
+splitLineAtCursor :: (Int -> VisibleLine c b -> (VisibleLine c b,VisibleLine c b))
+                  -> EditingLine c b -> (VisibleLine c b,VisibleLine c b)
+splitLineAtCursor f l@(EditingLine bs _ _) = f (length bs) (viewLine l)
 
 lineCursorMovable :: MoveDirection -> EditingLine c b -> Bool
 lineCursorMovable MovePrev (EditingLine (_:_) _ _) = True

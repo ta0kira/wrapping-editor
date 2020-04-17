@@ -26,7 +26,6 @@ limitations under the License.
 
 module WEditor.Base.Parser (
   FixedFontParser(..),
-  emptyLine,
 ) where
 
 import WEditor.Base.Line
@@ -36,8 +35,6 @@ import WEditor.Base.Line
 class FixedFontParser a c | a -> c where
   -- | Type used to differentiate between line-break types.
   type BreakType a :: *
-  -- | An acceptable fallback line-break type.
-  defaultBreak :: a -> BreakType a
   -- | Change the max line width used for parsing. A width of zero must result
   --   in breakLines skipping line breaks.
   setLineWidth :: a -> Int -> a
@@ -51,13 +48,17 @@ class FixedFontParser a c | a -> c where
   --   Implement 'renderLine' and 'tweakCursor' to make visual adjustments (such
   --   as adding hyphens or indentation) if necessary.
   breakLines :: a -> [c] -> [VisibleLine c (BreakType a)]
+  -- | A place-holder line for empty paragraphs.
+  emptyLine :: a -> VisibleLine c (BreakType a)
   -- | Render the line for viewing. Implement 'tweakCursor' if 'renderLine'
   --   changes the positions of any characters on the line.
   renderLine :: a -> VisibleLine c (BreakType a) -> [c]
   -- | Adjust the horizontal cursor position.
   tweakCursor :: a -> VisibleLine c (BreakType a) -> Int -> Int
   tweakCursor _ _ = id
-
--- | Create an empty line.
-emptyLine :: FixedFontParser a c => a -> VisibleLine c (BreakType a)
-emptyLine p = VisibleLine (defaultBreak p) []
+  -- | Split the line to create a paragraph break.
+  splitLine :: a
+            -> Int                           -- ^ Index to split at.
+            -> VisibleLine c (BreakType a)   -- ^ Line to split.
+            -> (VisibleLine c (BreakType a),
+                VisibleLine c (BreakType a)) -- ^ End of original paragraph and beginning of next paragraph.
