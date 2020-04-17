@@ -115,7 +115,7 @@ updateEditorExtent editor = do
 --     * `Alt`+`Down` shifts the view downward one line.
 --     * `Alt`+`Home` shifts the view to hide empty space at the bottom.
 --
---   To disable over override any of these keys, intercept them in the main
+--   To disable or override any of these keys, intercept them in the main
 --   handler for the `App`.
 handleEditor :: Eq n => WrappingEditor Char n -> Event -> EventM n (WrappingEditor Char n)
 handleEditor editor event = do
