@@ -86,15 +86,17 @@ paragraphs = map UnparsedPara $ lines $ "Your document contents."
 editor = editDocument (breakWords lazyHyphen) paragraphs
 
 -- 3a. Edit the document using actions from `Viewer` and `Editor`. Don't forget
--- to set the viewport size! If either dimension is < 1, the text will be
--- unbounded in that direction.
+--     to set the viewport size! If either dimension is < 1, the text will be
+--     unbounded in that direction.
 editor' = foldl (flip ($)) editor [
     viewerResizeAction (80,24),
-    editorDownAction,
+    editorEndAction,
     editorEnterAction,
     editorAppendAction "Here is a new paragraph.",
     -- Resizing while editing is fine.
-    viewerResizeAction (7,3)
+    viewerResizeAction (7,3),
+    -- Use this if you don't like scrolling below the last line.
+    viewerFillAction
   ]
 
 -- 3b. Get the viewport contents for display. This does not necessarily fill up
