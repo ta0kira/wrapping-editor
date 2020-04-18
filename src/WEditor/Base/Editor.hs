@@ -56,15 +56,15 @@ class FixedFontEditor a c | a -> c where
   breakPara :: a -> EditDirection -> a
   -- | Apply a cursor movement.
   moveCursor :: a -> MoveDirection -> a
-  -- | Get the (row,col) cursor position relative to the viewport.
+  -- | Get the @(row,col)@ cursor position relative to the viewport.
   getCursor :: a -> (Int,Int)
-  -- | Get the absolute (paragraph,char) edit position.
+  -- | Get the absolute @(paragraph,char)@ edit position.
   --
   --   The position can be restored after cursor movements by calling
   --   'setEditPoint'; however, calling 'editText' or 'breakPara' invalidates
   --   this position.
   getEditPoint :: a -> (Int,Int)
-  -- | Set the absolute (paragraph,char) edit position.
+  -- | Set the absolute @(paragraph,char)@ edit position.
   setEditPoint :: a -> (Int,Int) -> a
   -- | Get the number of characters in the current paragraph.
   getParaSize :: a -> Int
@@ -100,15 +100,15 @@ data MoveDirection =
 -- | Any action that updates a 'FixedFontEditor'.
 type EditorAction c = forall a. FixedFontEditor a c => a -> a
 
--- | Action for the Backspace key.
+-- | Action for the @Backspace@ key.
 editorBackspaceAction :: EditorAction c
 editorBackspaceAction e = editText e DeleteText EditBefore
 
--- | Action for the Delete key.
+-- | Action for the @Delete@ key.
 editorDeleteAction :: EditorAction c
 editorDeleteAction e = editText e DeleteText EditAfter
 
--- | Action for the Enter key.
+-- | Action for the @Enter@ key.
 editorEnterAction :: EditorAction c
 editorEnterAction e = breakPara e EditBefore
 
@@ -140,18 +140,18 @@ editorLeftAction e = moveCursor e MovePrev
 editorRightAction :: EditorAction c
 editorRightAction e = moveCursor e MoveNext
 
--- | Action for the Home key.
+-- | Action for the @Home@ key.
 editorHomeAction :: EditorAction c
 editorHomeAction e = moveCursor e MoveHome
 
--- | Action for the End key.
+-- | Action for the @End@ key.
 editorEndAction :: EditorAction c
 editorEndAction e = moveCursor e MoveEnd
 
--- | Action for the PageUp key.
+-- | Action for the @PageUp@ key.
 editorPageUpAction :: EditorAction c
 editorPageUpAction e = moveCursor e MovePageUp
 
--- | Action for the PageDown key.
+-- | Action for the @PageDown@ key.
 editorPageDownAction :: EditorAction c
 editorPageDownAction e = moveCursor e MovePageDown

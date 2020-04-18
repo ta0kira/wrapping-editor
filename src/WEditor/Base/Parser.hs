@@ -57,8 +57,13 @@ class FixedFontParser a c | a -> c where
   tweakCursor :: a -> VisibleLine c (BreakType a) -> Int -> Int
   tweakCursor _ _ = id
   -- | Split the line to create a paragraph break.
+  --
+  --   The following must hold for all possible inputs to a 'FixedFontParser'
+  --   `p`:
+  --
+  --   prop> let (b,t) = splitLine p l in vlText l == vlText b ++ vlText t
   splitLine :: a
             -> Int                           -- ^ Index to split at.
             -> VisibleLine c (BreakType a)   -- ^ Line to split.
             -> (VisibleLine c (BreakType a),
-                VisibleLine c (BreakType a)) -- ^ End of original paragraph and beginning of next paragraph.
+                VisibleLine c (BreakType a)) -- ^ New lines at @(bottom,top)@ of previous/next paragraphs.

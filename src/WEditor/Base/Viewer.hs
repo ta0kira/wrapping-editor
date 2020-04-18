@@ -36,10 +36,10 @@ module WEditor.Base.Viewer (
 
 -- | Generic editor viewport for fixed-width fonts.
 class FixedFontViewer a c | a -> c where
-  -- | Set the (width,height) size of the viewport. A width < 0 must disable
-  --   line wrapping, and a height < 0 must disable vertical bounding.
+  -- | Set the @(width,height)@ size of the viewport. Setting either to @<=0@
+  --   disables bounding in that dimension.
   setViewSize :: a -> (Int,Int) -> a
-  -- | Get the (width,height) size of the viewport.
+  -- | Get the @(width,height)@ size of the viewport.
   getViewSize :: a -> (Int,Int)
   -- | Get the visible lines in the viewport. This does not need to completely
   --   fill the viewport area, but it must not exceed it.
@@ -68,5 +68,6 @@ viewerShiftUpAction n v = updateView v (ShiftVertical (-n))
 viewerShiftDownAction :: Int -> ViewerAction c
 viewerShiftDownAction n v = updateView v (ShiftVertical n)
 
+-- | Action to attempt to fill the viewport.
 viewerFillAction :: ViewerAction c
 viewerFillAction v = updateView v FillView

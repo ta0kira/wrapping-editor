@@ -110,13 +110,13 @@ updateEditorExtent editor = do
 --
 --   In addition to the canonical typing events, this handler also supports:
 --
---     * `PageUp`, `PageDown`, `Home`, and `End` keys.
---     * `Alt`+`Up` shifts the view upward one line.
---     * `Alt`+`Down` shifts the view downward one line.
---     * `Alt`+`Home` shifts the view to hide empty space at the bottom.
+--     * @PageUp@, @PageDown@, @Home@, and @End@ keys.
+--     * @Alt@+@Up@ shifts the view upward one line.
+--     * @Alt@+@Down@ shifts the view downward one line.
+--     * @Alt@+@Home@ shifts the view to hide empty space at the bottom.
 --
 --   To disable or override any of these keys, intercept them in the main
---   handler for the `App`.
+--   handler for the 'App'.
 handleEditor :: Eq n => WrappingEditor Char n -> Event -> EventM n (WrappingEditor Char n)
 handleEditor editor event = do
   extent <- lookupExtent (getName editor)
