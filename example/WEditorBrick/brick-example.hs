@@ -34,7 +34,8 @@ import WEditor.LineWrap             -- For the line-wrapping policy.
 import WEditorBrick.WrappingEditor  -- For the wrapping editor Brick widget.
 
 
--- Delegate most events to a single handler.
+-- Delegate most events to a single handler. If you get annoyed by scrolling
+-- past the last line, you can apply mapEditor viewerFillAction before continue.
 handleEventsWith _ x (VtyEvent (EvKey KEsc [])) = halt x
 handleEventsWith handler x (VtyEvent e) = continue =<< handler x e
 
