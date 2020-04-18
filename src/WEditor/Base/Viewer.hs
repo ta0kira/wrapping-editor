@@ -35,17 +35,20 @@ module WEditor.Base.Viewer (
 
 
 -- | Generic editor viewport for fixed-width fonts.
-class FixedFontViewer a c | a -> c where
+--
+--     * @v@: Viewer type providing the operations.
+--     * @c@: Character type.
+class FixedFontViewer v c | v -> c where
   -- | Set the @(width,height)@ size of the viewport. Setting either to @<=0@
   --   disables bounding in that dimension.
-  setViewSize :: a -> (Int,Int) -> a
+  setViewSize :: v -> (Int,Int) -> v
   -- | Get the @(width,height)@ size of the viewport.
-  getViewSize :: a -> (Int,Int)
+  getViewSize :: v -> (Int,Int)
   -- | Get the visible lines in the viewport. This does not need to completely
   --   fill the viewport area, but it must not exceed it.
-  getVisible :: a -> [[c]]
+  getVisible :: v -> [[c]]
   -- | Apply a view change.
-  updateView :: a -> ViewAction -> a
+  updateView :: v -> ViewAction -> v
 
 -- | Actions that modify the view without affecting editing.
 data ViewAction =
@@ -54,7 +57,7 @@ data ViewAction =
     deriving (Eq,Show)
 
 -- | Any action that updates a 'FixedFontViewer'.
-type ViewerAction c = forall a. FixedFontViewer a c => a -> a
+type ViewerAction c = forall v. FixedFontViewer v c => v -> v
 
 -- | Action to resize the viewport.
 viewerResizeAction :: (Int,Int) -> ViewerAction c

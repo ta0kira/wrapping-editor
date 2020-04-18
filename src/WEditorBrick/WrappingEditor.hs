@@ -50,22 +50,22 @@ import WEditor.Document
 
 
 -- | Create a new 'WrappingEditor' using the default editor component.
-newEditor :: FixedFontParser a c => a -> n -> [[c]] -> WrappingEditor c n
+newEditor :: FixedFontParser p c => p -> n -> [[c]] -> WrappingEditor c n
 newEditor b n cs = genericEditor n $ editDocument b $ map UnparsedPara cs
 
 -- | Create a new 'WrappingEditor' using a custom editor component.
-genericEditor :: (FixedFontViewer a c, FixedFontEditor a c) => n -> a -> WrappingEditor c n
+genericEditor :: (FixedFontViewer e c, FixedFontEditor e c) => n -> e -> WrappingEditor c n
 genericEditor = WrappingEditor
 
 -- | Any action that updates the editor state.
-type WrappingEditorAction c = forall a. (FixedFontViewer a c, FixedFontEditor a c) => a -> a
+type WrappingEditorAction c = forall e. (FixedFontViewer e c, FixedFontEditor e c) => e -> e
 
 -- | Update the editor state.
 mapEditor :: WrappingEditorAction c -> WrappingEditor c n -> WrappingEditor c n
 mapEditor f (WrappingEditor name editor) = WrappingEditor name (f editor)
 
 -- | Any action that reads the editor state.
-type WrappingEditorDoer c b = forall a. (FixedFontViewer a c, FixedFontEditor a c) => a -> b
+type WrappingEditorDoer c b = forall e. (FixedFontViewer e c, FixedFontEditor e c) => e -> b
 
 -- | Read from the editor state.
 doEditor :: WrappingEditorDoer c b -> WrappingEditor c n -> b
@@ -143,9 +143,9 @@ handleEditor editor event = do
 
 -- | Editor widget for use with Brick.
 data WrappingEditor c n =
-  forall a. (FixedFontViewer a c, FixedFontEditor a c) => WrappingEditor {
+  forall e. (FixedFontViewer e c, FixedFontEditor e c) => WrappingEditor {
     weName :: n,
-    weEditor :: a
+    weEditor :: e
   }
 
 instance Show n => Show (WrappingEditor c n) where

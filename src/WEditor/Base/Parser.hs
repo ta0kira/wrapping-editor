@@ -32,38 +32,41 @@ import WEditor.Base.Line
 
 
 -- | Line parser for fixed-width fonts.
-class FixedFontParser a c | a -> c where
+--
+--     * @p@: Parser type providing the operations.
+--     * @c@: Character type.
+class FixedFontParser p c | p -> c where
   -- | Type used to differentiate between line-break types.
-  type BreakType a :: *
+  type BreakType p :: *
   -- | Change the max line width used for parsing. A width of zero must result
   --   in breakLines skipping line breaks.
-  setLineWidth :: a -> Int -> a
+  setLineWidth :: p -> Int -> p
   -- | Break the sequence into lines.
   --
   --   The following must hold for all possible inputs to a 'FixedFontParser'
-  --   `p`:
+  --   @p@:
   --
-  --   prop> concat (map vlText (breakLines p line)) == line
+  --   prop> concat (map vlText (breakLines p l)) == l
   --
   --   Implement 'renderLine' and 'tweakCursor' to make visual adjustments (such
   --   as adding hyphens or indentation) if necessary.
-  breakLines :: a -> [c] -> [VisibleLine c (BreakType a)]
+  breakLines :: p -> [c] -> [VisibleLine c (BreakType p)]
   -- | A place-holder line for empty paragraphs.
-  emptyLine :: a -> VisibleLine c (BreakType a)
+  emptyLine :: p -> VisibleLine c (BreakType p)
   -- | Render the line for viewing. Implement 'tweakCursor' if 'renderLine'
   --   changes the positions of any characters on the line.
-  renderLine :: a -> VisibleLine c (BreakType a) -> [c]
+  renderLine :: p -> VisibleLine c (BreakType p) -> [c]
   -- | Adjust the horizontal cursor position.
-  tweakCursor :: a -> VisibleLine c (BreakType a) -> Int -> Int
+  tweakCursor :: p -> VisibleLine c (BreakType p) -> Int -> Int
   tweakCursor _ _ = id
   -- | Split the line to create a paragraph break.
   --
   --   The following must hold for all possible inputs to a 'FixedFontParser'
-  --   `p`:
+  --   @p@:
   --
-  --   prop> let (b,t) = splitLine p l in vlText l == vlText b ++ vlText t
-  splitLine :: a
+  --   prop> let (b,t) = splitLine p n l in vlText l == vlText b ++ vlText t
+  splitLine :: p
             -> Int                           -- ^ Index to split at.
-            -> VisibleLine c (BreakType a)   -- ^ Line to split.
-            -> (VisibleLine c (BreakType a),
-                VisibleLine c (BreakType a)) -- ^ New lines at @(bottom,top)@ of previous/next paragraphs.
+            -> VisibleLine c (BreakType p)   -- ^ Line to split.
+            -> (VisibleLine c (BreakType p),
+                VisibleLine c (BreakType p)) -- ^ New lines at @(bottom,top)@ of previous/next paragraphs.

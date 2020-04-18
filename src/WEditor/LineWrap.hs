@@ -68,7 +68,10 @@ breakExact = breakWords NoSplit
 instance WordSplitter (NoSplit c) c
 
 -- | Word-splitting operations for use with 'BreakWords'.
-class WordSplitter a c | a -> c where
+--
+--     * @s@: Splitter type providing the operations.
+--     * @c@: Character type.
+class WordSplitter s c | s -> c where
   -- | Determine where to break a word.
   --
   --   * The splitter can refuse to process the word by returning 'Nothing'.
@@ -84,28 +87,28 @@ class WordSplitter a c | a -> c where
   --          line being parsed.
   --       3. All remaining segments are put on separate lines between the
   --          current and next lines.
-  splitWord :: a
+  splitWord :: s
             -> Int         -- ^ Space available on the first line.
             -> Int         -- ^ Space available on new lines.
             -> [c]         -- ^ The word to break.
             -> Maybe [Int] -- ^ List of segment sizes.
   splitWord _ _ _ _ = Nothing
   -- | Predicate for characters that should be treated as a part of a word.
-  isWordChar :: a -> c -> Bool
+  isWordChar :: s -> c -> Bool
   isWordChar _ _ = False
   -- | Predicate for detecting whitespace between words.
-  isWhitespace :: a -> c -> Bool
+  isWhitespace :: s -> c -> Bool
   isWhitespace _ _ = False
   -- | Append the canonical hyphen character to show word breaks.
-  appendHyphen :: a -> [c] -> [c]
+  appendHyphen :: s -> [c] -> [c]
   appendHyphen _ = id
 
 -- | Wrapping policy that breaks lines based on words. Use 'breakWords' to
 --   construct a new value.
-data BreakWords c = forall a. (Show a, WordSplitter a c) => BreakWords Int a
+data BreakWords c = forall s. (Show s, WordSplitter s c) => BreakWords Int s
 
 -- | Wrapping policy that breaks lines based on words.
-breakWords :: (Show a, WordSplitter a c) => a -> BreakWords c
+breakWords :: (Show s, WordSplitter s c) => s -> BreakWords c
 breakWords = BreakWords 0
 
 data NoHyphen c = NoHyphen deriving (Show)
@@ -174,7 +177,7 @@ instance FixedFontParser (BreakWords c) c where
     total = length cs
   tweakCursor _ (VisibleLine HyphenatedWord cs) = id
 
-breakAllLines :: WordSplitter a c => Int -> a -> [c] -> [VisibleLine c LineBreak]
+breakAllLines :: WordSplitter s c => Int -> s -> [c] -> [VisibleLine c LineBreak]
 breakAllLines _ _ [] = [VisibleLine lineBreakEnd []]
 breakAllLines w s cs
   | w < 1 = [VisibleLine lineBreakEnd cs]

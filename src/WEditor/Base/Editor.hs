@@ -49,29 +49,32 @@ import WEditor.Base.Para
 
 
 -- | Generic text editor for fixed-width fonts.
-class FixedFontEditor a c | a -> c where
+--
+--     * @e@: Editor type providing the operations.
+--     * @c@: Character type.
+class FixedFontEditor e c | e -> c where
   -- | Apply an edit action.
-  editText :: a -> EditAction c -> EditDirection -> a
+  editText :: e -> EditAction c -> EditDirection -> e
   -- | Break the current paragraph at the cursor.
-  breakPara :: a -> EditDirection -> a
-  -- | Apply a cursor movement.
-  moveCursor :: a -> MoveDirection -> a
+  breakPara :: e -> EditDirection -> e
+  -- | Apply e cursor movement.
+  moveCursor :: e -> MoveDirection -> e
   -- | Get the @(row,col)@ cursor position relative to the viewport.
-  getCursor :: a -> (Int,Int)
+  getCursor :: e -> (Int,Int)
   -- | Get the absolute @(paragraph,char)@ edit position.
   --
   --   The position can be restored after cursor movements by calling
   --   'setEditPoint'; however, calling 'editText' or 'breakPara' invalidates
   --   this position.
-  getEditPoint :: a -> (Int,Int)
+  getEditPoint :: e -> (Int,Int)
   -- | Set the absolute @(paragraph,char)@ edit position.
-  setEditPoint :: a -> (Int,Int) -> a
+  setEditPoint :: e -> (Int,Int) -> e
   -- | Get the number of characters in the current paragraph.
-  getParaSize :: a -> Int
+  getParaSize :: e -> Int
   -- | Get the number of paragraphs in the document.
-  getParaCount :: a -> Int
+  getParaCount :: e -> Int
   -- | Export the modified data.
-  exportData :: a -> [UnparsedPara c]
+  exportData :: e -> [UnparsedPara c]
 
 -- | Actions that modify data.
 data EditAction c =
@@ -98,7 +101,7 @@ data MoveDirection =
     deriving (Eq,Show)
 
 -- | Any action that updates a 'FixedFontEditor'.
-type EditorAction c = forall a. FixedFontEditor a c => a -> a
+type EditorAction c = forall e. FixedFontEditor e c => e -> e
 
 -- | Action for the @Backspace@ key.
 editorBackspaceAction :: EditorAction c
