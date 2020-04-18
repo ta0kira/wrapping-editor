@@ -39,30 +39,30 @@ allTests = [
        id),
     ("default view at top", checkEditView
        "original-long.txt"
-       "default-view.txt"
+       "default-view.txt" (0,0)
        id),
     ("zero width skips wrapping", checkEditView
        "original-long.txt"
-       "no-wrap-view.txt" $
+       "no-wrap-view.txt" (0,0) $
        viewerResizeAction (0,snd defaultView)),
     ("zero height skips truncation", checkEditView
        "original-long.txt"
-       "no-bound-view.txt" $
+       "no-bound-view.txt" (0,4) $
        composeActions [
            viewerResizeAction (fst defaultView,0),
            repeatAction 4 editorDownAction
          ]),
     ("move cursor below bottom", checkEditView
        "original-long.txt"
-       "below-view.txt" $
+       "below-view.txt" (0,9) $
        repeatAction 15 editorDownAction),
     ("scroll below end of doc", checkEditView
        "original-long.txt"
-       "below-bottom-view.txt" $
+       "below-bottom-view.txt" (10,0) $
        repeatAction 100 editorDownAction),
     ("page down puts edit at top and preserves cursor", checkEditView
        "original-long.txt"
-       "page-down-view.txt" $
+       "page-down-view.txt" (7,0) $
        composeActions [
            repeatAction 4 editorRightAction,
            editorPageDownAction,
@@ -70,7 +70,7 @@ allTests = [
          ]),
     ("page up puts edit at top and preserves cursor", checkEditView
        "original-long.txt"
-       "page-up-view.txt" $
+       "page-up-view.txt" (7,0) $
        composeActions [
            repeatAction 4 editorRightAction,
            repeatAction 15 editorDownAction,
@@ -79,7 +79,7 @@ allTests = [
          ]),
     ("fill view ignores already full", checkEditView
        "original-long.txt"
-       "fill-noop-view.txt" $
+       "fill-noop-view.txt" (0,4) $
        composeActions [
            editorPageDownAction,
            repeatAction 4 editorDownAction,
@@ -87,7 +87,7 @@ allTests = [
          ]),
     ("fill view with short text", checkEditView
        "original-short.txt"
-       "fill-short-view.txt" $
+       "fill-short-view.txt" (2,5) $
        composeActions [
            editorPageDownAction,
            -- Manually shift the view up by one line.
@@ -97,7 +97,7 @@ allTests = [
          ]),
     ("fill view starting past end", checkEditView
        "original-long.txt"
-       "fill-end-view.txt" $
+       "fill-end-view.txt" (10,7) $
        composeActions [
            repeatAction 5 editorPageDownAction,
            repeatAction 2 editorUpAction,
@@ -105,7 +105,7 @@ allTests = [
          ]),
     ("shift view up within bounds", checkEditView
        "original-long.txt"
-       "shift-up-bounded-view.txt" $
+       "shift-up-bounded-view.txt" (0,8) $
        composeActions [
            editorPageDownAction,
            repeatAction 4 editorDownAction,
@@ -113,22 +113,22 @@ allTests = [
          ]),
     ("shift view down within bounds", checkEditView
        "original-long.txt"
-       "shift-down-bounded-view.txt" $
+       "shift-down-bounded-view.txt" (0,4) $
        composeActions [
            editorPageDownAction,
-           repeatAction 4 editorDownAction,
+           repeatAction 8 editorDownAction,
            viewerShiftDownAction 4
          ]),
     ("shift view up past doc front", checkEditView
        "original-long.txt"
-       "shift-up-unbounded-view.txt" $
+       "shift-up-unbounded-view.txt" (0,4) $
        composeActions [
            repeatAction 4 editorDownAction,
            viewerShiftUpAction 4
          ]),
     ("shift view down past doc back", checkEditView
        "original-long.txt"
-       "shift-down-unbounded-view.txt" $
+       "shift-down-unbounded-view.txt" (10,0) $
        composeActions [
            repeatAction 5 editorPageDownAction,
            repeatAction 4 editorUpAction,
@@ -136,14 +136,14 @@ allTests = [
          ]),
     ("move previous at doc front", checkEditView
        "original-long.txt"
-       "insert-front-view.txt" $
+       "insert-front-view.txt" (3,0) $
        composeActions [
            editorLeftAction,
            editorAppendAction "XYZ"
          ]),
     ("move next at doc back", checkEditView
        "original-long.txt"
-       "insert-back-view.txt" $
+       "insert-back-view.txt" (13,9) $
        composeActions [
            -- 43 total lines after wrapping => down 42 then to end of line.
            repeatAction 43 editorDownAction,
@@ -152,7 +152,7 @@ allTests = [
          ]),
     ("insert in middle view", checkEditView
        "original-long.txt"
-       "insert-middle-view.txt" $
+       "insert-middle-view.txt" (10,4) $
        composeActions [
            repeatAction 15 editorDownAction,
            repeatAction 5 editorUpAction,
@@ -161,7 +161,7 @@ allTests = [
          ]),
     ("line position preserved when passing short lines", checkEditView
        "original-long.txt"
-       "insert-middle-view.txt" $
+       "insert-middle-view.txt" (10,4) $
        composeActions [
            repeatAction 7 editorRightAction,
            -- This traverses past empty lines after the line position is set.
@@ -180,7 +180,7 @@ allTests = [
          ]),
     ("delete in middle view", checkEditView
        "original-long.txt"
-       "delete-middle-view.txt" $
+       "delete-middle-view.txt" (4,4) $
        composeActions [
            repeatAction 15 editorDownAction,
            repeatAction 5 editorUpAction,
@@ -198,14 +198,14 @@ allTests = [
          ]),
     ("join with previous", checkEditView
        "original-long.txt"
-       "join-prev-view.txt" $
+       "join-prev-view.txt" (8,8) $
        composeActions [
            repeatAction 9 editorDownAction,
            editorBackspaceAction
          ]),
     ("join with next", checkEditView
        "original-long.txt"
-       "join-next-view.txt" $
+       "join-next-view.txt" (8,8) $
        composeActions [
            repeatAction 9 editorDownAction,
            editorLeftAction,
@@ -213,7 +213,7 @@ allTests = [
          ]),
     ("break in middle before", checkEditView
        "original-long.txt"
-       "break-before-view.txt" $
+       "break-before-view.txt" (3,5) $
        composeActions [
            repeatAction 15 editorDownAction,
            repeatAction 5 editorUpAction,
@@ -223,7 +223,7 @@ allTests = [
          ]),
     ("break in middle after", checkEditView
        "original-long.txt"
-       "break-after-view.txt" $
+       "break-after-view.txt" (7,4) $
        composeActions [
            repeatAction 15 editorDownAction,
            repeatAction 5 editorUpAction,
@@ -233,7 +233,7 @@ allTests = [
          ]),
     ("resize smaller preserves line offset and cursor", checkEditView
        "original-long.txt"
-       "resize-smaller-view.txt" $
+       "resize-smaller-view.txt" (5,4) $
        composeActions [
            repeatAction 15 editorDownAction,
            repeatAction 5 editorUpAction,
@@ -243,14 +243,14 @@ allTests = [
          ]),
     ("resize smaller truncates offset", checkEditView
        "original-long.txt"
-       "resize-truncate-view.txt" $
+       "resize-truncate-view.txt" (0,9) $
        composeActions [
            repeatAction 9 editorDownAction,
            editorInsertAction "XYZ"
          ]),
     ("resize larger preserves line offset and cursor", checkEditView
        "original-long.txt"
-       "resize-larger-view.txt" $
+       "resize-larger-view.txt" (23,4) $
        composeActions [
            repeatAction 15 editorDownAction,
            repeatAction 5 editorUpAction,
@@ -425,11 +425,15 @@ checkEditContent fx fy f = do
   let restored = joinParas $ exportData edit
   checkCondition ("\n" ++ restored) (restored == view)
 
-checkEditView fx fy f = do
+checkEditView fx fy c f = do
   edit <- fmap (f . loadDoc breakExact) $ readFile (testFilesRoot </> fx)
   view <- fmap (map trimSpace . lines)  $ readFile (testFilesRoot </> fy)
   let restored = map trimSpace $ getVisible edit
-  checkCondition ("\n" ++ unlines restored) (restored == view)
+  let cursor = getCursor edit
+  checkConditions [
+      ("Cursor: " ++ show cursor,cursor == c),
+      ("View:\n" ++ unlines restored,restored == view)
+    ]
 
 checkEditCursor b fx c e f = do
   edit <- fmap (f . loadDoc b) $ readFile (testFilesRoot </> fx)
