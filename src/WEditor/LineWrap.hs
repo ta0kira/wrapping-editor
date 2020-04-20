@@ -102,6 +102,9 @@ class WordSplitter s c | s -> c where
   -- | Append the canonical hyphen character to show word breaks.
   appendHyphen :: s -> [c] -> [c]
   appendHyphen _ = id
+  -- | Check the word segment for an existing hyphenation.
+  endsWithHyphen :: s -> [c] -> Bool
+  endsWithHyphen _ _ = False
 
 -- | Wrapping policy that breaks lines based on words. Use 'breakWords' to
 --   construct a new value.
@@ -154,6 +157,7 @@ instance (WordChar c, HyphenChar c) => WordSplitter (LazyHyphen c) c where
   isWordChar _ = defaultIsWordChar
   isWhitespace _ = defaultIsWhitespace
   appendHyphen _ = (++[defaultHyphen])
+  endsWithHyphen _ cs = not (null cs) && isDefaultHyphen (last cs)
 
 instance FixedFontParser (BreakWords c) c where
   type BreakType (BreakWords c) = LineBreak
@@ -197,14 +201,17 @@ breakAllLines w s cs
           when (null breaks && length wordFront == w) Nothing
           return $ case breaks of
                         []     -> VisibleLine lineBreakSimple (reverse ls2):(breakOrEmpty (word ++ rs2))
-                        (b:bs) -> VisibleLine lineBreakHyphen (reverse ls2 ++ take b word):(hyphenate (drop b word) bs)
+                        (b:bs) -> (autoHyphen (reverse ls2 ++ take b word)):(hyphenate (drop b word) bs)
         ls2 = dropWhile (isWordChar s) ls
         rs2 = dropWhile (isWordChar s) rs
         wordFront = reverse $ takeWhile (isWordChar s) ls
         wordBack = takeWhile (isWordChar s) rs
         word = wordFront ++ wordBack
+        autoHyphen ls = if endsWithHyphen s ls
+                           then VisibleLine lineBreakSimple ls
+                           else VisibleLine lineBreakHyphen ls
         hyphenate word bs | null word || null bs = breakOrEmpty (word ++ rs2)
-        hyphenate word (b:bs) = (VisibleLine lineBreakHyphen (take b word)):(hyphenate (drop b word) bs)
+        hyphenate word (b:bs) = (autoHyphen (take b word)):(hyphenate (drop b word) bs)
       tryWord _ _ = Nothing
       trySpaces ls rs@(r:_) | isWhitespace s r = newLines where
         ls' = reverse ls ++ takeWhile (isWhitespace s) rs

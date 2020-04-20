@@ -77,7 +77,14 @@ tests_English_US = [
        (setLineWidth (breakWords (langHyphen English_US)) 8)
        "    \"The.\""
        [innerLine "    ",
-        endLine "\"The.\""])
+        endLine "\"The.\""]),
+    ("langHyphen English_US split at existing hyphen", checkLineBreak
+       (setLineWidth (breakWords (langHyphen English_US)) 8)
+       "pseudo-somethingness"
+       [innerLine "pseudo-",
+        hyphenLine "some",
+        hyphenLine "thing",
+        endLine "ness"])
   ]
 
 checkLineBreak b x ys = do

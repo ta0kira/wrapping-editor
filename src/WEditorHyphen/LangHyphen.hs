@@ -28,6 +28,7 @@ module WEditorHyphen.LangHyphen (
 ) where
 
 import Data.Char
+import Data.List
 import Text.Hyphenation
 import WEditor.LineWrap
 
@@ -78,6 +79,9 @@ instance WordSplitter LangHyphen Char where
   isWordChar (LangHyphen l _) = wordChars l
   isWhitespace (LangHyphen l _) = whitespaceChars l
   appendHyphen (LangHyphen l _) = (++ hyphenChar l)
+  endsWithHyphen (LangHyphen l _) cs
+    | null cs || null (hyphenChar l) = False
+    | otherwise = hyphenChar l `isSuffixOf` cs
 
 minWidth :: Language -> Int
 minWidth _ = 8

@@ -1,5 +1,10 @@
 # Revision history for WEditor
 
+## 0.2.1.0  -- 2020-04-20
+
+* **[new]** Fixes an issue with hyphenating words that already have hyphens by
+  adding `endsWithHyphen` to `WordSplitter`.
+
 ## 0.2.0.0  -- 2020-04-17
 
 * **[breaking]** Adds line-splitting to `FixedFontParser` requirements. This

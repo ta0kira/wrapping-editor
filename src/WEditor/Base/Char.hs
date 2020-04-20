@@ -43,12 +43,15 @@ class WhitespaceChar c => WordChar c where
 class HyphenChar c where
   -- | The canonical hyphen character.
   defaultHyphen :: c
+  isDefaultHyphen :: c -> Bool
+  isDefaultHyphen _ = False
 
 instance WhitespaceChar Char where
   defaultIsWhitespace = (== ' ')
 
 instance WordChar Char where
-  defaultIsWordChar = flip any [isAlpha,(`elem` ".'")] . flip ($)
+  defaultIsWordChar = flip any [isAlpha,(`elem` ".'-")] . flip ($)
 
 instance HyphenChar Char where
   defaultHyphen = '-'
+  isDefaultHyphen = (== defaultHyphen)

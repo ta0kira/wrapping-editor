@@ -153,6 +153,12 @@ allTests = [
         hyphenLine "aver",
         hyphenLine "ylon",
         endLine "gword"]),
+    ("lazyHyphen skips redundant hyphen", checkLineBreak
+       (setLineWidth (breakWords lazyHyphen) 6)
+       "here-isalongword"
+       [innerLine "here-",
+        hyphenLine "isalo",
+        endLine "ngword"]),
     ("lazyHyphen preserves data", do
        let breaker = setLineWidth (breakWords lazyHyphen) 7
        let line = "Here      are some extra spaces and alongwordthatwillnotfit.      "
