@@ -142,6 +142,9 @@ final = unlines $ map upText $ exportData editor'
     line. This policy requires [`WordChar`][WordChar] and
     [`HyphenChar`][HyphenChar] instances for the character type.
 
+  - [**`langHyphen l`**][langHyphen] (from the *optional* `WEditorHyphen`
+    packge) uses language-specific hyphenation rules, e.g., `English_US`.
+
   - Create custom word-splitting by creating a new
     [`WordSplitter`][WordSplitter]. This can be used for supporting new
     character types, adding dictionary awareness, expanding the characters that
@@ -177,6 +180,7 @@ will likely be modified to support other character types.
 [breakWords]: https://ta0kira.github.io/wrapping-editor/library/WEditor-LineWrap.html#v:breakWords
 [doEditor]: https://ta0kira.github.io/wrapping-editor/library/WEditorBrick-WrappingEditor.html#v:doEditor
 [genericEditor]: https://ta0kira.github.io/wrapping-editor/library/WEditorBrick-WrappingEditor.html#v:genericEditor
+[langHyphen]: https://ta0kira.github.io/wrapping-editor/library/WEditorHyphen-LangHyphen.html#v:langHyphen
 [lazyHyphen]:  https://ta0kira.github.io/wrapping-editor/library/WEditor-LineWrap.html#v:lazyHyphen
 [mapEditor]: https://ta0kira.github.io/wrapping-editor/library/WEditorBrick-WrappingEditor.html#v:mapEditor
 [noHyphen]: https://ta0kira.github.io/wrapping-editor/library/WEditor-LineWrap.html#v:noHyphen
