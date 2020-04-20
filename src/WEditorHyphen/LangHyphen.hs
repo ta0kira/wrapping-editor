@@ -40,8 +40,8 @@ data LangHyphen = LangHyphen Language Hyphenator
 --
 -- @
 -- import Text.Hyphenation
--- import WEditor.LineWrap
 -- import WEditor.Document
+-- import WEditor.LineWrap
 -- import WEditorHyphen.LangHyphen
 --
 -- content = map UnparsedPara (lines "Your document content.")

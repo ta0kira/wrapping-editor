@@ -4,8 +4,8 @@ synopsis:            Language-specific hyphenation policies for WEditor.
 
 description:
   This package provides language-specific hyphenation policies for use with
-  the <https://github.com/ta0kira/wrapping-editor WEditor> and
-  <https://github.com/ta0kira/wrapping-editor WEditorBrick> packages.
+  the @<http://hackage.haskell.org/package/WEditor WEditor>@ and
+  @<http://hackage.haskell.org/package/WEditorBrick WEditorBrick>@ packages.
 
 homepage:            https://github.com/ta0kira/wrapping-editor
 license:             Apache-2.0
