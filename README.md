@@ -17,28 +17,44 @@ features, please see the [issues page][issues]. Also check out the
 
 ## Installation
 
-This library can be installed from [Hackage][hackage] using [`cabal`][cabal].
+This library is split into 3 separate packages:
 
-1. Installing just the [generic editor][hackage-WEditor]:
+- **`WEditor`** is the base package, containing the generic editor logic and
+  simple line-wrapping and hyphenation policies. This can be used as the basis
+  for a new editor widget for a UI library without depending on any of the
+  other packages.
 
-   ```shell
-   # cabal < 2.0
-   cabal install WEditor
+- **`WEditorHyphen`** contains language-specific hyphenation policies for use
+  with both `WEditor` and `WEditorBrick`. This package is *not* required in
+  order to use either of those packages. You will need to explicitly install the
+  `hyphenation` package in order to have access to the rules for each supported
+  language.
 
-   # cabal >= 2.0
-   cabal install --lib WEditor
-   ```
+- **`WEditorBrick`** contains just the [Brick][brick] `Widget`.
 
-1. Installing the [Brick `Widget`][hackage-WEditorBrick] (also installs
-   [Brick][brick]!):
+All of these packages can be installed from [Hackage][hackage] using
+[`cabal`][cabal]. You will need to explicitly install `WEditor` in order to set
+up editors in either of the other packages.
 
-   ```shell
-   # cabal < 2.0
-   cabal install WEditorBrick
+- Just the base package:
 
-   # cabal >= 2.0
-   cabal install --lib WEditorBrick
-   ```
+  ```shell
+  # cabal < 2.0
+  cabal install WEditor
+
+  # cabal >= 2.0
+  cabal install --lib WEditor
+  ```
+
+- Everything:
+
+  ```shell
+  # cabal < 2.0
+  cabal install WEditor WEditorBrick hyphenation WEditorHyphen
+
+  # cabal >= 2.0
+  cabal install --lib WEditor WEditorBrick hyphenation WEditorHyphen
+  ```
 
 ## Using with [Brick][brick]
 
@@ -72,7 +88,7 @@ You can customize the widget using the following helper functions from the
   actions in a custom event handler. (If you use a custom event handler, call
   [`updateEditorExtent`][updateEditorExtent] *before* applying editor actions.)
 
-## Using the Basic Editor
+## Using the Generic Editor
 
 ```haskell
 import WEditor.LineWrap
@@ -137,7 +153,7 @@ final = unlines $ map upText $ exportData editor'
 
 ## Character Support
 
-The basic editor can support any character type for which a wrapping policy is
+The generic editor can support any character type for which a wrapping policy is
 available. The editor for [Brick][brick] currently only supports `Char`, but it
 will likely be modified to support other character types.
 

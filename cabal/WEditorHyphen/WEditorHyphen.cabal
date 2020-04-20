@@ -13,7 +13,7 @@ license-file:        LICENSE
 author:              Kevin P. Barry
 maintainer:          Kevin P. Barry <ta0kira@gmail.com>
 copyright:           (c) Kevin P. Barry 2020
-category:            Graphics
+category:            Text
 build-type:          Simple
 
 cabal-version:       2.0
