@@ -1,5 +1,5 @@
 name:                WEditor
-version:             0.2.0.2
+version:             0.2.0.3
 synopsis:            Generic text-editor logic for use with fixed-width fonts.
 
 description:

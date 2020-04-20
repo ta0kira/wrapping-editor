@@ -1,5 +1,5 @@
 name:                WEditorBrick
-version:             0.2.0.1
+version:             0.2.0.2
 synopsis:            Text-editor widget with dynamic line-wrapping for use with Brick.
 
 description:
