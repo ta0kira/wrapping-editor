@@ -19,18 +19,18 @@ features, please see the [issues page][issues]. Also check out the
 
 This library is split into 3 separate packages:
 
-- **`WEditor`** is the base package, containing the generic editor logic and
-  simple line-wrapping and hyphenation policies. This can be used as the basis
-  for a new editor widget for a UI library without depending on any of the
-  other packages.
+- [**`WEditor`**][WEditor] is the base package, containing the generic editor
+  logic and simple line-wrapping and hyphenation policies. This can be used as
+  the basis for a new editor widget for a UI library without depending on any of
+  the other packages.
 
-- **`WEditorHyphen`** contains language-specific hyphenation policies for use
-  with both `WEditor` and `WEditorBrick`. This package is *not* required in
-  order to use either of those packages. You will need to explicitly install the
-  `hyphenation` package in order to have access to the rules for each supported
-  language.
+- [**`WEditorHyphen`**][WEditorHyphen] contains language-specific hyphenation
+  policies for use with both `WEditor` and `WEditorBrick`. This package is *not*
+  required in order to use either of those packages. You will need to explicitly
+  install the `hyphenation` package in order to have access to the rules for
+  each supported language.
 
-- **`WEditorBrick`** contains just the [Brick][brick] `Widget`.
+- [**`WEditorBrick`**][WEditorBrick] contains just the [Brick][brick] `Widget`.
 
 All of these packages can be installed from [Hackage][hackage] using
 [`cabal`][cabal]. You will need to explicitly install `WEditor` in order to set
@@ -170,6 +170,10 @@ will likely be modified to support other character types.
 [home]: https://github.com/ta0kira/wrapping-editor
 [issues]: https://github.com/ta0kira/wrapping-editor/issues
 [library-doc]: https://ta0kira.github.io/wrapping-editor/library
+
+[WEditor]: http://hackage.haskell.org/package/WEditor
+[WEditorBrick]: http://hackage.haskell.org/package/WEditorBrick
+[WEditorHyphen]: http://hackage.haskell.org/package/WEditorHyphen
 
 [FixedFontParser]: https://ta0kira.github.io/wrapping-editor/library/WEditor-Base-Parser.html#t:FixedFontParser
 [HyphenChar]: https://ta0kira.github.io/wrapping-editor/library/WEditor-Base-Char.html#t:HyphenChar
