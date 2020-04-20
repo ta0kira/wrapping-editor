@@ -39,13 +39,14 @@ data LangHyphen = LangHyphen Language Hyphenator
 --   Example usage:
 --
 -- @
+-- import Text.Hyphenation
 -- import WEditor.LineWrap
 -- import WEditor.Document
 -- import WEditorHyphen.LangHyphen
 --
 -- content = map UnparsedPara (lines "Your document content.")
 --
--- doc = editDocument (breakWords (langHyphen English_US))
+-- doc = editDocument (breakWords (langHyphen English_US)) content
 -- @
 langHyphen :: Language -> LangHyphen
 langHyphen l = LangHyphen l (languageHyphenator l)
