@@ -161,7 +161,7 @@ available. The editor for [Brick][brick] currently only supports `Char`, but it
 will likely be modified to support other character types.
 
 [brick]: https://github.com/jtdaugherty/brick
-[brick-example.hs]: https://github.com/ta0kira/wrapping-editor/blob/master/example/brick-example.hs
+[brick-example.hs]: https://github.com/ta0kira/wrapping-editor/blob/master/example/WEditorBrick/brick-example.hs
 [cabal]: https://www.haskell.org/cabal/#install-upgrade
 [ghc]: https://www.haskell.org/ghc/
 [hackage]: http://hackage.haskell.org
