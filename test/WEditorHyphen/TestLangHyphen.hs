@@ -23,6 +23,7 @@ module TestLangHyphen (
   allTests,
 ) where
 
+import Text.Hyphenation
 import WEditor.Base
 import WEditor.LineWrap
 import WEditorHyphen.LangHyphen
@@ -31,7 +32,52 @@ import Common
 
 
 allTests :: [(String,IO (Maybe String))]
-allTests = [
+allTests = tests_English_US
+
+tests_English_US :: [(String,IO (Maybe String))]
+tests_English_US = [
+    ("langHyphen English_US without punctuation", checkLineBreak
+       (setLineWidth (breakWords (langHyphen English_US)) 8)
+       "Hyphenation testability depends on the usage of longer lexicographical objects"
+       [hyphenLine "Hyphen",
+        innerLine "ation ",
+        hyphenLine "testa",
+        innerLine "bility ",
+        innerLine "depends ",
+        innerLine "on the ",
+        innerLine "usage of ",
+        innerLine "longer ",
+        hyphenLine "lexico",
+        hyphenLine "graphi",
+        hyphenLine "cal ob",
+        endLine "jects"]),
+    ("langHyphen English_US with quoted text", checkLineBreak
+       (setLineWidth (breakWords (langHyphen English_US)) 8)
+       "Hyphenation \"testability\" depends on the usage of longer \"lexicographical objects\""
+       [hyphenLine "Hyphen",
+        innerLine"ation ",
+        hyphenLine "\"testa",
+        innerLine "bility\" ",
+        innerLine "depends ",
+        innerLine "on the ",
+        innerLine "usage of ",
+        innerLine "longer ",
+        hyphenLine "\"lexico",
+        hyphenLine "graphi",
+        hyphenLine "cal ob",
+        endLine "jects\""]),
+    ("langHyphen English_US leading quote not left hanging", checkLineBreak
+       (setLineWidth (breakWords (langHyphen English_US)) 8)
+       "012345 \"somethingness\""
+       [innerLine "012345 ",
+        hyphenLine "\"some",
+        hyphenLine "thing",
+        endLine "ness\""]),
+    ("langHyphen English_US trailing quote and period not left hanging", checkLineBreak
+       (setLineWidth (breakWords (langHyphen English_US)) 8)
+       "    \"The.\""
+       [innerLine "    ",
+        endLine "\"The.\""])
   ]
 
 checkLineBreak b x ys = do

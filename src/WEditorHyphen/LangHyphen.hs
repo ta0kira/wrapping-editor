@@ -35,6 +35,18 @@ import WEditor.LineWrap
 data LangHyphen = LangHyphen Language Hyphenator
 
 -- | Hyphenates words using 'Language'-specific rules.
+--
+--   Example usage:
+--
+--   @
+--   import WEditor.LineWrap
+--   import WEditor.Document
+--   import WEditorHyphen.LangHyphen
+--
+--   content = map UnparsedPara (lines "Your document content.")
+--
+--   doc = editDocument (breakWords (langHyphen English_US))
+--   @
 langHyphen :: Language -> LangHyphen
 langHyphen l = LangHyphen l (languageHyphenator l)
 
@@ -46,25 +58,28 @@ instance Show LangHyphen where
 
 instance WordSplitter LangHyphen Char where
   splitWord (LangHyphen l h) k w cs
-    | w < 4 || k > w          = Nothing
-    | k >= length cs || k < 3 = Just []
+    | w < (minWidth l) || k > w = Nothing
+    | k >= length cs || k < 3   = Just []
     | otherwise = Just breaks where
         (nb,cs',ne) = trimPunct l cs
         (n0:ns) = map length $ hyphenate h cs'
-        hyphen = hyphenChar l
         breaks
           -- Move the word to the next line if it has punctuation in the middle.
           | any (noSplitChars l) cs' = []
+          | null ns = []
           | otherwise = combine k (nb+n0) (init ns ++ [ne+last ns])
         combine _ _ [] = []
         combine t n (k:ks)
           -- Add a break if adding a segment would exceed the remaining space.
-          | (n+k > t-1 && not (null ks)) || n+k > t = n:(combine w k ks)
+          | (n+k > t-(length (hyphenChar l)) && not (null ks)) || n+k > t = n:(combine w k ks)
           -- Append the next segment to the current segment.
           | otherwise = combine w (n+k) ks
   isWordChar (LangHyphen l _) = wordChars l
   isWhitespace (LangHyphen l _) = whitespaceChars l
   appendHyphen (LangHyphen l _) = (++ hyphenChar l)
+
+minWidth :: Language -> Int
+minWidth _ = 8
 
 wordChars :: Language -> Char -> Bool
 wordChars l c = generalCategory c `elem` cats l || noSplitChars l c where
