@@ -61,27 +61,31 @@ instance Show LangHyphen where
 instance WordSplitter LangHyphen Char where
   splitWord (LangHyphen l h) k w cs
     | w < (minWidth l) || k > w = Nothing
-    | k >= length cs || k < 3   = Just []
     | otherwise = Just breaks where
-        (nb,cs',ne) = trimPunct l cs
-        (n0:ns) = map length $ hyphenate h cs'
+        (cb,cs',ce) = trimPunct l cs
+        (s0:ss) = hyphenate h cs'
         breaks
           -- Move the word to the next line if it has punctuation in the middle.
-          | any (noSplitChars l) cs' = []
-          | null ns = []
-          | otherwise = combine k (nb+n0) (init ns ++ [ne+last ns])
+          | any (noSplitChars l) cs' || null ss = []
+          | otherwise = combine k (cb ++ s0) (init ss ++ [last ss ++ ce])
         combine _ _ [] = []
-        combine t n (k:ks)
+        combine t x (y:ys)
+          -- Move the rest to the next line if the segment is already too large.
+          | size x > t = []
           -- Add a break if adding a segment would exceed the remaining space.
-          | (n+k > t-(length (hyphenChar l)) && not (null ks)) || n+k > t = n:(combine w k ks)
+          | length (x ++ y) > t && null ys = (length x):(combine w y ys)
+          | size   (x ++ y) > t            = (length x):(combine w y ys)
           -- Append the next segment to the current segment.
-          | otherwise = combine t (n+k) ks
+          | otherwise = combine t (x ++ y) ys
+        size s = if hyphenChar l `isSuffixOf` s
+                    then length s
+                    else length s+length (hyphenChar l)
   isWordChar (LangHyphen l _) = wordChars l
   isWhitespace (LangHyphen l _) = whitespaceChars l
   appendHyphen (LangHyphen l _) = (++ hyphenChar l)
   endsWithHyphen (LangHyphen l _) cs
-    | null cs || null (hyphenChar l) = False
-    | otherwise = hyphenChar l `isSuffixOf` cs
+    | null (hyphenChar l) = False
+    | otherwise           = hyphenChar l `isSuffixOf` cs
 
 -- Set the language-specific minimum line width here.
 minWidth :: Language -> Int
@@ -136,8 +140,8 @@ whitespaceChars _ c = isSeparator c
 hyphenChar :: Language -> [Char]
 hyphenChar _ = "-"
 
-trimPunct :: Language -> [Char] -> (Int,[Char],Int)
+trimPunct :: Language -> [Char] -> ([Char],[Char],[Char])
 trimPunct l cs =
-  (length $ takeWhile (noSplitChars l) cs,
+  (takeWhile (noSplitChars l) cs,
    dropWhile (noSplitChars l) $ reverse $ dropWhile (noSplitChars l) $ reverse cs,
-   length $ takeWhile (noSplitChars l) $ reverse cs)
+   takeWhile (noSplitChars l) $ reverse cs)

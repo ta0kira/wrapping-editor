@@ -32,7 +32,13 @@ import Common
 
 
 allTests :: [(String,IO (Maybe String))]
-allTests = tests_English_US
+allTests = tests_English_US ++ [
+    ("langHyphen multiple segments on first line", checkLineBreak
+       (setLineWidth (breakWords (langHyphen English_US)) 12)
+       "the existentialism"
+       [hyphenLine "the existen",
+        endLine "tialism"])
+  ]
 
 tests_English_US :: [(String,IO (Maybe String))]
 tests_English_US = [
@@ -85,6 +91,13 @@ tests_English_US = [
         hyphenLine "some",
         hyphenLine "thing",
         endLine "ness"]),
+    ("langHyphen English_US existing hyphen at end of line", checkLineBreak
+       (setLineWidth (breakWords (langHyphen English_US)) 8)
+       " pseudo-somethingness"
+       [innerLine " pseudo-",
+        hyphenLine "some",
+        hyphenLine "thing",
+        endLine "ness"]),
     ("langHyphen English_US apostrophe toward end", checkLineBreak
        (setLineWidth (breakWords (langHyphen English_US)) 8)
        "something's"
@@ -94,12 +107,7 @@ tests_English_US = [
        (setLineWidth (breakWords (langHyphen English_US)) 8)
        "    aren't"
        [innerLine "    ",
-        endLine "aren't"]),
-    ("langHyphen English_US multiple segments on first line", checkLineBreak
-       (setLineWidth (breakWords (langHyphen English_US)) 12)
-       "the existentialism"
-       [hyphenLine "the existen",
-        endLine "tialism"])
+        endLine "aren't"])
   ]
 
 checkLineBreak b x ys = do
