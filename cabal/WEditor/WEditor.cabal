@@ -4,17 +4,17 @@ synopsis:            Generic text-editor logic for use with fixed-width fonts.
 
 description:
   This package contains interfaces and implementations of text-editing idioms
-  that can be wired up to UI libraries to create a text-editor widget.
+  that can be wired up to UI libraries to create text-editor widgets.
   .
   The goal is to provide:
   .
-  * Dynamic line wrapping that preserves the cursor and edit positions.
+  * Automatic management of a dynamically-sized viewable area, with preservation
+    of the cursor position and minimal view disruption during resizing.
   * Customizable line-wrapping policies and word-hyphenation policies.
-  * Automatic management of a dynamically-sized viewable area.
-  * Support for novel character types.
+  * Support for user-defined character types.
   .
   Also see @<http://hackage.haskell.org/package/WEditorHyphen WEditorHyphen>@
-  for  language-specific hyphenation rules.
+  for language-specific hyphenation rules.
 
 homepage:            https://github.com/ta0kira/wrapping-editor
 license:             Apache-2.0
