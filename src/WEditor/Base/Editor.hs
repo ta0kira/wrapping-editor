@@ -59,7 +59,7 @@ class FixedFontEditor e c | e -> c where
   breakPara :: e -> EditDirection -> e
   -- | Apply e cursor movement.
   moveCursor :: e -> MoveDirection -> e
-  -- | Get the @(row,col)@ cursor position relative to the viewport.
+  -- | Get the @(col,row)@ cursor position relative to the viewport.
   getCursor :: e -> (Int,Int)
   -- | Get the absolute @(paragraph,char)@ edit position.
   --
