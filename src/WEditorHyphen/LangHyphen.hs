@@ -83,35 +83,56 @@ instance WordSplitter LangHyphen Char where
     | null cs || null (hyphenChar l) = False
     | otherwise = hyphenChar l `isSuffixOf` cs
 
+-- Set the language-specific minimum line width here.
 minWidth :: Language -> Int
 minWidth _ = 8
 
 wordChars :: Language -> Char -> Bool
-wordChars l c = generalCategory c `elem` cats l || noSplitChars l c where
-  -- Add language-specific tokenizing rules here.
-  cats _ = [UppercaseLetter,
-            LowercaseLetter,
-            TitlecaseLetter,
-            ModifierLetter,
-            OtherLetter,
-            NonSpacingMark,
-            SpacingCombiningMark,
-            DashPunctuation]
+wordChars = check where
+  -- Override the language-specific predicate here.
+  check l@English_US c = checkDefault l c || c `elem` "'"
+  check l@English_GB c = checkDefault l c || c `elem` "'"
+  check l c = checkDefault l c
+  -- Override the language-specific character categories here.
+  cats _ = defaultCats
+  -- Leave the stuff below here alone.
+  checkDefault l c = generalCategory c `elem` cats l || noSplitChars l c
+  defaultCats = [
+      DashPunctuation,
+      LowercaseLetter,
+      ModifierLetter,
+      NonSpacingMark,
+      OtherLetter,
+      SpacingCombiningMark,
+      TitlecaseLetter,
+      UppercaseLetter
+    ]
 
 noSplitChars :: Language -> Char -> Bool
-noSplitChars l c = generalCategory c `elem` cats l where
-  -- Add language-specific punctuation rules here.
-  cats _ = [DecimalNumber,
-            OtherNumber,
-            ConnectorPunctuation,
-            InitialQuote,
-            FinalQuote,
-            OtherPunctuation,
-            CurrencySymbol]
+noSplitChars = check where
+  -- Override the language-specific predicate here.
+  check l@English_US c = checkDefault l c && not (c `elem` "'")
+  check l@English_GB c = checkDefault l c && not (c `elem` "'")
+  check l c = checkDefault l c
+  -- Override the language-specific character categories here.
+  cats _ = defaultCats
+  -- Leave the stuff below here alone.
+  checkDefault l c = generalCategory c `elem` cats l
+  defaultCats = [
+      ConnectorPunctuation,
+      CurrencySymbol,
+      DecimalNumber,
+      FinalQuote,
+      InitialQuote,
+      OtherNumber,
+      OtherPunctuation
+    ]
 
+-- Set language-specific whitespace detection here.
 whitespaceChars :: Language -> Char -> Bool
 whitespaceChars _ c = isSeparator c
 
+-- Set the language-specific hyphen char here.
 hyphenChar :: Language -> [Char]
 hyphenChar _ = "-"
 

@@ -84,7 +84,17 @@ tests_English_US = [
        [innerLine "pseudo-",
         hyphenLine "some",
         hyphenLine "thing",
-        endLine "ness"])
+        endLine "ness"]),
+    ("langHyphen English_US apostrophe toward end", checkLineBreak
+       (setLineWidth (breakWords (langHyphen English_US)) 8)
+       "something's"
+       [hyphenLine "some",
+        endLine"thing's"]),
+    ("langHyphen English_US trailing apostrophe not left hanging", checkLineBreak
+       (setLineWidth (breakWords (langHyphen English_US)) 8)
+       "    aren't"
+       [innerLine "    ",
+        endLine "aren't"])
   ]
 
 checkLineBreak b x ys = do
