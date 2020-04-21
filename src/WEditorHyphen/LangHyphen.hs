@@ -75,7 +75,7 @@ instance WordSplitter LangHyphen Char where
           -- Add a break if adding a segment would exceed the remaining space.
           | (n+k > t-(length (hyphenChar l)) && not (null ks)) || n+k > t = n:(combine w k ks)
           -- Append the next segment to the current segment.
-          | otherwise = combine w (n+k) ks
+          | otherwise = combine t (n+k) ks
   isWordChar (LangHyphen l _) = wordChars l
   isWhitespace (LangHyphen l _) = whitespaceChars l
   appendHyphen (LangHyphen l _) = (++ hyphenChar l)

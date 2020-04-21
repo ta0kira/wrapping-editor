@@ -94,7 +94,12 @@ tests_English_US = [
        (setLineWidth (breakWords (langHyphen English_US)) 8)
        "    aren't"
        [innerLine "    ",
-        endLine "aren't"])
+        endLine "aren't"]),
+    ("langHyphen English_US multiple segments on first line", checkLineBreak
+       (setLineWidth (breakWords (langHyphen English_US)) 12)
+       "the existentialism"
+       [hyphenLine "the existen",
+        endLine "tialism"])
   ]
 
 checkLineBreak b x ys = do
