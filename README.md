@@ -1,6 +1,6 @@
 # [Wrapping Editor for Haskell][home]
 
-[![Haskell CI](https://github.com/ta0kira/wrapping-editor/workflows/Haskell%20CI/badge.svg)](https://github.com/ta0kira/wrapping-editor)
+[![Haskell CI][action-status]][action-link]
 
 This library contains a simple text-editing component for fixed-size fonts. It
 can either be used as a [Brick][brick] `Widget` or as the basis for creating a
@@ -166,6 +166,8 @@ will likely be modified to support other character types.
 [brick-example.hs]: https://github.com/ta0kira/wrapping-editor/blob/master/example/WEditorBrick/brick-example.hs
 [cabal]: https://www.haskell.org/cabal/#install-upgrade
 [ghc]: https://www.haskell.org/ghc/
+[action-status]: https://github.com/ta0kira/wrapping-editor/workflows/Haskell%20CI/badge.svg
+[action-link]: https://github.com/ta0kira/wrapping-editor/actions?query=workflow%3A%22Haskell+CI%22
 [hackage]: http://hackage.haskell.org
 [hackage-WEditor]: http://hackage.haskell.org/package/WEditor
 [hackage-WEditorBrick]: http://hackage.haskell.org/package/WEditorBrick
