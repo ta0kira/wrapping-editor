@@ -1,6 +1,10 @@
 # [Wrapping Editor for Haskell][home]
 
-[![Haskell CI][action-status]][action-link]
+
+
+| Tests                                       |`WEditor`                                     | `WEditorHyphen`                                          | `WEditorBrick`                                               |
+|---------------------------------------------|----------------------------------------------|----------------------------------------------------------|--------------------------------------------------------------|
+| [![Haskell CI][action-status]][action-link] | [![Hackage Status][status-WEditor]][WEditor] | [![Hackage Status][status-WEditorHyphen]][WEditorHyphen] | [![Hackage Status][status-WEditorBrick]][WEditorBrick]       |
 
 This library contains a simple text-editing component for fixed-size fonts. It
 can either be used as a [Brick][brick] `Widget` or as the basis for creating a
@@ -169,12 +173,13 @@ will likely be modified to support other character types.
 [action-status]: https://github.com/ta0kira/wrapping-editor/workflows/Haskell%20CI/badge.svg
 [action-link]: https://github.com/ta0kira/wrapping-editor/actions?query=workflow%3A%22Haskell+CI%22
 [hackage]: http://hackage.haskell.org
-[hackage-WEditor]: http://hackage.haskell.org/package/WEditor
-[hackage-WEditorBrick]: http://hackage.haskell.org/package/WEditorBrick
 [home]: https://github.com/ta0kira/wrapping-editor
 [issues]: https://github.com/ta0kira/wrapping-editor/issues
 [library-doc]: https://ta0kira.github.io/wrapping-editor/library
 
+[status-WEditor]: https://img.shields.io/hackage/v/WEditor.svg?style=flat
+[status-WEditorHyphen]: https://img.shields.io/hackage/v/WEditorHyphen.svg?style=flat
+[status-WEditorBrick]: https://img.shields.io/hackage/v/WEditorBrick.svg?style=flat
 [WEditor]: http://hackage.haskell.org/package/WEditor
 [WEditorBrick]: http://hackage.haskell.org/package/WEditorBrick
 [WEditorHyphen]: http://hackage.haskell.org/package/WEditorHyphen
