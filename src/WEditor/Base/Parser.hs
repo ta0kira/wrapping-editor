@@ -39,7 +39,7 @@ class FixedFontParser p c | p -> c where
   -- | Type used to differentiate between line-break types.
   type BreakType p :: *
   -- | Change the max line width used for parsing. A width of zero must result
-  --   in breakLines skipping line breaks.
+  --   in 'breakLines' skipping line breaks.
   setLineWidth :: p -> Int -> p
   -- | Break the sequence into lines.
   --

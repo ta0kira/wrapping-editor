@@ -1,5 +1,7 @@
 # [Wrapping Editor for Haskell][home]
 
+[![Haskell CI](https://github.com/ta0kira/wrapping-editor/workflows/Haskell%20CI/badge.svg)](https://github.com/ta0kira/wrapping-editor)
+
 This library contains a simple text-editing component for fixed-size fonts. It
 can either be used as a [Brick][brick] `Widget` or as the basis for creating a
 new widget for another UI library.

@@ -119,7 +119,6 @@ updateEditorExtent editor = do
 --   handler for the 'App'.
 handleEditor :: Eq n => WrappingEditor Char n -> Event -> EventM n (WrappingEditor Char n)
 handleEditor editor event = do
-  extent <- lookupExtent (getName editor)
   updateEditorExtent editor >>= return . mapEditor action where
     action :: WrappingEditorAction Char
     action =
