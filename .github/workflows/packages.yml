@@ -49,15 +49,15 @@ jobs:
           ${{ runner.os }}-build-${{ env.cache-name }}-
           ${{ runner.os }}-build-
           ${{ runner.os }}-
+    - name: Use Local WEditor
+      if: ${{matrix.package != 'WEditor'}}
+      working-directory: cabal/${{matrix.package}}
+      run: "echo 'packages: ../WEditor/WEditor.cabal' > cabal.project.local"
     - name: Install Dependencies
       working-directory: cabal/${{matrix.package}}
       run: |
         cabal update
         cabal build --only-dependencies --enable-tests --enable-benchmarks
-    - name: Use Local WEditor
-      if: ${{matrix.package != 'WEditor'}}
-      working-directory: cabal/${{matrix.package}}
-      run: "echo 'packages: ../WEditor/WEditor.cabal' > cabal.project.local"
     - name: Build
       run:  cabal build --enable-tests --enable-benchmarks all
     - name: Run Tests
