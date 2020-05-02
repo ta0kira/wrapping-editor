@@ -50,7 +50,7 @@ jobs:
           ${{ runner.os }}-build-
           ${{ runner.os }}-
     - name: Preinstall Local WEditor
-      if: ${{matrix.package != WEditor}}
+      if: ${{matrix.package != 'WEditor'}}
       working-directory: cabal/WEditor
       run: cabal install --lib
     - name: Install Dependencies
