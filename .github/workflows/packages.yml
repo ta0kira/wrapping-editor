@@ -53,7 +53,7 @@ jobs:
       working-directory: cabal/${{matrix.package}}
       run: |
         cabal update
-        cabal build --only-dependencies --enable-tests --enable-benchmarks
+        cabal build --only-dependencies --enable-tests --enable-benchmarks --allow-older=WEditor
     - name: Use Local WEditor
       if: ${{matrix.package != 'WEditor'}}
       working-directory: cabal/WEditor
